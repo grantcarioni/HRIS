@@ -518,6 +518,21 @@ const BrandElement = ({ style }) => (
 
 // ─── DASHBOARD (ROLE-AWARE) ──────────────────────────────────────────────────
 const ME = EMPLOYEES[2];
+const EmpModuleHeader = ({ emp, label, sub, color = B.accent }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 18px", borderRadius: 12, background: `linear-gradient(90deg, ${color}12, ${color}04)`, border: `1px solid ${color}22`, marginBottom: 18 }}>
+    <Avatar name={`${emp.first} ${emp.last}`} size={40} />
+    <div style={{ flex: 1 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{emp.first} {emp.last} <span style={{ fontWeight: 400, color: B.textMuted }}>· {emp.title}</span></div>
+      <div style={{ fontSize: 11, color: B.textMuted }}>{emp.flag} {emp.countryName} · {emp.department} · {emp.id}</div>
+    </div>
+    <div style={{ textAlign: "right" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</div>
+      {sub && <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{sub}</div>}
+    </div>
+    <div style={{ width: 8, height: 8, borderRadius: 4, background: B.success, boxShadow: `0 0 6px ${B.success}` }} />
+  </div>
+);
+
 const QuickAction = ({ icon, label, desc, color, onClick }) => (
   <div onClick={onClick} style={{ background: B.white, border: `1px solid ${B.border}`, borderRadius: 12, padding: "16px 14px", cursor: "pointer", transition: "all 0.18s", display: "flex", flexDirection: "column", gap: 8, boxShadow: "0 1px 4px rgba(37,55,70,0.06)" }}
     onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.transform = "translateY(-2px)"; }}
@@ -563,12 +578,12 @@ const EmployeeDashboard = ({ setModule }) => {
   const tenure = Math.round((now - new Date(emp.hireDate)) / (1000*60*60*24*365.25)*10)/10;
   const myMgr = EMPLOYEES.find(m => m.id === emp.managerId) || EMPLOYEES[0];
   const whosOut = [{ emp: EMPLOYEES[14], reason: "Annual Leave · Returns May 2" }, { emp: EMPLOYEES[22], reason: "Sick Leave · Until Apr 29" }];
-  const celebrations = [{ emp: EMPLOYEES[4], type: "Birthday", date: "May 3" }, { emp: EMPLOYEES[1], type: "Work Anniversary", date: "May 8 · 8 yrs" }, { emp: EMPLOYEES[9], type: "Birthday", date: "May 14" }];
+  const celebrations = [{ emp: EMPLOYEES[4], type: "🎂 Birthday", date: "May 3" }, { emp: EMPLOYEES[1], type: "🎉 Work Anniversary", date: "May 8 · 8 yrs" }, { emp: EMPLOYEES[9], type: "🎂 Birthday", date: "May 14" }];
   const activity = [
-    { icon: "checkmark", text: "L&D claim (CA$450 - Data Science) approved", time: "2 hours ago", color: B.success },
-    { icon: "calendar", text: "Leave request approved: Apr 28 - May 2", time: "Yesterday", color: B.blue },
-    { icon: "clipboard", text: "Q1 2026 performance review submitted", time: "Apr 20", color: B.purple },
-    { icon: "money", text: "March payslip available", time: "Apr 1", color: B.teal },
+    { icon: "✅", text: "L&D claim (CA$450 · Data Science course) approved", time: "2 hours ago", color: B.success },
+    { icon: "📅", text: "Leave request approved: Apr 28 – May 2 (5 days)", time: "Yesterday", color: B.blue },
+    { icon: "📋", text: "Q1 2026 performance review submitted by manager", time: "Apr 20", color: B.purple },
+    { icon: "💰", text: "March payslip is available for download", time: "Apr 1", color: B.teal },
   ];
   const myLearning = [
     { title: "Nutrition Program Management", progress: 72, modules: 8, color: B.teal },
@@ -645,7 +660,7 @@ const EmployeeDashboard = ({ setModule }) => {
         </Card>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Card>
-            <SectionTitle>Who Is Out Today</SectionTitle>
+            <SectionTitle>Who's Out Today</SectionTitle>
             {whosOut.map((w,i)=>(
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
                 <Avatar name={`${w.emp.first} ${w.emp.last}`} size={30} />
@@ -1751,7 +1766,8 @@ const GRANTS_PROJECTS = [
 ];
 
 // â”€â”€â”€ ENHANCED TIME & ATTENDANCE MODULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const TimeModule = () => {
+const TimeModule = ({ employee: empProp } = {}) => {
+  const emp = empProp || ME;
   const [tab, setTab] = useState("clock");
   const [countryFilter, setCountryFilter] = useState("ALL");
   const [requests, setRequests] = useState(LEAVE_REQUESTS);
@@ -1839,6 +1855,7 @@ const TimeModule = () => {
 
   return (
     <div>
+      <EmpModuleHeader emp={emp} label="Time &amp; Leave" sub={`${emp.leaveBalance.annual} vacation days · ${emp.leaveBalance.sick} sick days remaining`} color={B.teal} />
       <Tabs tabs={[
         { key: "clock", label: "Clock In/Out" },
         { key: "attendance", label: "Weekly Timesheet" },
@@ -2620,7 +2637,8 @@ const WorkflowModule = () => {
 };
 
 // â”€â”€â”€ H&W / L&D ALLOWANCE MODULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const AllowanceModule = () => {
+const AllowanceModule = ({ employee: empProp } = {}) => {
+  const emp = empProp || ME;
   const [tab, setTab] = useState("hw");
   const [dragOver, setDragOver] = useState(false);
   const [uploads, setUploads] = useState([]);
@@ -2642,6 +2660,7 @@ const AllowanceModule = () => {
 
   return (
     <div>
+      <EmpModuleHeader emp={emp} label="My Allowances" sub={`H&amp;W CA$${emp.hwAllowance.total - emp.hwAllowance.used} remaining · L&amp;D CA$${emp.ldAllowance.total - emp.ldAllowance.used} remaining`} color={B.blue} />
       <Tabs tabs={[{ key: "hw", label: "Health & Wellness" }, { key: "ld", label: "Learning & Development" }]} active={tab} onChange={setTab} />
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
         <MetricCard label={`${tab === "hw" ? "H&W" : "L&D"} Budget (Org-wide)`} value={tab === "hw" ? "$14,000" : "$42,000"} sub="Annual allocation" color={tab === "hw" ? B.teal : B.blue} />
@@ -3483,7 +3502,8 @@ const CompPlanningModule = ({ role }) => {
 };
 
 // â”€â”€â”€ SURVEY & ENGAGEMENT MODULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SurveyModule = () => {
+const SurveyModule = ({ employee: empProp } = {}) => {
+  const emp = empProp || ME;
   const [tab, setTab] = useState("dashboard");
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -3622,6 +3642,7 @@ const SurveyModule = () => {
 
   return (
     <div>
+      <EmpModuleHeader emp={emp} label="Engagement &amp; Surveys" sub="Your voice shapes our culture" color={B.purple} />
       <Tabs tabs={[
         { key: "dashboard", label: "Engagement Dashboard" },
         { key: "surveys", label: "Surveys", count: SURVEYS.filter(s => s.status === "Active").length },
@@ -4814,7 +4835,8 @@ const SuperuserModule = () => {
 };
 
 // â”€â”€â”€ PERFORMANCE MANAGEMENT MODULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const PerformanceModule = () => {
+const PerformanceModule = ({ employee: empProp } = {}) => {
+  const emp = empProp || ME;
   const [tab, setTab] = useState("dashboard");
   const [selectedCycle, setSelectedCycle] = useState("2026-H1");
   const [showGoalModal, setShowGoalModal] = useState(false);
@@ -4868,6 +4890,7 @@ const PerformanceModule = () => {
 
   return (
     <div>
+      <EmpModuleHeader emp={emp} label="My Performance" sub={`Current rating: ${emp.performanceRating}/5.0 · Next review: July 2026`} color={B.orange} />
       <Tabs tabs={[
         { key: "dashboard", label: "Performance Dashboard" },
         { key: "goals", label: "Goals & OKRs" },
@@ -5288,7 +5311,8 @@ const PerformanceModule = () => {
 };
 
 // â”€â”€â”€ LEARNING MANAGEMENT SYSTEM (LMS) MODULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const LMSModule = () => {
+const LMSModule = ({ employee: empProp } = {}) => {
+  const emp = empProp || ME;
   const [tab, setTab] = useState("dashboard");
   const [catalogFilter, setCatalogFilter] = useState("ALL");
   const [audienceFilter, setAudienceFilter] = useState("ALL");
@@ -5336,6 +5360,7 @@ const LMSModule = () => {
 
   return (
     <div>
+      <EmpModuleHeader emp={emp} label="My Learning" sub="3 courses in progress · 1 completed" color={B.teal} />
       <Tabs tabs={[
         { key: "dashboard", label: "LMS Dashboard" },
         { key: "catalog", label: "Course Catalog", count: COURSES.length },
