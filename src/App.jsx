@@ -194,8 +194,8 @@ const generateEmployees = () => {
       performanceRating: [3.2, 3.8, 4.1, 4.5, 3.9, 4.3, 3.6, 4.0, 4.4, 3.7][i % 10],
       skills: [["Program Management", "M&E", "Nutrition"], ["Writing", "Media", "Advocacy"], ["Budgeting", "Grants", "Compliance"], ["HR Policy", "Recruitment", "L&D"], ["Research", "Data Analysis", "Policy"]][i % 5],
       grants: [{ name: "GC-Vitamin A", code: "GA-2024-001", allocation: 0.6 }, { name: "BMGF-Fortification", code: "GA-2024-015", allocation: 0.4 }],
-      hwAllowance: { total: 500, used: Math.floor(Math.random() * 400), currency: country.currency },
-      ldAllowance: { total: 1500, used: Math.floor(Math.random() * 1200), currency: country.currency },
+      hwAllowance: { total: 500, used: Math.floor(Math.random() * 400), currency: "CAD", annual: true },
+      ldAllowance: { total: country.code === "CA" ? 1500 : 1200, used: Math.floor(Math.random() * (country.code === "CA" ? 1200 : 950)), currency: "CAD", hqRate: country.code === "CA" },
       certifications: i % 4 === 0 ? [{ name: "PMP", expiry: "2027-06-30" }] : [],
       emergencyContact: { name: `${n.first} Family`, phone: "+1000000000", relationship: "Spouse" },
       // Employment classification (per NI Contracting Policy)
