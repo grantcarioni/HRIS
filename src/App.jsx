@@ -6333,22 +6333,29 @@ const NIcon = ({ name, size = 18, color = "currentColor" }) => {
 };
 
 const NAV = [
-  { key: "dashboard", label: "Dashboard", icon: "dashboard" },
-  { key: "people", label: "People", icon: "people" },
-  { key: "orgchart", label: "Org Chart", icon: "orgchart" },
-  { key: "onboarding", label: "Onboarding", icon: "onboarding" },
-  { key: "time", label: "Time & Leave", icon: "time" },
-  { key: "approvals", label: "Approvals", icon: "approvals" },
-  { key: "allowances", label: "Allowances", icon: "allowances" },
-  { key: "compplan", label: "Comp Planning", icon: "comp" },
-  { key: "lms", label: "Learning", icon: "learning" },
-  { key: "performance", label: "Performance", icon: "analytics" },
-  { key: "surveys", label: "Surveys", icon: "surveys" },
-  { key: "workflows", label: "Workflows", icon: "workflows" },
-  { key: "analytics", label: "Analytics", icon: "analytics" },
-  { key: "settings", label: "Admin", icon: "admin" },
-  { key: "superuser", label: "Superuser", icon: "superuser", superOnly: true },
+  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",  roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "people",     label: "People",          icon: "people",     roles: ["hr", "superuser"] },
+  { key: "orgchart",   label: "Org Chart",       icon: "orgchart",   roles: ["manager", "hr", "superuser"] },
+  { key: "onboarding", label: "Onboarding",      icon: "onboarding", roles: ["hr", "superuser"] },
+  { key: "time",       label: "Time & Leave",    icon: "time",       roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "approvals",  label: "Approvals",       icon: "approvals",  roles: ["manager", "hr", "superuser"] },
+  { key: "allowances", label: "Allowances",      icon: "allowances", roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "compplan",   label: "Comp Planning",   icon: "comp",       roles: ["hr", "superuser"] },
+  { key: "lms",        label: "Learning",        icon: "learning",   roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "performance",label: "Performance",     icon: "analytics",  roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "surveys",    label: "Surveys",         icon: "surveys",    roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "workflows",  label: "Workflows",       icon: "workflows",  roles: ["manager", "hr", "superuser"] },
+  { key: "analytics",  label: "Analytics",       icon: "analytics",  roles: ["hr", "superuser"] },
+  { key: "settings",   label: "Admin",           icon: "admin",      roles: ["hr", "superuser"] },
+  { key: "superuser",  label: "Superuser",       icon: "superuser",  roles: ["superuser"], superOnly: true },
 ];
+
+const ROLE_META = {
+  employee:  { label: "Employee",  icon: "👤", color: B.teal },
+  manager:   { label: "Manager",   icon: "👥", color: B.blue },
+  hr:        { label: "HR Admin",  icon: "⚙️", color: B.orange },
+  superuser: { label: "Superuser", icon: "🔐", color: B.yellow },
+};
 
 // ─── MAIN APP ───────────────────────────────────────────────────────────────
 export default function App() {
@@ -6357,6 +6364,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState("desktop");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [role, setRole] = useState("superuser");
+  const [rolePickerOpen, setRolePickerOpen] = useState(false);
 
   const handleEmployeeSelect = (emp) => { setSelectedEmployee(emp); setModule("profile"); };
   const isMobile = viewMode === "mobile";
@@ -6364,7 +6372,20 @@ export default function App() {
   const sidebarW = isMobile ? 0 : isTablet ? (sidebarOpen ? 200 : 56) : (sidebarOpen ? 230 : 56);
   const isSuperuser = role === "superuser";
 
-  const visibleNav = NAV.filter(n => !n.superOnly || isSuperuser);
+  // Filter nav by role access
+  const visibleNav = NAV.filter(n => n.roles.includes(role));
+
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    setRolePickerOpen(false);
+    // If current module isn't accessible in the new role, go to dashboard
+    const newNav = NAV.filter(n => n.roles.includes(newRole));
+    const isCurrentVisible = newNav.some(n => n.key === module) || module === "profile";
+    if (!isCurrentVisible) {
+      setModule("dashboard");
+      setSelectedEmployee(null);
+    }
+  };
 
   const renderModule = () => {
     if (module === "profile" && selectedEmployee) return <EmployeeProfile employee={selectedEmployee} onBack={() => { setSelectedEmployee(null); setModule("people"); }} role={role} />;
@@ -6388,6 +6409,8 @@ export default function App() {
     }
   };
 
+  const currentRoleMeta = ROLE_META[role];
+
   return (
     <div style={{ display: "flex", height: "100vh", background: B.bg, fontFamily: "Arial, Helvetica, sans-serif", color: B.textPrimary, overflow: "hidden", position: "relative" }}>
       {/* Mobile Bottom Nav */}
@@ -6405,7 +6428,7 @@ export default function App() {
 
       {/* Sidebar */}
       {!isMobile && (
-        <div style={{ width: sidebarW, background: B.charcoal, display: "flex", flexDirection: "column", transition: "width 0.2s ease", overflow: "hidden", flexShrink: 0 }}>
+        <div style={{ width: sidebarW, background: B.charcoal, display: "flex", flexDirection: "column", transition: "width 0.2s ease", overflow: "hidden", flexShrink: 0, position: "relative" }}>
           <div style={{ padding: sidebarOpen ? "14px 16px" : "14px 10px", borderBottom: `1px solid ${B.grey}`, display: "flex", alignItems: "center", gap: 10, cursor: "pointer", minHeight: 50 }} onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <NILogo size={22} /> : <NILogoCompact />}
           </div>
@@ -6415,7 +6438,7 @@ export default function App() {
               const isSU = n.superOnly;
               return (
                 <button key={n.key} onClick={() => { setModule(n.key); setSelectedEmployee(null); }}
-                  style={{ display: "flex", alignItems: "center", gap: 10, padding: sidebarOpen ? "9px 12px" : "9px 12px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500,
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500,
                     background: active ? (isSU ? B.yellow : B.accent) : "transparent",
                     color: active ? (isSU ? B.charcoal : "#fff") : (isSU ? B.yellow : B.ltGrey),
                     transition: "all 0.12s", textAlign: "left", width: "100%", justifyContent: sidebarOpen ? "flex-start" : "center",
@@ -6429,14 +6452,43 @@ export default function App() {
               );
             })}
           </div>
+
+          {/* Role Picker — custom styled dropdown */}
           {sidebarOpen && (
-            <div style={{ padding: "10px 14px", borderTop: `1px solid ${B.grey}` }}>
-              <div style={{ fontSize: 10, color: B.ltGrey, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 6 }}>View As</div>
-              <Select value={role} onChange={setRole} style={{ width: "100%", fontSize: 11, background: B.grey, color: B.white, borderColor: B.grey }} options={[
-                { value: "employee", label: "👤 Employee" }, { value: "manager", label: "👥 Manager" }, { value: "hr", label: "⚙️ HR Admin" }, { value: "superuser", label: "🔐 Superuser" },
-              ]} />
+            <div style={{ padding: "8px 10px", borderTop: `1px solid ${B.grey}`, position: "relative" }}>
+              {/* Role picker popup */}
+              {rolePickerOpen && (
+                <>
+                  <div style={{ position: "fixed", inset: 0, zIndex: 200 }} onClick={() => setRolePickerOpen(false)} />
+                  <div style={{ position: "absolute", bottom: "100%", left: 10, right: 10, marginBottom: 6, background: "#1e2d3a", border: `1px solid ${B.grey}`, borderRadius: 10, boxShadow: "0 -8px 24px rgba(0,0,0,0.35), 0 -2px 8px rgba(0,0,0,0.2)", overflow: "hidden", zIndex: 201 }}>
+                    <div style={{ padding: "8px 12px 6px", fontSize: 9, fontWeight: 700, color: B.ltGrey, textTransform: "uppercase", letterSpacing: 1, borderBottom: `1px solid ${B.grey}` }}>View As Role</div>
+                    {Object.entries(ROLE_META).map(([key, meta]) => (
+                      <button key={key} onClick={() => handleRoleChange(key)}
+                        style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 14px", border: "none", background: role === key ? `${meta.color}20` : "transparent", cursor: "pointer", textAlign: "left", borderBottom: `1px solid ${B.grey}`, transition: "background 0.12s" }}
+                        onMouseEnter={e => { if (role !== key) e.currentTarget.style.background = B.grey; }}
+                        onMouseLeave={e => { if (role !== key) e.currentTarget.style.background = "transparent"; }}>
+                        <span style={{ fontSize: 16, width: 22, flexShrink: 0 }}>{meta.icon}</span>
+                        <span style={{ fontSize: 12, fontWeight: role === key ? 700 : 500, color: role === key ? meta.color : B.ltGrey, flex: 1 }}>{meta.label}</span>
+                        {role === key && <span style={{ width: 6, height: 6, borderRadius: 6, background: meta.color, flexShrink: 0 }} />}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {/* Current role button — triggers picker */}
+              <button onClick={() => setRolePickerOpen(p => !p)}
+                style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 10px", borderRadius: 8, border: `1px solid ${B.grey}`, background: "rgba(255,255,255,0.06)", cursor: "pointer", transition: "background 0.15s" }}
+                onMouseEnter={e => e.currentTarget.style.background = B.grey}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}>
+                <span style={{ fontSize: 15 }}>{currentRoleMeta.icon}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: currentRoleMeta.color, flex: 1, textAlign: "left" }}>{currentRoleMeta.label}</span>
+                <svg width="10" height="6" viewBox="0 0 10 6" style={{ transform: rolePickerOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s", flexShrink: 0 }}>
+                  <path d="M1 5L5 1L9 5" stroke={B.ltGrey} strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                </svg>
+              </button>
             </div>
           )}
+
           {sidebarOpen && (
             <div style={{ padding: "10px 14px", borderTop: `1px solid ${B.grey}`, display: "flex", alignItems: "center", gap: 8 }}>
               <Avatar name={isSuperuser ? "Grant Carioni" : "Admin User"} size={28} />
