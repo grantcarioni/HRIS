@@ -516,6 +516,304 @@ const BrandElement = ({ style }) => (
   </svg>
 );
 
+
+// ── MY PROFILE MODULE (Employee self-service view) ──────────────────────────
+// Industry standard: employees can view/edit own personal info, see benefits,
+// download payslips, access documents — NO access to other employees' data.
+const MyProfileModule = ({ emp = ME }) => {
+  const [tab, setTab] = useState("personal");
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({
+    phone: emp.phone || "+1 613-555-0142",
+    address: emp.address || "142 Laurier Ave, Ottawa ON K1A 0A6",
+    emergency: emp.emergency || "Sarah Chen · Spouse · +1 613-555-0188",
+    linkedin: emp.linkedin || "linkedin.com/in/" + emp.first.toLowerCase() + emp.last.toLowerCase(),
+  });
+  const country = COUNTRIES.find(c => c.code === emp.country) || COUNTRIES[0];
+  const benefits = BENEFITS_PACKAGES[emp.country] || BENEFITS_PACKAGES["CA"];
+  const tabs = [
+    { k: "personal",   l: "Personal Info"  },
+    { k: "job",        l: "Job Details"    },
+    { k: "benefits",   l: "My Benefits"    },
+    { k: "pay",        l: "Pay & Tax"      },
+    { k: "documents",  l: "Documents"      },
+  ];
+  const payslips = [
+    { period: "April 2026",    date: "Apr 30, 2026", gross: 6250, net: 4812, status: "Pending" },
+    { period: "March 2026",    date: "Mar 31, 2026", gross: 6250, net: 4812, status: "Paid" },
+    { period: "February 2026", date: "Feb 28, 2026", gross: 6250, net: 4801, status: "Paid" },
+    { period: "January 2026",  date: "Jan 31, 2026", gross: 6250, net: 4801, status: "Paid" },
+  ];
+  const docs = [
+    { name: "Offer Letter", type: "Contract", date: emp.hireDate, icon: "document" },
+    { name: "Employee Handbook 2026", type: "Policy", date: "2026-01-01", icon: "document" },
+    { name: "Benefits Guide — " + country.name, type: "Guide", date: "2026-01-01", icon: "document" },
+    { name: "Safeguarding Policy", type: "Policy", date: "2025-11-01", icon: "document" },
+    { name: "Code of Conduct", type: "Policy", date: "2025-11-01", icon: "document" },
+    { name: "T4 / Tax Summary 2025", type: "Tax", date: "2026-02-28", icon: "document" },
+  ];
+  const mgr = EMPLOYEES.find(m => m.id === emp.managerId) || EMPLOYEES[0];
+  const tenure = (((new Date()) - new Date(emp.hireDate)) / (1000*60*60*24*365.25)).toFixed(1);
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+      {/* Hero banner */}
+      <div style={{ borderRadius:16, background:`linear-gradient(135deg,${B.charcoal},${B.dkTeal})`, padding:"24px 28px", display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
+        <Avatar name={`${emp.first} ${emp.last}`} size={72}/>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:22, fontWeight:700, color:"#fff", fontFamily:"Georgia,serif" }}>{emp.first} {emp.last}</div>
+          <div style={{ fontSize:13, color:"rgba(255,255,255,0.75)", marginTop:4 }}>{emp.title} · {emp.department}</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", marginTop:2 }}>{country.flag} {country.name} · {country.entity} · {emp.id}</div>
+        </div>
+        <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+          {[
+            { l:"Tenure",      v:`${tenure} yrs`, c:B.ltTeal   },
+            { l:"Contract",    v:emp.contractType||"OE",  c:"rgba(255,255,255,0.7)" },
+            { l:"Level",       v:emp.level||"P3",  c:B.yellow },
+          ].map((s,i)=>(
+            <div key={i} style={{ textAlign:"center", padding:"10px 16px", borderRadius:10, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.15)" }}>
+              <div style={{ fontSize:15, fontWeight:700, color:s.c, fontFamily:"Georgia,serif" }}>{s.v}</div>
+              <div style={{ fontSize:10, color:"rgba(255,255,255,0.5)", marginTop:2 }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display:"flex", gap:4, borderBottom:`2px solid ${B.border}`, marginBottom:4 }}>
+        {tabs.map(t=>(
+          <button key={t.k} onClick={()=>setTab(t.k)} style={{ padding:"10px 16px", border:"none", background:"none", cursor:"pointer", fontSize:13, fontWeight:tab===t.k?700:500, color:tab===t.k?B.accent:B.textMuted, borderBottom:`2px solid ${tab===t.k?B.accent:"transparent"}`, marginBottom:-2, transition:"all 0.15s" }}>
+            {t.l}
+          </button>
+        ))}
+      </div>
+
+      {/* ── PERSONAL INFO ────────────────────────────────────────── */}
+      {tab==="personal" && (
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+          <Card>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+              <SectionTitle style={{ margin:0 }}>Contact Information</SectionTitle>
+              <Btn variant="ghost" size="sm" onClick={()=>setEditMode(!editMode)}>{editMode?"Cancel":"Edit"}</Btn>
+            </div>
+            {[
+              { l:"Phone",            k:"phone",   type:"tel"  },
+              { l:"Home Address",     k:"address", type:"text" },
+              { l:"Emergency Contact",k:"emergency",type:"text"},
+              { l:"LinkedIn",         k:"linkedin",type:"url"  },
+            ].map(f=>(
+              <div key={f.k} style={{ marginBottom:14 }}>
+                <div style={{ fontSize:10, fontWeight:700, color:B.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:4 }}>{f.l}</div>
+                {editMode
+                  ? <input type={f.type} value={formData[f.k]} onChange={e=>setFormData(p=>({...p,[f.k]:e.target.value}))} style={{ width:"100%", padding:"8px 10px", borderRadius:6, border:`1px solid ${B.border}`, fontSize:13, outline:"none", boxSizing:"border-box" }}/>
+                  : <div style={{ fontSize:13, color:B.textPrimary }}>{formData[f.k]}</div>
+                }
+              </div>
+            ))}
+            {editMode && <Btn variant="primary" onClick={()=>{ setEditMode(false); alert("Changes saved — pending HR approval."); }}>Save Changes</Btn>}
+          </Card>
+          <Card>
+            <SectionTitle>Read-Only Details</SectionTitle>
+            <div style={{ fontSize:11, color:B.textMuted, marginBottom:12, padding:"8px 10px", borderRadius:6, background:B.bgHover }}>These fields are managed by HR. Contact People & Culture to request changes.</div>
+            {[
+              { l:"Legal Name",     v:`${emp.first} ${emp.last}` },
+              { l:"Date of Birth",  v:"On file with HR" },
+              { l:"Nationality",    v:"On file with HR" },
+              { l:"National ID",    v:"••••••••" },
+              { l:"Work Email",     v:`${emp.first.toLowerCase()}.${emp.last.toLowerCase()}@nutritionintl.org` },
+              { l:"Work Location",  v:country.name + " — " + country.entity },
+            ].map((r,i)=>(
+              <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"9px 0", borderBottom:i<5?`1px solid ${B.borderLight}`:"none" }}>
+                <span style={{ fontSize:12, color:B.textMuted }}>{r.l}</span>
+                <span style={{ fontSize:12, fontWeight:600, color:B.textPrimary }}>{r.v}</span>
+              </div>
+            ))}
+          </Card>
+        </div>
+      )}
+
+      {/* ── JOB DETAILS ──────────────────────────────────────────── */}
+      {tab==="job" && (
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+          <Card>
+            <SectionTitle>My Position</SectionTitle>
+            {[
+              { l:"Job Title",        v:emp.title },
+              { l:"Department",       v:emp.department },
+              { l:"Employment Type",  v:emp.contractType === "OE" ? "Open-Ended (National)" : emp.contractType||"Open-Ended" },
+              { l:"Level / Grade",    v:emp.level||"P3" },
+              { l:"Start Date",       v:new Date(emp.hireDate).toLocaleDateString("en-CA",{year:"numeric",month:"long",day:"numeric"}) },
+              { l:"Work Schedule",    v:"Monday – Friday, 37.5 hrs/week" },
+              { l:"Location",         v:country.name },
+              { l:"Legal Entity",     v:country.entity },
+            ].map((r,i,a)=>(
+              <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"9px 0", borderBottom:i<a.length-1?`1px solid ${B.borderLight}`:"none" }}>
+                <span style={{ fontSize:12, color:B.textMuted }}>{r.l}</span>
+                <span style={{ fontSize:12, fontWeight:600, color:B.textPrimary }}>{r.v}</span>
+              </div>
+            ))}
+          </Card>
+          <Card>
+            <SectionTitle>Reporting Structure</SectionTitle>
+            <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:10, background:B.bgHover, marginBottom:14 }}>
+              <Avatar name={`${mgr.first} ${mgr.last}`} size={40}/>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700 }}>{mgr.first} {mgr.last}</div>
+                <div style={{ fontSize:11, color:B.textMuted }}>{mgr.title}</div>
+                <div style={{ fontSize:11, color:B.textMuted }}>{mgr.department}</div>
+              </div>
+              <Badge color={B.blue} bg={`${B.blue}12`} style={{ marginLeft:"auto" }}>Your Manager</Badge>
+            </div>
+            <div style={{ fontSize:10, fontWeight:700, color:B.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:8 }}>Compensation (approximate band)</div>
+            <div style={{ padding:"12px 14px", borderRadius:8, background:B.accentBg, border:`1px solid ${B.accent}22` }}>
+              <div style={{ fontSize:13, color:B.textMuted }}>Salary information is accessible via your payslips tab.</div>
+              <div style={{ fontSize:11, color:B.textMuted, marginTop:4 }}>For compensation queries, contact People & Culture.</div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* ── BENEFITS ─────────────────────────────────────────────── */}
+      {tab==="benefits" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          <div style={{ padding:"10px 14px", borderRadius:8, background:B.successBg, border:`1px solid ${B.success}22`, fontSize:12, color:B.textPrimary }}>
+            Your benefits are active as of {new Date(emp.hireDate).toLocaleDateString("en-CA",{month:"long",year:"numeric"})}. Open enrolment runs <strong>Oct 15 – Nov 15</strong> each year.
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {[
+              { l:"Health Insurance",  v:benefits.health,   icon:"heart",  color:B.accent },
+              { l:"Dental Coverage",   v:benefits.dental,   icon:"check",  color:B.teal   },
+              { l:"Pension / RRSP",    v:benefits.pension,  icon:"growth", color:B.blue   },
+              { l:"Life Insurance",    v:benefits.life||"2× annual salary", icon:"lock", color:B.purple },
+            ].map((b,i)=>(
+              <div key={i} style={{ padding:"16px 18px", borderRadius:12, background:B.white, border:`1px solid ${B.border}`, display:"flex", gap:14, alignItems:"flex-start" }}>
+                <div style={{ width:38, height:38, borderRadius:10, background:`${b.color}15`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <NIcon name={b.icon} size={20} color={b.color}/>
+                </div>
+                <div>
+                  <div style={{ fontSize:11, fontWeight:700, color:B.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:3 }}>{b.l}</div>
+                  <div style={{ fontSize:13, color:B.textPrimary, lineHeight:1.5 }}>{b.v}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Card>
+            <SectionTitle>Allowances</SectionTitle>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+              <div style={{ padding:"14px", borderRadius:10, background:B.bgHover }}>
+                <div style={{ fontSize:11, fontWeight:700, color:B.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Health & Wellness</div>
+                <div style={{ fontSize:20, fontWeight:700, color:B.teal, fontFamily:"Georgia,serif" }}>{emp.country==="CA"?"CA$500":"$500"} / yr</div>
+                <ProgressBar value={emp.hwAllowance?.used||135} max={emp.hwAllowance?.total||500} color={B.teal} height={4}/>
+                <div style={{ fontSize:11, color:B.textMuted, marginTop:4 }}>{emp.hwAllowance?.used||135} used · {(emp.hwAllowance?.total||500)-(emp.hwAllowance?.used||135)} remaining</div>
+              </div>
+              <div style={{ padding:"14px", borderRadius:10, background:B.bgHover }}>
+                <div style={{ fontSize:11, fontWeight:700, color:B.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Learning & Development</div>
+                <div style={{ fontSize:20, fontWeight:700, color:B.blue, fontFamily:"Georgia,serif" }}>{emp.country==="CA"?"CA$1,500":"CA$1,200"} / yr</div>
+                <ProgressBar value={emp.ldAllowance?.used||450} max={emp.ldAllowance?.total||1500} color={B.blue} height={4}/>
+                <div style={{ fontSize:11, color:B.textMuted, marginTop:4 }}>{emp.ldAllowance?.used||450} used · {(emp.ldAllowance?.total||1500)-(emp.ldAllowance?.used||450)} remaining</div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* ── PAY & TAX ────────────────────────────────────────────── */}
+      {tab==="pay" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          <Card>
+            <SectionTitle>Pay Statements</SectionTitle>
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {payslips.map((p,i)=>(
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:14, padding:"12px 14px", borderRadius:10, background:B.bgHover, border:`1px solid ${B.border}` }}>
+                  <NIcon name="document" size={22} color={B.accent}/>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:700 }}>{p.period}</div>
+                    <div style={{ fontSize:11, color:B.textMuted }}>Pay date: {p.date}</div>
+                  </div>
+                  <div style={{ textAlign:"right", marginRight:16 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:B.textPrimary }}>Net: {country.currency} {p.net.toLocaleString()}</div>
+                    <div style={{ fontSize:11, color:B.textMuted }}>Gross: {country.currency} {p.gross.toLocaleString()}</div>
+                  </div>
+                  <Badge color={p.status==="Paid"?B.success:B.orange} bg={p.status==="Paid"?B.successBg:B.warningBg}>{p.status}</Badge>
+                  <Btn variant="ghost" size="sm" onClick={()=>alert(`Downloading ${p.period} payslip...`)}>
+                    <NIcon name="download" size={14} color={B.accent}/> PDF
+                  </Btn>
+                </div>
+              ))}
+            </div>
+          </Card>
+          <Card>
+            <SectionTitle>Direct Deposit & Banking</SectionTitle>
+            <div style={{ padding:"12px 14px", borderRadius:8, background:B.bgHover, fontSize:13, color:B.textSecondary }}>
+              Banking details on file. Contact People & Culture to update your banking information.
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* ── DOCUMENTS ────────────────────────────────────────────── */}
+      {tab==="documents" && (
+        <Card>
+          <SectionTitle>My Documents</SectionTitle>
+          <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+            {docs.map((d,i)=>(
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px", borderRadius:10, background:B.bgHover, border:`1px solid ${B.border}` }}>
+                <NIcon name="document" size={20} color={B.accent}/>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:13, fontWeight:600 }}>{d.name}</div>
+                  <div style={{ fontSize:11, color:B.textMuted }}>{d.type} · {d.date}</div>
+                </div>
+                <Btn variant="ghost" size="sm" onClick={()=>alert(`Opening ${d.name}...`)}>
+                  <NIcon name="download" size={13} color={B.blue}/> View
+                </Btn>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+// ── EMPLOYEE DIRECTORY (read-only, employees can look up colleagues) ──────
+const EmployeeDirectoryModule = ({ emp = ME }) => {
+  const [search, setSearch] = useState("");
+  const [dept, setDept] = useState("ALL");
+  const filtered = EMPLOYEES.filter(e =>
+    (dept === "ALL" || e.department === dept) &&
+    (search.length < 2 || `${e.first} ${e.last} ${e.title} ${e.department}`.toLowerCase().includes(search.toLowerCase()))
+  );
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+      <Card>
+        <div style={{ display:"flex", gap:10, marginBottom:16, flexWrap:"wrap" }}>
+          <input placeholder="Search people..." value={search} onChange={e=>setSearch(e.target.value)} style={{ flex:1, minWidth:180, padding:"8px 12px", borderRadius:8, border:`1px solid ${B.border}`, fontSize:13, outline:"none" }}/>
+          <select value={dept} onChange={e=>setDept(e.target.value)} style={{ padding:"8px 12px", borderRadius:8, border:`1px solid ${B.border}`, fontSize:13, background:B.white }}>
+            <option value="ALL">All Departments</option>
+            {DEPARTMENTS.map(d=><option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:10 }}>
+          {filtered.map(e=>{
+            const c = COUNTRIES.find(x=>x.code===e.country)||COUNTRIES[0];
+            const isMe = e.id === emp.id;
+            return (
+              <div key={e.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:12, background: isMe ? B.accentBg : B.bgHover, border:`1px solid ${isMe ? B.accent+"44" : B.border}` }}>
+                <Avatar name={`${e.first} ${e.last}`} size={40}/>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:B.textPrimary }}>{e.first} {e.last} {isMe && <Badge color={B.teal} bg={`${B.teal}12`} style={{fontSize:9}}>You</Badge>}</div>
+                  <div style={{ fontSize:11, color:B.textMuted, marginTop:1 }}>{e.title}</div>
+                  <div style={{ fontSize:11, color:B.textMuted }}>{e.department} · {c.flag} {c.name}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ marginTop:12, fontSize:12, color:B.textMuted }}>Showing {filtered.length} of {EMPLOYEES.length} people</div>
+      </Card>
+    </div>
+  );
+};
 // --- DASHBOARD (ROLE-AWARE) ---
 const ME = EMPLOYEES[2];
 const EmpModuleHeader = ({ emp, label, sub, color = B.accent }) => (
@@ -616,13 +914,15 @@ const EmployeeDashboard = ({ setModule }) => {
       </div>
       <div>
         <div style={{ fontSize:11, fontWeight:700, color:B.textMuted, textTransform:"uppercase", letterSpacing:1, marginBottom:10 }}>Quick Actions</div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))", gap:10 }}>
-          <QuickAction icon="&#x1F3D6;&#xFE0F;" label="Request Time Off" desc="Submit leave request" color={B.teal} onClick={()=>setModule("time")}/>
-          <QuickAction icon="&#x1F48A;" label="H&W Claim" desc="Submit wellness receipt" color={B.accent} onClick={()=>setModule("allowances")}/>
-          <QuickAction icon="&#x1F393;" label="L&D Claim" desc="Submit learning expense" color={B.blue} onClick={()=>setModule("allowances")}/>
-          <QuickAction icon="&#x1F4CA;" label="My Performance" desc="View reviews and ratings" color={B.purple} onClick={()=>setModule("performance")}/>
-          <QuickAction icon="&#x1F4DA;" label="My Learning" desc="Continue courses" color={B.orange} onClick={()=>setModule("lms")}/>
-          <QuickAction icon="&#x1F4CB;" label="Take a Survey" desc="Share your feedback" color={B.pink} onClick={()=>setModule("surveys")}/>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))", gap:10 }}>
+          <QuickAction icon={<NIcon name="time"        size={20} color={B.teal}   />} label="Request Time Off"  desc="Submit leave request"      color={B.teal}    onClick={()=>setModule("time")}/>
+          <QuickAction icon={<NIcon name="heart"       size={20} color={B.accent} />} label="H&W Claim"         desc="Submit wellness receipt"   color={B.accent}  onClick={()=>setModule("allowances")}/>
+          <QuickAction icon={<NIcon name="learning"    size={20} color={B.blue}   />} label="L&D Claim"         desc="Submit learning expense"   color={B.blue}    onClick={()=>setModule("allowances")}/>
+          <QuickAction icon={<NIcon name="performance" size={20} color={B.purple} />} label="My Performance"    desc="View reviews and ratings"  color={B.purple}  onClick={()=>setModule("performance")}/>
+          <QuickAction icon={<NIcon name="learning"    size={20} color={B.orange} />} label="My Learning"       desc="Continue courses"          color={B.orange}  onClick={()=>setModule("lms")}/>
+          <QuickAction icon={<NIcon name="surveys"     size={20} color={B.pink}   />} label="Take a Survey"     desc="Share your feedback"       color={B.pink}    onClick={()=>setModule("surveys")}/>
+          <QuickAction icon={<NIcon name="employee"    size={20} color={B.teal}   />} label="My Profile"        desc="Personal info & documents" color={B.teal}    onClick={()=>setModule("myprofile")}/>
+          <QuickAction icon={<NIcon name="people"      size={20} color={B.charcoal}/>}label="Directory"         desc="Find a colleague"          color={B.charcoal}onClick={()=>setModule("directory")}/>
         </div>
       </div>
       <div>
@@ -6619,21 +6919,26 @@ const NIcon = ({ name, size = 18, color = "currentColor" }) => {
 };
 
 const NAV = [
-  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",  roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "people",     label: "People",          icon: "people",     roles: ["hr", "superuser"] },
-  { key: "orgchart",   label: "Org Chart",       icon: "orgchart",   roles: ["manager", "hr", "superuser"] },
-  { key: "onboarding", label: "Onboarding",      icon: "onboarding", roles: ["hr", "superuser"] },
-  { key: "time",       label: "Time & Leave",    icon: "time",       roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "approvals",  label: "Approvals",       icon: "approvals",  roles: ["manager", "hr", "superuser"] },
-  { key: "allowances", label: "Allowances",      icon: "allowances", roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "compplan",   label: "Comp Planning",   icon: "comp",       roles: ["hr", "superuser"] },
-  { key: "lms",        label: "Learning",        icon: "learning",   roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "performance",label: "Performance",     icon: "analytics",  roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "surveys",    label: "Surveys",         icon: "surveys",    roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "workflows",  label: "Workflows",       icon: "workflows",  roles: ["manager", "hr", "superuser"] },
-  { key: "analytics",  label: "Analytics",       icon: "analytics",  roles: ["hr", "superuser"] },
-  { key: "settings",   label: "Admin",           icon: "admin",      roles: ["hr", "superuser"] },
-  { key: "superuser",  label: "Superuser",       icon: "superuser",  roles: ["superuser"], superOnly: true },
+  // ── Available to ALL roles ───────────────────────────────────────────────
+  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",   roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "myprofile",  label: "My Profile",     icon: "employee",    roles: ["employee"] },                              // ESS: own profile, payslips, benefits, docs
+  { key: "time",       label: "Time & Leave",   icon: "time",        roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "allowances", label: "Allowances",     icon: "allowances",  roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "lms",        label: "Learning",       icon: "learning",    roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "performance",label: "Performance",    icon: "performance", roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "surveys",    label: "Surveys",        icon: "surveys",     roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "directory",  label: "Directory",      icon: "people",      roles: ["employee"] },                              // ESS: read-only colleague lookup
+  { key: "orgchart",   label: "Org Chart",      icon: "orgchart",    roles: ["employee", "manager", "hr", "superuser"] }, // ESS: read-only org chart
+  // ── Manager-level ────────────────────────────────────────────────────────
+  { key: "approvals",  label: "Approvals",      icon: "approvals",   roles: ["manager", "hr", "superuser"] },
+  { key: "workflows",  label: "Workflows",      icon: "workflows",   roles: ["manager", "hr", "superuser"] },
+  // ── HR Admin only ────────────────────────────────────────────────────────
+  { key: "people",     label: "People (HR)",    icon: "people",      roles: ["hr", "superuser"] },
+  { key: "onboarding", label: "Onboarding",     icon: "onboarding",  roles: ["hr", "superuser"] },
+  { key: "compplan",   label: "Comp Planning",  icon: "comp",        roles: ["hr", "superuser"] },
+  { key: "analytics",  label: "Analytics",      icon: "analytics",   roles: ["hr", "superuser"] },
+  { key: "settings",   label: "Admin",          icon: "admin",       roles: ["hr", "superuser"] },
+  { key: "superuser",  label: "Superuser",      icon: "superuser",   roles: ["superuser"], superOnly: true },
 ];
 
 const ROLE_META = {
@@ -6674,24 +6979,26 @@ export default function App() {
   };
 
   const renderModule = () => {
-    if (module === "profile" && selectedEmployee) return <EmployeeProfile employee={selectedEmployee} onBack={() => { setSelectedEmployee(null); setModule("people"); }} role={role} />;
+    if (module === "profile" && selectedEmployee) return <EmployeeProfile employee={selectedEmployee} onBack={() => { setSelectedEmployee(null); setModule(role === "employee" ? "directory" : "people"); }} role={role} />;
     switch (module) {
-      case "dashboard": return <DashboardModule setModule={setModule} role={role} />;
-      case "people": return <PeopleModule setSelectedEmployee={handleEmployeeSelect} />;
-      case "orgchart": return <OrgChartModule setSelectedEmployee={handleEmployeeSelect} />;
-      case "onboarding": return <OnboardingModule />;
-      case "time": return <TimeModule />;
-      case "approvals": return <ApprovalsModule />;
-      case "allowances": return <AllowanceModule />;
-      case "compplan": return <CompPlanningModule role={role} />;
-      case "lms": return <LMSModule />;
+      case "dashboard":   return <DashboardModule setModule={setModule} role={role} />;
+      case "myprofile":   return <MyProfileModule emp={ME} />;
+      case "directory":   return <EmployeeDirectoryModule emp={ME} />;
+      case "people":      return <PeopleModule setSelectedEmployee={handleEmployeeSelect} />;
+      case "orgchart":    return <OrgChartModule setSelectedEmployee={role === "employee" ? () => {} : handleEmployeeSelect} readOnly={role === "employee"} />;
+      case "onboarding":  return <OnboardingModule />;
+      case "time":        return <TimeModule />;
+      case "approvals":   return <ApprovalsModule />;
+      case "allowances":  return <AllowanceModule />;
+      case "compplan":    return <CompPlanningModule role={role} />;
+      case "lms":         return <LMSModule />;
       case "performance": return <PerformanceModule />;
-      case "surveys": return <SurveyModule />;
-      case "workflows": return <WorkflowModule />;
-      case "analytics": return <AnalyticsModule />;
-      case "settings": return <SettingsModule />;
-      case "superuser": return isSuperuser ? <SuperuserModule /> : <DashboardModule setModule={setModule} />;
-      default: return <DashboardModule setModule={setModule} />;
+      case "surveys":     return <SurveyModule />;
+      case "workflows":   return <WorkflowModule />;
+      case "analytics":   return <AnalyticsModule />;
+      case "settings":    return <SettingsModule />;
+      case "superuser":   return isSuperuser ? <SuperuserModule /> : <DashboardModule setModule={setModule} />;
+      default:            return <DashboardModule setModule={setModule} />;
     }
   };
 
