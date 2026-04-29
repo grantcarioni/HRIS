@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+﻿import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 // ─── NI BRAND COLORS ────────────────────────────────────────────────────────
 const B = {
@@ -424,7 +424,7 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
       {!uploaded && (
         <div onDragOver={ev => { ev.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleDrop}
           style={{ border: `2px dashed ${dragOver ? color : B.border}`, borderRadius: 8, padding: 28, textAlign: "center", background: dragOver ? `${color}06` : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>=���</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}></div>
           <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>Drag & drop {module} file here</div>
           <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Accepts .xlsx, .csv, .tsv — headers will be auto-mapped to system fields</div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 10 }}>
@@ -437,8 +437,8 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
       {uploaded && !validated && (
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 6, background: `${color}08`, border: `1px solid ${color}20`, marginBottom: 12 }}>
-            <span style={{ fontSize: 20 }}>=���</span>
-            <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{uploaded.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{uploaded.type} ┬╖ {uploaded.size}</div></div>
+            <span style={{ fontSize: 20 }}></span>
+            <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{uploaded.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{uploaded.type}  · {uploaded.size}</div></div>
             <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={reset}>✕ Remove</Btn>
           </div>
           {mappedFields && (
@@ -476,12 +476,12 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ fontSize: 22 }}>✅</span>
               <div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>Validation Passed — Ready to Import</div>
-                <div style={{ fontSize: 12, color: B.textSecondary }}>{uploaded.name} ┬╖ {sampleRows.length} records detected ┬╖ {mappedFields?.length} fields mapped ┬╖ 0 errors, {Math.floor(Math.random() * 3)} warnings</div></div>
+                <div style={{ fontSize: 12, color: B.textSecondary }}>{uploaded.name}  · {sampleRows.length} records detected  · {mappedFields?.length} fields mapped  · 0 errors, {Math.floor(Math.random() * 3)} warnings</div></div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <Btn variant="secondary" onClick={reset}>Start Over</Btn>
-            <Btn variant="primary" onClick={() => { onUpload?.(sampleRows.length); reset(); }}>=��� Import {sampleRows.length} Records</Btn>
+            <Btn variant="primary" onClick={() => { onUpload?.(sampleRows.length); reset(); }}> Import {sampleRows.length} Records</Btn>
           </div>
         </div>
       )}
@@ -1150,7 +1150,7 @@ const PeopleModule = ({ setSelectedEmployee }) => {
       <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: 200 }}><SearchBar value={search} onChange={setSearch} placeholder="Search by name, ID, email, department..." /></div>
         <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
-        <Btn variant="secondary" size="sm" onClick={() => setShowUpload(!showUpload)}>=��� Batch Upload</Btn>
+        <Btn variant="secondary" size="sm" onClick={() => setShowUpload(!showUpload)}> Batch Upload</Btn>
       </div>
       {showUpload && (
         <Card style={{ marginBottom: 14, borderTop: `4px solid ${B.accent}` }}>
@@ -1281,11 +1281,11 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
               <StatusBadge status={e.status} />
               {e.isManager && <Badge color={B.blue} bg={`${B.blue}12`}>MANAGER</Badge>}
             </div>
-            <div style={{ fontSize: 13, color: B.textSecondary }}>{e.title} ┬╖ {e.level} ┬╖ {e.department}</div>
-            <div style={{ fontSize: 12, color: B.textMuted }}>{e.flag} {country?.entity} ┬╖ {e.email}</div>
+            <div style={{ fontSize: 13, color: B.textSecondary }}>{e.title}  · {e.level}  · {e.department}</div>
+            <div style={{ fontSize: 12, color: B.textMuted }}>{e.flag} {country?.entity}  · {e.email}</div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <Btn variant="primary" onClick={() => setShowLetter(true)}>=��� Verification Letter</Btn>
+            <Btn variant="primary" onClick={() => setShowLetter(true)}> Verification Letter</Btn>
             <Btn variant="secondary" onClick={() => setShowEdit(true)}>✏∩╕Å Edit</Btn>
             <Btn variant="secondary" onClick={() => setShowActions(!showActions)}>Actions ▾</Btn>
           </div>
@@ -1294,14 +1294,14 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         {showActions && (<>
           <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setShowActions(false)} />
           <div style={{ position: "absolute", top: "100%", right: 20, marginTop: -6, background: B.white, border: `1px solid ${B.border}`, borderRadius: 10, boxShadow: "0 12px 36px rgba(37,55,70,0.15), 0 4px 12px rgba(37,55,70,0.08)", zIndex: 50, minWidth: 230, overflow: "hidden" }}>
-            {[{ label: "=��� View Change History", action: () => setTab("history") },
-              { label: "=��� View Total Rewards", action: () => setTab("totalrewards") },
-              { label: "=��� Transfer / Reassign", action: () => alert("Transfer workflow initiated for " + e.first + " " + e.last) },
-              { label: "=��� Performance Review", action: () => alert("Performance review form opened for " + e.first) },
-              { label: "=��� Assign Training", action: () => setTab("learning") },
+            {[{ label: " View Change History", action: () => setTab("history") },
+              { label: " View Total Rewards", action: () => setTab("totalrewards") },
+              { label: " Transfer / Reassign", action: () => alert("Transfer workflow initiated for " + e.first + " " + e.last) },
+              { label: " Performance Review", action: () => alert("Performance review form opened for " + e.first) },
+              { label: " Assign Training", action: () => setTab("learning") },
               { label: "⏸∩╕Å Place on Leave", action: () => setShowLeaveOfAbsence(true) },
-              { label: "=��� Export Profile (PDF)", action: () => alert("Employee profile exported as PDF") },
-              ...(role === "hr" || role === "superuser" ? [{ label: "=��� Deactivate Employee", action: () => alert("Deactivation requires confirmation — this would trigger offboarding workflow"), danger: true }] : []),
+              { label: " Export Profile (PDF)", action: () => alert("Employee profile exported as PDF") },
+              ...(role === "hr" || role === "superuser" ? [{ label: " Deactivate Employee", action: () => alert("Deactivation requires confirmation — this would trigger offboarding workflow"), danger: true }] : []),
             ].map((item, i) => (
               <button key={i} onClick={() => { item.action(); setShowActions(false); }}
                 style={{ display: "block", width: "100%", padding: "10px 16px", border: "none", borderBottom: `1px solid ${B.borderLight}`, background: "transparent", textAlign: "left", cursor: "pointer", fontSize: 12, fontWeight: 600, color: item.danger ? B.danger : B.textPrimary, fontFamily: "Arial, sans-serif", transition: "background 0.12s" }}
@@ -1343,7 +1343,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
           <Btn variant="secondary" onClick={() => setShowEdit(false)}>Cancel</Btn>
-          <Btn variant="primary" onClick={() => { alert(`Changes saved for ${e.first} ${e.last}. Effective-dated record created.`); setShowEdit(false); }}>=��� Save Changes</Btn>
+          <Btn variant="primary" onClick={() => { alert(`Changes saved for ${e.first} ${e.last}. Effective-dated record created.`); setShowEdit(false); }}> Save Changes</Btn>
         </div>
       </Modal>
 
@@ -1377,7 +1377,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>=��� Zoom</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}> Zoom</label>
                   <span style={{ fontSize: 11, fontWeight: 700, color: B.accent }}>{cropPos.scale}%</span>
                 </div>
                 <input type="range" min="100" max="250" value={cropPos.scale} onChange={ev => setCropPos(p => ({ ...p, scale: parseInt(ev.target.value) }))} style={{ width: "100%", accentColor: B.accent }} />
@@ -1419,9 +1419,9 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             </div>
             {empPhoto && (
               <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 14 }}>
-                <Btn variant="danger" onClick={() => { setPhoto(e.id, null); }}>=��� Remove</Btn>
+                <Btn variant="danger" onClick={() => { setPhoto(e.id, null); }}> Remove</Btn>
                 <Btn variant="secondary" onClick={() => { setCropPos(empPhotoPos); setPhotoCropMode(true); }}>✂ Reposition</Btn>
-                <Btn variant="secondary" onClick={() => photoInputRef.current?.click()}>=��� Replace</Btn>
+                <Btn variant="secondary" onClick={() => photoInputRef.current?.click()}> Replace</Btn>
               </div>
             )}
             <div style={{ marginTop: 14, padding: 10, borderRadius: 6, background: B.bgHover, border: `1px solid ${B.border}`, fontSize: 11, color: B.textMuted, textAlign: "center" }}>
@@ -1435,7 +1435,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
       <Modal open={showLeaveOfAbsence} onClose={() => setShowLeaveOfAbsence(false)} title={`Place on Leave — ${e.first} ${e.last}`} width={640}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}`, marginBottom: 16 }}>
           <Avatar name={`${e.first} ${e.last}`} size={40} photo={empPhoto} photoPos={empPhotoPos} />
-          <div><div style={{ fontSize: 14, fontWeight: 700 }}>{e.first} {e.last}</div><div style={{ fontSize: 12, color: B.textMuted }}>{e.title} ┬╖ {e.department} ┬╖ {e.flag} {e.countryName}</div><div style={{ fontSize: 11, color: B.textMuted }}>Manager: {manager ? `${manager.first} ${manager.last}` : "—"} ┬╖ Status: <strong style={{ color: B.success }}>{e.status}</strong></div></div>
+          <div><div style={{ fontSize: 14, fontWeight: 700 }}>{e.first} {e.last}</div><div style={{ fontSize: 12, color: B.textMuted }}>{e.title}  · {e.department}  · {e.flag} {e.countryName}</div><div style={{ fontSize: 11, color: B.textMuted }}>Manager: {manager ? `${manager.first} ${manager.last}` : "—"}  · Status: <strong style={{ color: B.success }}>{e.status}</strong></div></div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1477,7 +1477,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
           {loaData.startDate && loaData.endDate && (
             <div style={{ padding: "8px 12px", borderRadius: 6, background: B.accentBg, border: `1px solid ${B.accent}20`, fontSize: 12, color: B.textSecondary }}>
               Duration: <strong>{Math.round((new Date(loaData.endDate) - new Date(loaData.startDate)) / 86400000)} calendar days</strong>
-              {loaData.returnDate && <span> ┬╖ Return: <strong>{fmtDate(loaData.returnDate)}</strong></span>}
+              {loaData.returnDate && <span>  · Return: <strong>{fmtDate(loaData.returnDate)}</strong></span>}
             </div>
           )}
 
@@ -1539,13 +1539,13 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <Btn variant="secondary" onClick={() => setShowLeaveOfAbsence(false)}>Cancel</Btn>
             <Btn variant="primary" onClick={() => {
               if (!loaData.startDate || !loaData.endDate) { alert("Please enter both start and end dates."); return; }
-              const msgs = [`✅ ${e.first} ${e.last} has been placed on ${loaData.type} (${loaData.payStatus}).`, `=��� Period: ${fmtDate(loaData.startDate)} — ${fmtDate(loaData.endDate)}`];
-              if (loaData.returnDate) msgs.push(`=��� Return date: ${fmtDate(loaData.returnDate)}`);
-              if (loaData.notifyManager && manager) msgs.push(`=��� Manager notification sent to ${manager.first} ${manager.last}`);
-              if (loaData.notifyHR) msgs.push(`=��� HR notification sent to People & Culture`);
+              const msgs = [`✅ ${e.first} ${e.last} has been placed on ${loaData.type} (${loaData.payStatus}).`, ` Period: ${fmtDate(loaData.startDate)} — ${fmtDate(loaData.endDate)}`];
+              if (loaData.returnDate) msgs.push(` Return date: ${fmtDate(loaData.returnDate)}`);
+              if (loaData.notifyManager && manager) msgs.push(` Manager notification sent to ${manager.first} ${manager.last}`);
+              if (loaData.notifyHR) msgs.push(` HR notification sent to People & Culture`);
               if (loaData.returnAlert && loaData.returnDate) msgs.push(`⏰ Return-to-work alert scheduled for ${loaData.returnAlertDays} days before return (${fmtDate(new Date(new Date(loaData.returnDate).getTime() - loaData.returnAlertDays * 86400000).toISOString().split("T")[0])})`);
-              if (loaData.backfill) msgs.push(`=��� Role flagged for temporary backfill`);
-              msgs.push(`\n=��� Audit log entry created. Employee status changed to "On Leave".`);
+              if (loaData.backfill) msgs.push(` Role flagged for temporary backfill`);
+              msgs.push(`\n Audit log entry created. Employee status changed to "On Leave".`);
               alert(msgs.join("\n"));
               setShowLeaveOfAbsence(false);
               setLoaData({ type: "Medical", startDate: "", endDate: "", returnDate: "", comments: "", notifyManager: true, notifyHR: true, returnAlert: true, returnAlertDays: 7, payStatus: "Full Pay", backfill: false });
@@ -1629,7 +1629,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{p.cycle}</div>
-                    <div style={{ fontSize: 11, color: B.textMuted }}>Reviewer: {p.reviewer} ┬╖ {p.rating >= 4.5 ? "Exceptional" : p.rating >= 4 ? "Exceeds Expectations" : p.rating >= 3.5 ? "Meets Expectations" : "Developing"}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>Reviewer: {p.reviewer}  · {p.rating >= 4.5 ? "Exceptional" : p.rating >= 4 ? "Exceeds Expectations" : p.rating >= 3.5 ? "Meets Expectations" : "Developing"}</div>
                   </div>
                   <Badge color={B.success} bg={B.successBg}>{p.status}</Badge>
                 </div>
@@ -1729,7 +1729,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                       <span style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{c.title}</span>
                       <Badge color={catColors[c.cat] || B.textMuted} bg={`${catColors[c.cat] || B.textMuted}14`} style={{ fontSize: 8 }}>{c.cat}</Badge>
                     </div>
-                    <div style={{ fontSize: 11, color: B.textMuted }}>Path: {c.path}{c.date ? ` ┬╖ Completed ${fmtDate(c.date)}` : ""}{c.score ? ` ┬╖ Score: ${c.score}%` : ""}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>Path: {c.path}{c.date ? `  · Completed ${fmtDate(c.date)}` : ""}{c.score ? `  · Score: ${c.score}%` : ""}</div>
                   </div>
                   {c.progress && <div style={{ width: 50, textAlign: "right" }}><div style={{ fontSize: 12, fontWeight: 700, color: B.blue }}>{c.progress}%</div><ProgressBar value={c.progress} max={100} color={B.blue} /></div>}
                   {c.status === "Not Started" && <Btn variant="primary" size="sm" onClick={() => alert(`Starting course: ${c.title}`)}>Start</Btn>}
@@ -1745,8 +1745,8 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 { title: "Cross-Cultural Management in INGOs", reason: `Recommended for ${e.countryName}-based staff`, hours: "3 hrs" },
               ].map((r, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4 }}>
-                  <span style={{ fontSize: 18 }}>=���</span>
-                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{r.title}</div><div style={{ fontSize: 10, color: B.textMuted }}>{r.reason} ┬╖ {r.hours}</div></div>
+                  <span style={{ fontSize: 18 }}></span>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{r.title}</div><div style={{ fontSize: 10, color: B.textMuted }}>{r.reason}  · {r.hours}</div></div>
                   <Btn variant="ghost" size="sm" style={{ color: B.accent }} onClick={() => alert(`Enrolled in: ${r.title}`)}>Enroll →</Btn>
                 </div>
               ))}
@@ -1761,12 +1761,12 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
           <Card style={{ borderTop: `4px solid ${B.teal}` }}>
             <SectionTitle>Core Benefits — {e.flag} {e.countryName}</SectionTitle>
             {[
-              { label: "Health Insurance", value: benefits.health, icon: "=���" },
-              { label: "Dental", value: benefits.dental, icon: "=���" },
-              { label: "Pension / Retirement", value: benefits.pension, icon: "=���" },
-              { label: "Life Insurance", value: benefits.life, icon: "=���∩╕Å" },
+              { label: "Health Insurance", value: benefits.health, icon: "" },
+              { label: "Dental", value: benefits.dental, icon: "" },
+              { label: "Pension / Retirement", value: benefits.pension, icon: "" },
+              { label: "Life Insurance", value: benefits.life, icon: "∩╕Å" },
               { label: "Disability", value: benefits.disability, icon: "♿" },
-              { label: "Employee Assistance (EAP)", value: benefits.eap, icon: "=���" },
+              { label: "Employee Assistance (EAP)", value: benefits.eap, icon: "" },
             ].map((b, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
                 <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{b.icon}</span>
@@ -1804,7 +1804,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
       {tab === "compensation" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card><SectionTitle>Current Compensation</SectionTitle><InfoRow label="Base Salary" value={fmt(e.salary, e.currency, e.locale)} /><InfoRow label="Bonus Target" value={fmt(e.bonus, e.currency, e.locale)} /><InfoRow label="Total Comp" value={fmt(e.salary + e.bonus, e.currency, e.locale)} /><InfoRow label="Currency" value={e.currency} /><InfoRow label="Frequency" value="Monthly" /></Card>
-          <Card><SectionTitle>Compensation History</SectionTitle>{[...e.compHistory].reverse().map((h, i) => (<div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}><div><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{fmt(h.salary, e.currency, e.locale)}</div><div style={{ fontSize: 11, color: B.textMuted }}>{h.reason} ┬╖ Approved by {h.approvedBy}</div></div><span style={{ fontSize: 12, color: B.textMuted }}>{fmtDate(h.effectiveDate)}</span></div>))}</Card>
+          <Card><SectionTitle>Compensation History</SectionTitle>{[...e.compHistory].reverse().map((h, i) => (<div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}><div><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{fmt(h.salary, e.currency, e.locale)}</div><div style={{ fontSize: 11, color: B.textMuted }}>{h.reason}  · Approved by {h.approvedBy}</div></div><span style={{ fontSize: 12, color: B.textMuted }}>{fmtDate(h.effectiveDate)}</span></div>))}</Card>
         </div>
       )}
 
@@ -1851,23 +1851,23 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         const prevYearTotal = Math.round(grandTotal * 0.93);
         const yoyGrowth = +((grandTotal - prevYearTotal) / prevYearTotal * 100).toFixed(1);
         const sections = [
-          { title: "Direct Compensation", subtitle: "Your cash earnings for the statement period", icon: "=���", color: B.accent, total: directComp, items: [
+          { title: "Direct Compensation", subtitle: "Your cash earnings for the statement period", icon: "", color: B.accent, total: directComp, items: [
             { label: "Annual Base Salary", value: e.salary, explain: "Your fixed annual pay before deductions, paid monthly" },
             { label: "Performance Bonus (Target)", value: e.bonus, explain: `Based on your ${e.performanceRating.toFixed(1)} performance rating and organizational results` },
           ]},
-          { title: "Employer-Paid Benefits", subtitle: "NI pays these premiums on your behalf — you don't see them on your payslip, but they protect you and your family", icon: "=���∩╕Å", color: B.teal, total: benefitsTotal, items: [
+          { title: "Employer-Paid Benefits", subtitle: "NI pays these premiums on your behalf — you don't see them on your payslip, but they protect you and your family", icon: "∩╕Å", color: B.teal, total: benefitsTotal, items: [
             { label: "Health Insurance Premium", value: healthPremium, explain: `Employer-paid ${(benefits || {}).health || "Group Health"} coverage for you and eligible dependents` },
             { label: "Dental Coverage", value: dentalPremium, explain: "Annual dental plan including preventive and major services" },
             { label: "Life Insurance", value: lifePremium, explain: `Group life coverage at ${e.country === "KE" ? "3" : "2"}├ù your annual salary` },
             { label: "Disability Insurance", value: disabilityPremium, explain: "Long-term disability coverage protecting your income if you're unable to work" },
             { label: "Pension / Retirement Contribution", value: pensionContrib, explain: `NI contributes this to your retirement plan — this is in addition to any employee contributions you make` },
           ]},
-          { title: "Time-Based Rewards", subtitle: "The value of your paid time away from work — these days are yours to use for rest, health, and personal needs", icon: "=���", color: B.blue, total: timeBasedTotal, items: [
+          { title: "Time-Based Rewards", subtitle: "The value of your paid time away from work — these days are yours to use for rest, health, and personal needs", icon: "", color: B.blue, total: timeBasedTotal, items: [
             { label: `Annual Leave (${e.leaveBalance.annual} days)`, value: annualLeaveValue, explain: "Paid vacation days based on your entitlement and country policy" },
             { label: `Sick Leave (${e.leaveBalance.sick} days)`, value: sickLeaveValue, explain: "Paid sick days — use without worry when you need them" },
             { label: `Personal Days (${e.leaveBalance.personal} days)`, value: personalLeaveValue, explain: "Flexible days for personal matters, appointments, or family needs" },
           ]},
-          { title: "Perks, Growth & Wellbeing", subtitle: "Investments in your development, health, and quality of life", icon: "=���", color: B.purple, total: perksTotal, items: [
+          { title: "Perks, Growth & Wellbeing", subtitle: "Investments in your development, health, and quality of life", icon: "", color: B.purple, total: perksTotal, items: [
             { label: "Health & Wellness Allowance", value: hwAllow, explain: "Annual budget for gym, fitness, mental health, or wellness activities" },
             { label: "Learning & Development Allowance", value: ldAllow, explain: "Annual budget for courses, certifications, conferences, and books" },
             { label: "Employee Assistance Program (EAP)", value: eapValue, explain: "Confidential counseling, legal advice, and support services for you and family" },
@@ -1883,7 +1883,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 <Avatar name={`${e.first} ${e.last}`} size={56} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "Georgia, serif" }}>{e.first}, here's the full picture of your rewards at Nutrition International</div>
-                  <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Statement Period: January 1 – December 31, 2026 ┬╖ {e.flag} {e.entity} ┬╖ {e.title}</div>
+                  <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Statement Period: January 1 – December 31, 2026  · {e.flag} {e.entity}  · {e.title}</div>
                 </div>
               </div>
               <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.1)", backdropFilter: "blur(4px)" }}>
@@ -1949,8 +1949,8 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <Card style={{ borderTop: `4px solid ${B.teal}` }}>
               <SectionTitle>What This Means For You</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 14 }}>
-                {[{ icon: "=���", title: "Security", desc: "Health, life, and disability coverage protect you and your family. Your pension builds long-term financial stability." },
-                  { icon: "=���", title: "Growth", desc: `Your L&D allowance of ${fmt(ldAllow, e.currency, e.locale)} and our career development programs support your professional journey.` },
+                {[{ icon: "", title: "Security", desc: "Health, life, and disability coverage protect you and your family. Your pension builds long-term financial stability." },
+                  { icon: "", title: "Growth", desc: `Your L&D allowance of ${fmt(ldAllow, e.currency, e.locale)} and our career development programs support your professional journey.` },
                   { icon: "⚖∩╕Å", title: "Balance", desc: `${e.leaveBalance.annual + e.leaveBalance.sick + e.leaveBalance.personal} days of paid leave plus flexible work arrangements help you manage work and life.` },
                 ].map((m, i) => (
                   <div key={i} style={{ padding: 14, borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}`, textAlign: "center" }}>
@@ -1979,7 +1979,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
       {tab === "recruiting" && e.isManager && (
         <div>
           <div style={{ padding: "10px 14px", borderRadius: 6, background: `${B.blue}08`, border: `1px solid ${B.blue}20`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 18 }}>=���</span>
+            <span style={{ fontSize: 18 }}></span>
             <div style={{ flex: 1, fontSize: 12, color: B.textSecondary }}>
               <strong>Workable ATS Integration</strong> — Connected via Open API. Data syncs every 15 minutes. <a href="https://nutrition-intl.workable.com" target="_blank" rel="noopener noreferrer" style={{ color: B.blue, fontWeight: 700 }}>Open Workable Dashboard →</a>
             </div>
@@ -1999,7 +1999,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                     <span style={{ fontSize: 15, fontWeight: 700, color: B.textPrimary }}>{req.title}</span>
                     <StatusBadge status={req.status} />
                   </div>
-                  <div style={{ fontSize: 12, color: B.textMuted, marginTop: 2 }}>{req.dept} ┬╖ {COUNTRIES.find(c => c.code === req.country)?.flag} {COUNTRIES.find(c => c.code === req.country)?.name} ┬╖ {req.salary}</div>
+                  <div style={{ fontSize: 12, color: B.textMuted, marginTop: 2 }}>{req.dept}  · {COUNTRIES.find(c => c.code === req.country)?.flag} {COUNTRIES.find(c => c.code === req.country)?.name}  · {req.salary}</div>
                 </div>
                 <Badge color={B.textMuted} bg={B.bgHover}>{req.id}</Badge>
               </div>
@@ -2012,8 +2012,8 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 ))}
               </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url, "_blank")}>=��� View Candidates</Btn>
-                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url + "/description", "_blank")}>=��� Job Description</Btn>
+                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url, "_blank")}> View Candidates</Btn>
+                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url + "/description", "_blank")}> Job Description</Btn>
                 <Btn variant="ghost" size="sm" style={{ color: B.blue }}onClick={() => alert('Opening requisition in Workable ATS...')}>↗ Open in Workable</Btn>
               </div>
             </Card>
@@ -2046,12 +2046,12 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 <input placeholder="e.g. Canadian Embassy, Immigration Division" style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, boxSizing: "border-box" }} />
               </div>
             )}
-            <Btn variant="primary" style={{ width: "100%" }} onClick={() => { setShowLetter(true); setLetterGenerated(true); }}>=��� Generate & Preview Letter</Btn>
+            <Btn variant="primary" style={{ width: "100%" }} onClick={() => { setShowLetter(true); setLetterGenerated(true); }}> Generate & Preview Letter</Btn>
           </Card>
           <Card>
             <SectionTitle>Employee Documents on File</SectionTitle>
             <Table columns={[
-              { label: "Document", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 14 }}>=���</span><span style={{ fontWeight: 600 }}>{r.name}</span></div> },
+              { label: "Document", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 14 }}></span><span style={{ fontWeight: 600 }}>{r.name}</span></div> },
               { label: "Date", render: r => fmtDate(r.date) },
               { label: "Status", render: r => <StatusBadge status={r.status} /> },
             ]} data={[
@@ -2098,7 +2098,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             Ottawa, Canada
           </div>
           <div style={{ marginTop: 20, padding: "8px 12px", borderRadius: 4, background: B.bgHover, fontSize: 10, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>
-            Document ID: EVL-{e.id}-{new Date().getTime().toString(36).toUpperCase()} ┬╖ Generated: {todayStr} ┬╖ This letter is electronically signed and is valid without a physical signature.
+            Document ID: EVL-{e.id}-{new Date().getTime().toString(36).toUpperCase()}  · Generated: {todayStr}  · This letter is electronically signed and is valid without a physical signature.
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
@@ -2251,7 +2251,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
               <div onClick={() => setIsOnline(!isOnline)} style={{ width: 44, height: 24, borderRadius: 12, background: isOnline ? B.success : B.textMuted, cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                 <div style={{ width: 20, height: 20, borderRadius: 10, background: "#fff", position: "absolute", top: 2, left: isOnline ? 22 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: isOnline ? B.success : B.textMuted }}>{isOnline ? "=��� ONLINE" : "=��� OFFLINE MODE"}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: isOnline ? B.success : B.textMuted }}>{isOnline ? " ONLINE" : " OFFLINE MODE"}</span>
             </div>
             {!isOnline && (
               <div style={{ padding: "8px 12px", borderRadius: 6, background: B.warningBg, border: `1px solid ${B.warning}30`, marginBottom: 12, fontSize: 12, color: B.textPrimary }}>
@@ -2276,7 +2276,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
             {/* GPS Location */}
             {gpsLocation && clockedIn && (
               <div style={{ padding: "8px 12px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, marginBottom: 12, fontSize: 11, color: B.textSecondary, display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 14 }}>=���</span>
+                <span style={{ fontSize: 14 }}></span>
                 GPS Verified: {gpsLocation.lat}, {gpsLocation.lng} — Nairobi, Kenya
               </div>
             )}
@@ -2308,10 +2308,10 @@ const TimeModule = ({ employee: empProp } = {}) => {
             <Card>
               <SectionTitle>Today's Activity Log</SectionTitle>
               {[
-                { time: "08:02 AM", action: "Clock In", grant: "GC – Vitamin A", gps: "Nairobi, KE", mode: "Online", icon: "=���" },
-                { time: "12:05 PM", action: "Clock Out (Lunch)", grant: "—", gps: "Nairobi, KE", mode: "Online", icon: "=���" },
-                { time: "12:58 PM", action: "Clock In", grant: "BMGF – Fortification", gps: "Field Site, Kiambu", mode: "Offline", icon: "=���" },
-                { time: "03:30 PM", action: "Grant Switch", grant: "USAID – Maternal", gps: "Kiambu", mode: "Offline", icon: "=���" },
+                { time: "08:02 AM", action: "Clock In", grant: "GC – Vitamin A", gps: "Nairobi, KE", mode: "Online", icon: "" },
+                { time: "12:05 PM", action: "Clock Out (Lunch)", grant: "—", gps: "Nairobi, KE", mode: "Online", icon: "" },
+                { time: "12:58 PM", action: "Clock In", grant: "BMGF – Fortification", gps: "Field Site, Kiambu", mode: "Offline", icon: "" },
+                { time: "03:30 PM", action: "Grant Switch", grant: "USAID – Maternal", gps: "Kiambu", mode: "Offline", icon: "" },
               ].map((log, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4, fontSize: 12 }}>
                   <span>{log.icon}</span>
@@ -2336,8 +2336,8 @@ const TimeModule = ({ employee: empProp } = {}) => {
                     <span style={{ fontSize: 14 }}>{item.synced ? "✅" : "⏳"}</span>
                     <div style={{ flex: 1, fontSize: 12 }}>
                       <span style={{ fontWeight: 700 }}>{item.action.replace("_", " ").toUpperCase()}</span>
-                      <span style={{ color: B.textMuted }}> ┬╖ {new Date(item.time).toLocaleTimeString()}</span>
-                      {item.gps && <span style={{ color: B.textMuted }}> ┬╖ GPS: {item.gps.lat}, {item.gps.lng}</span>}
+                      <span style={{ color: B.textMuted }}>  · {new Date(item.time).toLocaleTimeString()}</span>
+                      {item.gps && <span style={{ color: B.textMuted }}>  · GPS: {item.gps.lat}, {item.gps.lng}</span>}
                     </div>
                     <Badge color={item.synced ? B.success : B.orange} bg={item.synced ? B.successBg : B.warningBg}>
                       {item.synced ? "Synced" : "Queued"}
@@ -2359,7 +2359,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   </div>
                 ))}
               </div>
-              <div style={{ fontSize: 11, color: B.textMuted, marginTop: 6 }}>4 field staff clocked in across 3 sites ┬╖ Last updated 2 min ago</div>
+              <div style={{ fontSize: 11, color: B.textMuted, marginTop: 6 }}>4 field staff clocked in across 3 sites  · Last updated 2 min ago</div>
             </Card>
           </div>
         </div>
@@ -2372,7 +2372,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
             <FieldLabel>Pay Period</FieldLabel>
             <input type="week" value={timesheetWeek} onChange={e => setTimesheetWeek(e.target.value)} style={{ padding: "6px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif" }} />
             <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
-            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Employee ID, Week, Mon-Fri hours, Grant Code columns")}>=��� Batch Upload Timesheets</Btn>
+            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Employee ID, Week, Mon-Fri hours, Grant Code columns")}> Batch Upload Timesheets</Btn>
           </div>
           <div style={{ overflowX: "auto", borderRadius: 6, border: `1px solid ${B.border}` }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
@@ -2445,7 +2445,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
       {tab === "grants" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Grant Code, Allocation %, Period, Hours columns")}>=��� Batch Upload Allocations</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Grant Code, Allocation %, Period, Hours columns")}> Batch Upload Allocations</Btn>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12, marginBottom: 16 }}>
             {GRANTS_PROJECTS.map(g => {
@@ -2456,7 +2456,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{g.name}</div>
-                      <div style={{ fontSize: 11, color: B.textMuted }}>{g.donor} ┬╖ {g.currency}</div>
+                      <div style={{ fontSize: 11, color: B.textMuted }}>{g.donor}  · {g.currency}</div>
                     </div>
                     <Badge color={g.color} bg={`${g.color}14`}>{g.id}</Badge>
                   </div>
@@ -2466,7 +2466,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   </div>
                   <div style={{ marginTop: 8 }}>
                     <ProgressBar value={hoursLogged} max={3000} color={g.color} />
-                    <div style={{ fontSize: 10, color: B.textMuted, marginTop: 3 }}>Budget: {fmt(g.budget, g.currency)} ┬╖ {Math.round(hoursLogged / 3000 * 100)}% hours used</div>
+                    <div style={{ fontSize: 10, color: B.textMuted, marginTop: 3 }}>Budget: {fmt(g.budget, g.currency)}  · {Math.round(hoursLogged / 3000 * 100)}% hours used</div>
                   </div>
                 </Card>
               );
@@ -2477,7 +2477,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
           <Card>
             <SectionTitle>Staff Allocation by Grant — Current Period</SectionTitle>
             <Table columns={[
-              { label: "Employee", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={`${r.first} ${r.last}`} size={24} /><div><span style={{ fontWeight: 600, fontSize: 12 }}>{r.first} {r.last}</span><div style={{ fontSize: 10, color: B.textMuted }}>{r.flag} {r.countryName} ┬╖ {r.currency}</div></div></div> },
+              { label: "Employee", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={`${r.first} ${r.last}`} size={24} /><div><span style={{ fontWeight: 600, fontSize: 12 }}>{r.first} {r.last}</span><div style={{ fontSize: 10, color: B.textMuted }}>{r.flag} {r.countryName}  · {r.currency}</div></div></div> },
               { label: "Grant 1 (%)", render: r => (<div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: 4, background: B.accent }} /><span>{(r.grants[0]?.allocation * 100).toFixed(0)}% — {r.grants[0]?.name?.split(" – ")[0]}</span></div>) },
               { label: "Grant 2 (%)", render: r => r.grants[1] ? (<div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: 4, background: B.teal }} /><span>{(r.grants[1]?.allocation * 100).toFixed(0)}% — {r.grants[1]?.name?.split(" – ")[0]}</span></div>) : <span style={{ color: B.textMuted }}>—</span> },
               { label: "Hours This Week", render: (_, i) => <span style={{ fontWeight: 700 }}>{35 + (i % 6)}h</span> },
@@ -2528,11 +2528,11 @@ const TimeModule = ({ employee: empProp } = {}) => {
               <SectionTitle>{compCountry?.flag} Labor Law Summary — {compCountry?.name}</SectionTitle>
               {[
                 { label: "Max Daily Hours", value: `${law.maxDaily}h`, icon: "⏱" },
-                { label: "Max Weekly Hours", value: `${law.maxWeekly}h`, icon: "=���" },
-                { label: "Overtime Multiplier", value: `${law.otMultiplier}├ù base rate`, icon: "=���" },
+                { label: "Max Weekly Hours", value: `${law.maxWeekly}h`, icon: "" },
+                { label: "Overtime Multiplier", value: `${law.otMultiplier}├ù base rate`, icon: "" },
                 { label: "Mandatory Rest Break", value: law.restBreak, icon: "☕" },
-                { label: "Minimum Rest Between Shifts", value: law.minRest, icon: "=���" },
-                { label: "OT Hourly Rate", value: fmt(law.otRate, law.currency), icon: "=���" },
+                { label: "Minimum Rest Between Shifts", value: law.minRest, icon: "" },
+                { label: "OT Hourly Rate", value: fmt(law.otRate, law.currency), icon: "" },
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
                   <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{item.icon}</span>
@@ -2555,7 +2555,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                 { name: "Grace Okafor", issue: "5 consecutive work days — rest day required", severity: "warning" },
               ].filter(() => true).map((alert, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 6, background: alert.severity === "danger" ? B.dangerBg : B.warningBg, border: `1px solid ${alert.severity === "danger" ? B.danger : B.warning}20`, marginBottom: 6 }}>
-                  <span style={{ fontSize: 14 }}>{alert.severity === "danger" ? "=���" : "⚠∩╕Å"}</span>
+                  <span style={{ fontSize: 14 }}>{alert.severity === "danger" ? "" : "⚠∩╕Å"}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary }}>{alert.name}</div>
                     <div style={{ fontSize: 11, color: B.textSecondary }}>{alert.issue}</div>
@@ -2606,7 +2606,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
           <div style={{ display: "flex", gap: 10, marginBottom: 14, justifyContent: "space-between", flexWrap: "wrap" }}>
             <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
             <div style={{ display: "flex", gap: 6 }}>
-              <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Leave Type, Start Date, End Date, Days columns")}>=��� Batch Upload</Btn>
+              <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Leave Type, Start Date, End Date, Days columns")}> Batch Upload</Btn>
               <Btn variant="primary" onClick={() => setShowNewRequest(true)}>+ New Leave Request</Btn>
             </div>
           </div>
@@ -2619,8 +2619,8 @@ const TimeModule = ({ employee: empProp } = {}) => {
                     <span style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{r.employeeName}</span>
                     <StatusBadge status={r.status} />
                   </div>
-                  <div style={{ fontSize: 13, color: B.textSecondary }}>{r.type} ┬╖ {fmtDate(r.from)} – {fmtDate(r.to)} ({r.days} days)</div>
-                  <div style={{ fontSize: 12, color: B.textMuted }}>{r.reason} ┬╖ Submitted {fmtDate(r.submitted)}</div>
+                  <div style={{ fontSize: 13, color: B.textSecondary }}>{r.type}  · {fmtDate(r.from)} – {fmtDate(r.to)} ({r.days} days)</div>
+                  <div style={{ fontSize: 12, color: B.textMuted }}>{r.reason}  · Submitted {fmtDate(r.submitted)}</div>
                   {r.approvedBy && <div style={{ fontSize: 11, color: B.success, marginTop: 2 }}>Approved by {r.approvedBy} on {fmtDate(r.approvedDate)}</div>}
                   {r.rejectedReason && <div style={{ fontSize: 11, color: B.danger, marginTop: 2 }}>Rejected: {r.rejectedReason}</div>}
                 </div>
@@ -2660,7 +2660,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
           {/* Dec 1 Alert Banner */}
           {showDecAlert && (
             <div style={{ padding: "12px 16px", borderRadius: 8, background: B.dangerBg, border: `1px solid ${B.danger}25`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 22 }}>=���</span>
+              <span style={{ fontSize: 22 }}></span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: B.danger }}>Action Required: Review 2027 Public Holiday Calendars</div>
                 <div style={{ fontSize: 12, color: B.textSecondary }}>It's December — please review and update public holiday dates for all countries for the 2027 calendar year. Ensure holidays are confirmed with local offices before year-end payroll processing.</div>
@@ -2670,7 +2670,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
           )}
           {/* Upcoming alert preview (always visible as reminder) */}
           <div style={{ padding: "10px 14px", borderRadius: 8, background: B.warningBg, border: `1px solid ${B.warning}20`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
-            <span style={{ fontSize: 16 }}>=���</span>
+            <span style={{ fontSize: 16 }}></span>
             <span style={{ color: B.textSecondary }}><strong>Annual Reminder:</strong> On December 1, {calendarYear} an alert will notify HR Admin and Superuser to review and publish holiday calendars for {parseInt(calendarYear) + 1}. All changes are audit-logged.</span>
           </div>
 
@@ -2679,7 +2679,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
             <Select value={holidayCountryFilter} onChange={setHolidayCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...Object.keys(holidays).map(code => { const c = COUNTRIES.find(x => x.code === code); return { value: code, label: `${c?.flag} ${c?.name}` }; })]} />
             <Select value={calendarYear} onChange={setCalendarYear} options={[{ value: "2025", label: "2025" }, { value: "2026", label: "2026" }, { value: "2027", label: "2027" }]} />
             <span style={{ fontSize: 12, color: B.textMuted }}>{Object.values(holidays).reduce((s, h) => s + h.length, 0)} holidays across {Object.keys(holidays).length} countries</span>
-            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Country Code, Holiday Name, Date columns")}>=��� Batch Upload</Btn>
+            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Country Code, Holiday Name, Date columns")}> Batch Upload</Btn>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -2735,7 +2735,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   }
                   setShowHolidayEdit(null);
                   alert(`Holiday "${holidayForm.name}" ${showHolidayEdit.idx === "new" ? "added to" : "updated in"} ${COUNTRIES.find(x => x.code === cc)?.name} calendar. Audit log entry created.`);
-                }}>=��� {showHolidayEdit?.idx === "new" ? "Add Holiday" : "Save Changes"}</Btn>
+                }}> {showHolidayEdit?.idx === "new" ? "Add Holiday" : "Save Changes"}</Btn>
               </div>
             </div>
           </Modal>
@@ -2794,11 +2794,11 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   <span style={{ color: B.textMuted }}>= {fx.rate} USD</span>
                 </div>
               ))}
-              <div style={{ fontSize: 10, color: B.textMuted, marginTop: 8 }}>Rates updated: Apr 23, 2026 ┬╖ Source: Treasury rate feed</div>
+              <div style={{ fontSize: 10, color: B.textMuted, marginTop: 8 }}>Rates updated: Apr 23, 2026  · Source: Treasury rate feed</div>
             </Card>
             <Card>
               <SectionTitle>Payroll by Currency — Consolidated (USD)</SectionTitle>
-              {[{ curr: "CAD =���=���", usd: 42300, pct: 28 }, { curr: "KES =���=���", usd: 18900, pct: 12 }, { curr: "GBP =���=���", usd: 31200, pct: 20 }, { curr: "INR =���=���", usd: 12400, pct: 8 }, { curr: "NGN =���=���", usd: 8700, pct: 6 }, { curr: "Others", usd: 39500, pct: 26 }].map((item, i) => (
+              {[{ curr: "CAD ", usd: 42300, pct: 28 }, { curr: "KES ", usd: 18900, pct: 12 }, { curr: "GBP ", usd: 31200, pct: 20 }, { curr: "INR ", usd: 12400, pct: 8 }, { curr: "NGN ", usd: 8700, pct: 6 }, { curr: "Others", usd: 39500, pct: 26 }].map((item, i) => (
                 <div key={i} style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, fontSize: 12 }}>
                     <span style={{ fontWeight: 600 }}>{item.curr}</span>
@@ -2881,10 +2881,10 @@ const WorkflowModule = () => {
               ))}
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 11, color: B.textMuted }}>SLA: {wf.sla} ┬╖ Countries: {wf.countries}</div>
+              <div style={{ fontSize: 11, color: B.textMuted }}>SLA: {wf.sla}  · Countries: {wf.countries}</div>
               <div style={{ display: "flex", gap: 4 }}>
                 <Btn variant="secondary" size="sm" onClick={() => openEdit(wf)}>✏∩╕Å Edit</Btn>
-                <Btn variant="ghost" size="sm" onClick={() => setSelectedWF(wf)}>=��� View</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => setSelectedWF(wf)}> View</Btn>
                 <Btn variant="ghost" size="sm" style={{ color: wf.status === "Active" ? B.warning : B.success }} onClick={() => setWorkflows(prev => prev.map(w => w.id === wf.id ? { ...w, status: w.status === "Active" ? "Inactive" : "Active" } : w))}>{wf.status === "Active" ? "⏸" : "▶"}</Btn>
               </div>
             </div>
@@ -2998,10 +2998,10 @@ const WorkflowModule = () => {
                   setEditingWF(null);
                   alert(`Workflow "${editForm.name}" deleted. Audit log entry created.`);
                 }
-              }}>=��� Delete Workflow</Btn>
+              }}> Delete Workflow</Btn>
             )}
             <Btn variant="secondary" onClick={() => setEditingWF(null)}>Cancel</Btn>
-            <Btn variant="primary" onClick={saveWorkflow}>=��� {editingWF === "new" ? "Create Workflow" : "Save Changes"}</Btn>
+            <Btn variant="primary" onClick={saveWorkflow}> {editingWF === "new" ? "Create Workflow" : "Save Changes"}</Btn>
           </div>
         </div>
       </Modal>
@@ -3043,7 +3043,7 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
         <SectionTitle>Submit New {tab === "hw" ? "Health & Wellness" : "Learning & Development"} Claim</SectionTitle>
         <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleDrop}
           style={{ border: `2px dashed ${dragOver ? B.accent : B.border}`, borderRadius: 8, padding: 30, textAlign: "center", background: dragOver ? B.accentBg : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>=���</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}></div>
           <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Drag & drop receipts here</div>
           <div style={{ fontSize: 12, color: B.textMuted }}>PDF, JPG, PNG — receipts will be automatically parsed via OCR</div>
         </div>
@@ -3055,7 +3055,7 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
                 <span style={{ fontSize: 18 }}>✓</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{u.name}</div>
-                  <div style={{ fontSize: 12, color: B.textMuted }}>Vendor: {u.parsed.vendor} ┬╖ Amount: {u.parsed.amount} ┬╖ Date: {u.parsed.date} ┬╖ Category: {u.parsed.category}</div>
+                  <div style={{ fontSize: 12, color: B.textMuted }}>Vendor: {u.parsed.vendor}  · Amount: {u.parsed.amount}  · Date: {u.parsed.date}  · Category: {u.parsed.category}</div>
                 </div>
                 <Badge color={B.success} bg={B.successBg}>Parsed</Badge>
               </div>
@@ -3066,7 +3066,7 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
         )}
       </Card>
       <Card>
-        <SectionTitle action={<Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Type (H&W/L&D), Description, Amount, Currency, Date columns")}>=��� Batch Import Claims</Btn>}>Recent Claims</SectionTitle>
+        <SectionTitle action={<Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Type (H&W/L&D), Description, Amount, Currency, Date columns")}> Batch Import Claims</Btn>}>Recent Claims</SectionTitle>
         <Table columns={[
           { label: "ID", render: r => <span style={{ fontWeight: 600, color: B.accent }}>{r.id}</span> },
           { label: "Employee", key: "employee" },
@@ -3166,16 +3166,16 @@ const SettingsModule = () => {
 
   const REPORT_TEMPLATES = [
     { value: "headcount", label: "Headcount Report", desc: "Workforce count by country, department, level, gender, status", fields: ["country", "department", "date_range", "group_by"], icon: "\u{1F465}" },
-    { value: "compensation", label: "Compensation Report", desc: "Salary, bonus, total comp by entity with currency conversion", fields: ["country", "department", "currency", "date_range"], icon: "=���" },
-    { value: "leave", label: "Leave & Absence Report", desc: "Leave balances, usage, accruals, carryover by employee", fields: ["country", "department", "leave_type", "date_range"], icon: "=���" },
+    { value: "compensation", label: "Compensation Report", desc: "Salary, bonus, total comp by entity with currency conversion", fields: ["country", "department", "currency", "date_range"], icon: "" },
+    { value: "leave", label: "Leave & Absence Report", desc: "Leave balances, usage, accruals, carryover by employee", fields: ["country", "department", "leave_type", "date_range"], icon: "" },
     { value: "compliance", label: "Compliance & Overtime Report", desc: "Labor law violations, overtime hours, rest break gaps", fields: ["country", "date_range", "severity"], icon: "⚖∩╕Å" },
-    { value: "grant", label: "Grant / Donor Allocation Report", desc: "Hours, costs, and FTE allocation by grant/project code", fields: ["grant", "country", "date_range", "currency"], icon: "=���" },
-    { value: "turnover", label: "Turnover & Retention Report", desc: "Attrition rate, voluntary/involuntary, tenure analysis", fields: ["country", "department", "date_range"], icon: "=���" },
-    { value: "diversity", label: "Diversity & Inclusion Report", desc: "Gender balance, nationality mix, level distribution", fields: ["country", "department", "date_range"], icon: "=���" },
-    { value: "benefits", label: "Benefits Enrollment Report", desc: "Enrollment status, plan uptake, cost per employee", fields: ["country", "plan_type", "date_range"], icon: "=���" },
+    { value: "grant", label: "Grant / Donor Allocation Report", desc: "Hours, costs, and FTE allocation by grant/project code", fields: ["grant", "country", "date_range", "currency"], icon: "" },
+    { value: "turnover", label: "Turnover & Retention Report", desc: "Attrition rate, voluntary/involuntary, tenure analysis", fields: ["country", "department", "date_range"], icon: "" },
+    { value: "diversity", label: "Diversity & Inclusion Report", desc: "Gender balance, nationality mix, level distribution", fields: ["country", "department", "date_range"], icon: "" },
+    { value: "benefits", label: "Benefits Enrollment Report", desc: "Enrollment status, plan uptake, cost per employee", fields: ["country", "plan_type", "date_range"], icon: "" },
     { value: "performance", label: "Performance Review Report", desc: "Ratings distribution, calibration, goal completion", fields: ["country", "department", "review_cycle"], icon: "⭐" },
-    { value: "payroll", label: "Payroll Summary Report", desc: "Gross/net pay, deductions, taxes, multi-currency summary", fields: ["country", "pay_period", "currency"], icon: "=���" },
-    { value: "custom", label: "Custom Report Builder", desc: "Select fields, filters, grouping, and calculations from scratch", fields: ["all"], icon: "=���" },
+    { value: "payroll", label: "Payroll Summary Report", desc: "Gross/net pay, deductions, taxes, multi-currency summary", fields: ["country", "pay_period", "currency"], icon: "" },
+    { value: "custom", label: "Custom Report Builder", desc: "Select fields, filters, grouping, and calculations from scratch", fields: ["all"], icon: "" },
   ];
 
   const CUSTOM_FIELDS = [
@@ -3325,9 +3325,9 @@ const SettingsModule = () => {
               {/* Generate */}
               <div style={{ display: "flex", gap: 8 }}>
                 <Btn variant="primary" style={{ flex: 1 }} onClick={handleGenerate} disabled={!reportType}>
-                  {reportGenerated ? "✓ Report Generated!" : "=��� Generate Report"}
+                  {reportGenerated ? "✓ Report Generated!" : " Generate Report"}
                 </Btn>
-                <Btn variant="secondary" onClick={() => { if (reportType) setSavedReports(prev => [{ id: `RPT-${Date.now().toString(36)}`, name: `${REPORT_TEMPLATES.find(t => t.value === reportType)?.label || "Custom"} — ${new Date().toLocaleDateString()}`, type: reportType, created: new Date().toISOString().split("T")[0], createdBy: "Admin User", format: reportFormat.toUpperCase(), rows: Math.floor(Math.random() * 200 + 20) }, ...prev]); }}>=��� Save</Btn>
+                <Btn variant="secondary" onClick={() => { if (reportType) setSavedReports(prev => [{ id: `RPT-${Date.now().toString(36)}`, name: `${REPORT_TEMPLATES.find(t => t.value === reportType)?.label || "Custom"} — ${new Date().toLocaleDateString()}`, type: reportType, created: new Date().toISOString().split("T")[0], createdBy: "Admin User", format: reportFormat.toUpperCase(), rows: Math.floor(Math.random() * 200 + 20) }, ...prev]); }}> Save</Btn>
               </div>
               {reportGenerated && (
                 <div style={{ padding: "10px 14px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, fontSize: 12, color: B.success, fontWeight: 700 }}>
@@ -3354,7 +3354,7 @@ const SettingsModule = () => {
               <div style={{ display: "flex", gap: 4 }}>
                 <Btn variant="ghost" size="sm" onClick={() => alert(`Downloading ${r.name}`)}>⬇</Btn>
                 <Btn variant="ghost" size="sm" onClick={() => alert(`Re-running ${r.name}`)}>↻</Btn>
-                <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSavedReports(prev => prev.filter(x => x.id !== r.id))}>=���</Btn>
+                <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSavedReports(prev => prev.filter(x => x.id !== r.id))}></Btn>
               </div>
             )},
           ]} data={savedReports} />
@@ -3397,7 +3397,7 @@ const SettingsModule = () => {
                         <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
                           <div style={{ display: "flex", gap: 4 }}>
                             <Btn variant="ghost" size="sm" onClick={() => { setSalaryForm({ ...ss }); setShowSalaryEdit(ss.id); }}>✏∩╕Å</Btn>
-                            {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => prev.filter(s => s.id !== ss.id))}>=���</Btn>}
+                            {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => prev.filter(s => s.id !== ss.id))}></Btn>}
                           </div>
                         </td>
                       </tr>
@@ -3422,14 +3422,14 @@ const SettingsModule = () => {
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Currency</label>
                 <Select value={salaryForm.currency} onChange={v => setSalaryForm(p => ({ ...p, currency: v }))} style={{ width: "100%" }} options={[...new Set(COUNTRIES.map(c => c.currency))].map(c => ({ value: c, label: c }))} /></div>
             </div>
-            {salaryForm.min > 0 && salaryForm.max > 0 && <div style={{ marginTop: 10, padding: 8, borderRadius: 6, background: B.accentBg, fontSize: 12, color: B.textSecondary }}>Spread: {Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100)}% ┬╖ Midpoint penetration range: {fmt(salaryForm.min, salaryForm.currency)} — {fmt(salaryForm.max, salaryForm.currency)}</div>}
+            {salaryForm.min > 0 && salaryForm.max > 0 && <div style={{ marginTop: 10, padding: 8, borderRadius: 6, background: B.accentBg, fontSize: 12, color: B.textSecondary }}>Spread: {Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100)}%  · Midpoint penetration range: {fmt(salaryForm.min, salaryForm.currency)} — {fmt(salaryForm.max, salaryForm.currency)}</div>}
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 }}>
               <Btn variant="secondary" onClick={() => setShowSalaryEdit(null)}>Cancel</Btn>
               <Btn variant="primary" onClick={() => {
                 if (showSalaryEdit === "new") { setSalaryStructures(prev => [...prev, { ...salaryForm, id: `SS-${Date.now()}`, spread: salaryForm.min > 0 ? Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100) : 0 }]); }
                 else { setSalaryStructures(prev => prev.map(s => s.id === showSalaryEdit ? { ...s, ...salaryForm, spread: salaryForm.min > 0 ? Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100) : 0 } : s)); }
                 setShowSalaryEdit(null); alert(`Salary band ${showSalaryEdit === "new" ? "created" : "updated"}. Audit log entry created.`);
-              }}>=��� {showSalaryEdit === "new" ? "Create" : "Save"}</Btn>
+              }}> {showSalaryEdit === "new" ? "Create" : "Save"}</Btn>
             </div>
           </Modal>
         </div>
@@ -3466,7 +3466,7 @@ const SettingsModule = () => {
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
                         <div style={{ display: "flex", gap: 4 }}>
                           <Btn variant="ghost" size="sm" onClick={() => { setGradeForm({ ...jg }); setShowGradeEdit(jg.id); }}>✏∩╕Å</Btn>
-                          {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}>=���</Btn>}
+                          {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}></Btn>}
                         </div>
                       </td>
                     </tr>);
@@ -3499,7 +3499,7 @@ const SettingsModule = () => {
                 if (showGradeEdit === "new") { setJobGrades(prev => [...prev, { ...gradeForm, id: `JG-${Date.now()}` }]); }
                 else { setJobGrades(prev => prev.map(g => g.id === showGradeEdit ? { ...g, ...gradeForm } : g)); }
                 setShowGradeEdit(null); alert(`Job grade "${gradeForm.grade}" ${showGradeEdit === "new" ? "created" : "updated"}. Audit log entry created.`);
-              }}>=��� {showGradeEdit === "new" ? "Create" : "Save"}</Btn>
+              }}> {showGradeEdit === "new" ? "Create" : "Save"}</Btn>
             </div>
           </Modal>
         </div>
@@ -3518,7 +3518,7 @@ const SettingsModule = () => {
             <Card key={emp.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <Avatar name={`${emp.first} ${emp.last}`} size={32} />
-                <div><div style={{ fontSize: 13, fontWeight: 700 }}>{emp.first} {emp.last}</div><div style={{ fontSize: 11, color: B.textMuted }}>{emp.id} ┬╖ {emp.title} ┬╖ {emp.flag} {emp.countryName}</div></div>
+                <div><div style={{ fontSize: 13, fontWeight: 700 }}>{emp.first} {emp.last}</div><div style={{ fontSize: 11, color: B.textMuted }}>{emp.id}  · {emp.title}  · {emp.flag} {emp.countryName}</div></div>
               </div>
               <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", marginBottom: 6 }}>Employment History ({emp.employmentHistory.length} records)</div>
               {emp.employmentHistory.slice(0, 8).map((h, i) => {
@@ -3555,13 +3555,13 @@ const SettingsModule = () => {
             <div style={{ marginTop: 10, padding: 10, borderRadius: 6, background: `${B.charcoal}06`, border: `1px solid ${B.charcoal}12`, fontSize: 11, color: B.textMuted, fontFamily: "monospace" }}>
               <div><strong>Audit:</strong> {historyForm.idx === "new" ? "Insert" : "Modify"} historical record</div>
               <div><strong>Employee:</strong> {historyForm.empName} ({historyForm.empId})</div>
-              <div><strong>Field:</strong> {historyForm.field || "—"} ┬╖ <strong>Effective:</strong> {historyForm.effectiveDate || "—"}</div>
+              <div><strong>Field:</strong> {historyForm.field || "—"}  · <strong>Effective:</strong> {historyForm.effectiveDate || "—"}</div>
               <div><strong>Value:</strong> {historyForm.oldValue || "—"} → {historyForm.newValue || "—"}</div>
-              <div><strong>Modified by:</strong> Admin ┬╖ <strong>Timestamp:</strong> {new Date().toISOString()}</div>
+              <div><strong>Modified by:</strong> Admin  · <strong>Timestamp:</strong> {new Date().toISOString()}</div>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 }}>
               <Btn variant="secondary" onClick={() => setShowHistoryEdit(null)}>Cancel</Btn>
-              <Btn variant="primary" onClick={() => { setShowHistoryEdit(null); alert(`Historical record ${historyForm.idx === "new" ? "added" : "updated"} for ${historyForm.empName}. Audit entry created with full before/after values.`); }}>=��� {historyForm.idx === "new" ? "Add Record" : "Save Edit"}</Btn>
+              <Btn variant="primary" onClick={() => { setShowHistoryEdit(null); alert(`Historical record ${historyForm.idx === "new" ? "added" : "updated"} for ${historyForm.empName}. Audit entry created with full before/after values.`); }}> {historyForm.idx === "new" ? "Add Record" : "Save Edit"}</Btn>
             </div>
           </Modal>
         </div>
@@ -3604,7 +3604,7 @@ const SettingsModule = () => {
           {COUNTRIES.map(c => (
             <div key={c.code} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 6, background: B.bgHover, border: `1px solid ${B.border}` }}>
               <span style={{ fontSize: 20 }}>{c.flag}</span>
-              <div style={{ flex: 1 }}><div style={{ fontWeight: 700, fontSize: 13 }}>{c.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{c.locale} ┬╖ {c.currency}</div></div>
+              <div style={{ flex: 1 }}><div style={{ fontWeight: 700, fontSize: 13 }}>{c.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{c.locale}  · {c.currency}</div></div>
               <Badge color={B.success} bg={B.successBg}>Active</Badge>
             </div>
           ))}
@@ -3614,7 +3614,7 @@ const SettingsModule = () => {
   );
 };
 
-// ─── COMPENSATION PLANNING MODULE (ACR: COLA + Merit + Bonus ┬╖ Access Control) ─
+// ─── COMPENSATION PLANNING MODULE (ACR: COLA + Merit + Bonus  · Access Control) ─
 const CompPlanningModule = ({ role }) => {
   const [tab, setTab] = useState("hub");
   const [meritPool, setMeritPool] = useState(3.5);
@@ -3672,9 +3672,9 @@ const CompPlanningModule = ({ role }) => {
   return (
     <div>
       {isHR && (<div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 14px",borderRadius:6,background:`${B.charcoal}08`,border:`1px solid ${B.charcoal}15`,marginBottom:14}}>
-        <span style={{fontSize:14}}>=���</span>
+        <span style={{fontSize:14}}></span>
         <span style={{flex:1,fontSize:12,color:B.textSecondary}}><strong>Restricted Module</strong> — HR Admin + Superuser have full access. Managers see only their team worksheet when permissioned.</span>
-        <Btn variant="secondary" size="sm" onClick={()=>setShowPermModal(true)}>=��� Manage Access ({permUsers.length})</Btn>
+        <Btn variant="secondary" size="sm" onClick={()=>setShowPermModal(true)}> Manage Access ({permUsers.length})</Btn>
       </div>)}
       <Tabs tabs={[
         {key:"hub",label:"Compensation Hub"},{key:"acr",label:"ACR Configuration"},{key:"bands",label:"Pay Bands"},
@@ -3716,7 +3716,7 @@ const CompPlanningModule = ({ role }) => {
       {/* ACR CONFIGURATION */}
       {tab==="acr"&&(<div>
         <Card style={{marginBottom:14,borderTop:`4px solid ${B.accent}`}}>
-          <SectionTitle>ACR Pool Configuration — COLA ┬╖ Merit ┬╖ Bonus</SectionTitle>
+          <SectionTitle>ACR Pool Configuration — COLA  · Merit  · Bonus</SectionTitle>
           <div style={{fontSize:12,color:B.textMuted,marginBottom:14}}>COLA adjusts for country-level inflation. Merit rewards individual performance (added to base). Bonus is a one-time performance payment (not added to base).</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14}}>
             {[{label:"COLA Pool %",value:colaPool,set:setColaPool,color:B.orange,desc:"Country CPI-linked"},{label:"Merit Pool %",value:meritPool,set:setMeritPool,color:B.teal,desc:"Performance-based salary increase"},{label:"Bonus Pool %",value:bonusPool,set:setBonusPool,color:B.blue,desc:"One-time, not added to base"}].map((p,i)=>(
@@ -3774,12 +3774,12 @@ const CompPlanningModule = ({ role }) => {
           {[{l:"COLA",a:totals.colaCost,b:totals.colaBudget,c:B.orange},{l:"Merit",a:totals.meritCost,b:totals.meritBudget,c:B.teal},{l:"Bonus",a:totals.bonusCost,b:totals.bonusBudget,c:B.blue}].map((p,i)=>(
             <div key={i} style={{padding:"6px 12px",borderRadius:6,background:`${p.c}10`,border:`1px solid ${p.c}25`,fontWeight:700,color:p.c}}>{p.l}: {fmt(p.a,"CAD")} / {fmt(p.b,"CAD")} ({Math.round(p.a/p.b*100)}%)</div>))}
           <Badge color={totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?B.success:B.danger} bg={totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?B.successBg:B.dangerBg}>Total: {fmt(totals.totalACRCost,"CAD")} {totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?"✓ Within Budget":"⚠ Over"}</Badge>
-          <Btn variant="secondary" size="sm" style={{marginLeft:"auto"}} onClick={()=>alert("Batch upload: drag an Excel file with Employee ID, COLA%, Merit%, Bonus% columns to bulk-update the worksheet.")}>=��� Batch Upload Comp Data</Btn>
+          <Btn variant="secondary" size="sm" style={{marginLeft:"auto"}} onClick={()=>alert("Batch upload: drag an Excel file with Employee ID, COLA%, Merit%, Bonus% columns to bulk-update the worksheet.")}> Batch Upload Comp Data</Btn>
         </div>
         <div style={{overflowX:"auto",borderRadius:6,border:`1px solid ${B.border}`}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:10,fontFamily:"Arial, sans-serif"}}>
             <thead><tr style={{background:B.bgHover}}>
-              {["Employee","=���","Lvl","Current","CR","Perf","COLA%","COLA$","Merit%","Merit$","Bonus%","Bonus$","↑%","New Base","Flags","Status"].map(h=>(
+              {["Employee","","Lvl","Current","CR","Perf","COLA%","COLA$","Merit%","Merit$","Bonus%","Bonus$","↑%","New Base","Flags","Status"].map(h=>(
                 <th key={h} style={{padding:"6px 5px",textAlign:"left",borderBottom:`2px solid ${B.accent}`,fontWeight:700,fontSize:8,letterSpacing:0.4,textTransform:"uppercase",color:B.textSecondary,whiteSpace:"nowrap"}}>{h}</th>))}
             </tr></thead>
             <tbody>{worksheetData.map((r,i)=>(
@@ -3832,10 +3832,10 @@ const CompPlanningModule = ({ role }) => {
       {/* TOTAL REWARDS */}
       {tab==="statements"&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
         {EMPLOYEES.slice(0,6).map(e=>{const bv=Math.round(e.salary*0.22);const al=e.hwAllowance.total+e.ldAllowance.total;const t=e.salary+e.bonus+bv+al;return(<Card key={e.id} style={{borderLeft:`4px solid ${B.accent}`}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><Avatar name={`${e.first} ${e.last}`} size={28}/><div><div style={{fontWeight:700,fontSize:12}}>{e.first} {e.last}</div><div style={{fontSize:10,color:B.textMuted}}>{e.title} ┬╖ {e.flag}</div></div></div>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><Avatar name={`${e.first} ${e.last}`} size={28}/><div><div style={{fontWeight:700,fontSize:12}}>{e.first} {e.last}</div><div style={{fontSize:10,color:B.textMuted}}>{e.title}  · {e.flag}</div></div></div>
           {[{l:"Base",v:e.salary,c:B.accent},{l:"Bonus",v:e.bonus,c:B.teal},{l:"Benefits",v:bv,c:B.blue},{l:"Allowances",v:al,c:B.purple}].map((x,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,fontSize:11}}><div style={{width:6,height:6,borderRadius:3,background:x.c}}/><span style={{flex:1}}>{x.l}</span><span style={{fontWeight:700}}>{fmt(x.v,e.currency,e.locale)}</span></div>))}
           <div style={{display:"flex",justifyContent:"space-between",marginTop:6,paddingTop:6,borderTop:`2px solid ${B.accent}`,fontSize:12,fontWeight:700}}><span>Total</span><span style={{color:B.accent}}>{fmt(t,e.currency,e.locale)}</span></div>
-          <Btn variant="secondary" size="sm" style={{width:"100%",marginTop:6}}onClick={() => alert(`Total Rewards Statement PDF generated for ${e.first} ${e.last}`)}>=��� PDF</Btn>
+          <Btn variant="secondary" size="sm" style={{width:"100%",marginTop:6}}onClick={() => alert(`Total Rewards Statement PDF generated for ${e.first} ${e.last}`)}> PDF</Btn>
         </Card>);})}
       </div>)}
 
@@ -4099,9 +4099,9 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               <div onDragOver={ev => { ev.preventDefault(); setPyDragOver(true); }} onDragLeave={() => setPyDragOver(false)} onDrop={handlePYDrop}
                 style={{ border: `2px dashed ${pyDragOver ? B.accent : B.border}`, borderRadius: 8, padding: 24, textAlign: "center", background: pyDragOver ? B.accentBg : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
                 {priorYearData ? (
-                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>✅</div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>2025 Results Loaded</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>Engagement: {priorYearData.engagement}% ┬╖ {priorYearData.totalResponses} responses ┬╖ {priorYearData.responseRate}% rate</div></div>
+                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>✅</div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>2025 Results Loaded</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>Engagement: {priorYearData.engagement}%  · {priorYearData.totalResponses} responses  · {priorYearData.responseRate}% rate</div></div>
                 ) : (
-                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>=���</div><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>Drag & drop prior year results</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>.xlsx, .csv, or .pdf — columns auto-mapped</div></div>
+                  <div><div style={{ fontSize: 28, marginBottom: 6 }}></div><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>Drag & drop prior year results</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>.xlsx, .csv, or .pdf — columns auto-mapped</div></div>
                 )}
               </div>
             </Card>
@@ -4137,7 +4137,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
       {tab === "surveys" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14, gap: 6 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Survey ID, Employee ID, Question ID, Response, Score columns for bulk survey result import")}>=��� Batch Import Results</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Survey ID, Employee ID, Question ID, Response, Score columns for bulk survey result import")}> Batch Import Results</Btn>
             <Btn variant="primary" onClick={() => setTab("create")}>+ Create Survey</Btn>
           </div>
           {SURVEYS.map(s => (
@@ -4150,11 +4150,11 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                     <Badge color={B.textMuted} bg={B.bgHover}>{s.type}</Badge>
                     {s.anonymous && <Badge color={B.purple} bg={`${B.purple}12`}>Anonymous (≥{s.threshold})</Badge>}
                   </div>
-                  <div style={{ fontSize: 12, color: B.textMuted }}>{fmtDate(s.startDate)} – {fmtDate(s.endDate)} ┬╖ {s.responses}/{s.total} responses ({Math.round(s.responses / s.total * 100)}%)</div>
+                  <div style={{ fontSize: 12, color: B.textMuted }}>{fmtDate(s.startDate)} – {fmtDate(s.endDate)}  · {s.responses}/{s.total} responses ({Math.round(s.responses / s.total * 100)}%)</div>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
-                  {s.status === "Active" && <Btn variant="secondary" size="sm" onClick={() => alert('Reminder emails sent to non-respondents')}>=��� Send Reminder</Btn>}
-                  <Btn variant="secondary" size="sm" onClick={() => setTab("dashboard")}>=��� Results</Btn>
+                  {s.status === "Active" && <Btn variant="secondary" size="sm" onClick={() => alert('Reminder emails sent to non-respondents')}> Send Reminder</Btn>}
+                  <Btn variant="secondary" size="sm" onClick={() => setTab("dashboard")}> Results</Btn>
                 </div>
               </div>
             </Card>
@@ -4252,7 +4252,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 <div style={{ width: 24, height: 24, borderRadius: 12, background: d.priority <= 2 ? B.dangerBg : B.warningBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: d.priority <= 2 ? B.danger : B.orange }}>{d.priority}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 12, fontWeight: 700 }}>{d.driver}</div>
-                  <div style={{ fontSize: 11, color: B.textMuted }}>Impact: {d.impact} ┬╖ Current: {d.current}% ┬╖ Gap to target: {d.gap}pts</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Impact: {d.impact}  · Current: {d.current}%  · Gap to target: {d.gap}pts</div>
                 </div>
                 <div style={{ width: 60, height: 6, borderRadius: 3, background: B.bgCard, overflow: "hidden" }}>
                   <div style={{ width: `${d.impact * 100}%`, height: "100%", background: d.priority <= 2 ? B.danger : B.warning, borderRadius: 3 }} />
@@ -4280,7 +4280,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 ))}
               </div>
               <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: B.bgHover, fontSize: 12, color: B.textSecondary }}>
-                <strong>Sentiment Split:</strong> 58% positive ┬╖ 35% negative ┬╖ 7% neutral
+                <strong>Sentiment Split:</strong> 58% positive  · 35% negative  · 7% neutral
               </div>
             </Card>
             <Card>
@@ -4389,7 +4389,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Drag and drop an Excel, Word, or PDF file containing your survey questions. The system will automatically parse and format them into survey items with detected question types.</div>
               <div onDragOver={ev => { ev.preventDefault(); setQDragOver(true); }} onDragLeave={() => setQDragOver(false)} onDrop={handleQDrop}
                 style={{ border: `2px dashed ${qDragOver ? B.blue : B.border}`, borderRadius: 8, padding: 28, textAlign: "center", background: qDragOver ? `${B.blue}08` : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>=���</div>
+                <div style={{ fontSize: 32, marginBottom: 8 }}></div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>Drag & drop question file here</div>
                 <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Supports .xlsx, .csv, .docx, .pdf — one question per row/line</div>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
@@ -4462,9 +4462,9 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 <div style={{ display: "flex", justifyContent: "space-between", color: B.textSecondary, borderTop: `1px solid ${B.border}`, paddingTop: 6 }}><span style={{ fontWeight: 700 }}>Total questions</span><span style={{ fontWeight: 700, color: B.accent }}>{QUESTION_TEMPLATES.reduce((s, c) => s + c.questions.length, 0) + uploadedQuestions.length}</span></div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <Btn variant="primary" style={{ flex: 1 }} onClick={() => alert('Survey launched! Invitations sent to selected participants.')}>=��� Launch Survey</Btn>
-                <Btn variant="secondary" onClick={() => alert('Survey draft saved')}>=��� Save Draft</Btn>
-                <Btn variant="secondary" onClick={() => alert('Opening survey preview...')}>=��� Preview</Btn>
+                <Btn variant="primary" style={{ flex: 1 }} onClick={() => alert('Survey launched! Invitations sent to selected participants.')}> Launch Survey</Btn>
+                <Btn variant="secondary" onClick={() => alert('Survey draft saved')}> Save Draft</Btn>
+                <Btn variant="secondary" onClick={() => alert('Opening survey preview...')}> Preview</Btn>
               </div>
             </Card>
           </div>
@@ -4507,16 +4507,16 @@ const SuperuserModule = () => {
   const [showConfirm, setShowConfirm] = useState(null);
   const [showAddOnAssign, setShowAddOnAssign] = useState(null);
   const [addOnModules, setAddOnModules] = useState([
-    { id: "ADDON-001", name: "Expense Management", desc: "Travel and expense claims with receipt scanning, per-diem rules, and multi-currency reimbursement", icon: "=���", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-02-15" },
-    { id: "ADDON-002", name: "Asset & Equipment Tracker", desc: "Assign, track, and recover organizational assets (laptops, phones, vehicles) per employee", icon: "=���", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["IT & Digital", "Operations"], created: "2026-03-01" },
-    { id: "ADDON-003", name: "Volunteer Management", desc: "Onboard, schedule, track hours, and manage credentials for volunteers and short-term consultants", icon: "=���", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Programs"], created: "2026-01-20" },
+    { id: "ADDON-001", name: "Expense Management", desc: "Travel and expense claims with receipt scanning, per-diem rules, and multi-currency reimbursement", icon: "", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-02-15" },
+    { id: "ADDON-002", name: "Asset & Equipment Tracker", desc: "Assign, track, and recover organizational assets (laptops, phones, vehicles) per employee", icon: "", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["IT & Digital", "Operations"], created: "2026-03-01" },
+    { id: "ADDON-003", name: "Volunteer Management", desc: "Onboard, schedule, track hours, and manage credentials for volunteers and short-term consultants", icon: "", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Programs"], created: "2026-01-20" },
     { id: "ADDON-004", name: "Travel & Security Clearance", desc: "Travel request approvals, security briefings, field travel risk assessments, and emergency contact sync", icon: "✈∩╕Å", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-03-10" },
     { id: "ADDON-005", name: "Document Vault (e-Signature)", desc: "Secure document storage with e-signature workflows, version control, and retention policy enforcement", icon: "\u{1F510}", status: "active", assignedTo: "individuals", assignedUsers: ["Sarah Chen", "Marcus Johnson", "Priya Patel", "Grant Carioni"], assignedGroups: [], created: "2026-04-01" },
-    { id: "ADDON-006", name: "Mentorship & Coaching Platform", desc: "Match mentors with mentees, schedule sessions, track goals, and collect feedback", icon: "=���", status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: "2026-04-18" },
+    { id: "ADDON-006", name: "Mentorship & Coaching Platform", desc: "Match mentors with mentees, schedule sessions, track goals, and collect feedback", icon: "", status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: "2026-04-18" },
     { id: "ADDON-007", name: "Workplace Safety & Incident Reporting", desc: "Report workplace incidents, near-misses, and safety concerns with investigation workflows", icon: "⚠∩╕Å", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Operations", "Programs", "Technical"], created: "2026-02-01" },
-    { id: "ADDON-008", name: "Internal Job Board & Mobility", desc: "Post internal opportunities, allow employees to express interest, and track internal transfers", icon: "=���", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-01-15" },
+    { id: "ADDON-008", name: "Internal Job Board & Mobility", desc: "Post internal opportunities, allow employees to express interest, and track internal transfers", icon: "", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-01-15" },
   ]);
-  const [newAddOn, setNewAddOn] = useState({ name: "", desc: "", icon: "=���" });
+  const [newAddOn, setNewAddOn] = useState({ name: "", desc: "", icon: "" });
   const [assignTarget, setAssignTarget] = useState("all");
   const [assignDepts, setAssignDepts] = useState([]);
   const [assignIndividuals, setAssignIndividuals] = useState([]);
@@ -4594,7 +4594,7 @@ const SuperuserModule = () => {
     <div>
       {/* Superuser banner */}
       <div style={{ padding: "10px 16px", borderRadius: 6, background: `linear-gradient(135deg, ${B.charcoal}, ${B.grey})`, color: "#fff", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={{ fontSize: 22 }}>=���</span>
+        <span style={{ fontSize: 22 }}></span>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>Superuser Control Panel</div>
           <div style={{ fontSize: 11, opacity: 0.8 }}>Full system access — feature management, formatting, audit logs, user administration. All actions are logged.</div>
@@ -4641,10 +4641,10 @@ const SuperuserModule = () => {
                       </div>
                       <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 4 }}>{a.detail}</div>
                       <div style={{ display: "flex", gap: 12, fontSize: 11, color: B.textMuted, flexWrap: "wrap" }}>
-                        <span>=��� {a.user} <Badge color={a.role === "Superuser" ? B.yellow : a.role === "HR Admin" ? B.accent : a.role === "System" ? B.textMuted : B.blue} bg={`${a.role === "Superuser" ? B.yellow : B.textMuted}14`} style={{ fontSize: 9, marginLeft: 4 }}>{a.role}</Badge></span>
-                        <span>=��� {a.ip}</span>
-                        <span>=��� {a.location}</span>
-                        <span>=��� {a.session}</span>
+                        <span> {a.user} <Badge color={a.role === "Superuser" ? B.yellow : a.role === "HR Admin" ? B.accent : a.role === "System" ? B.textMuted : B.blue} bg={`${a.role === "Superuser" ? B.yellow : B.textMuted}14`} style={{ fontSize: 9, marginLeft: 4 }}>{a.role}</Badge></span>
+                        <span> {a.ip}</span>
+                        <span> {a.location}</span>
+                        <span> {a.session}</span>
                       </div>
                     </div>
                   </div>
@@ -4705,7 +4705,7 @@ const SuperuserModule = () => {
             <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
               <div style={{ flex: "0 0 50px" }}>
                 <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Icon</label>
-                <Select value={newAddOn.icon} onChange={v => setNewAddOn(p => ({ ...p, icon: v }))} options={["=���","=���","=���","=���","✈∩╕Å","=���","=���","⚠∩╕Å","=���","=���","=���","=���","=��P","=���∩╕Å","=���"].map(i => ({ value: i, label: i }))} />
+                <Select value={newAddOn.icon} onChange={v => setNewAddOn(p => ({ ...p, icon: v }))} options={["","","","","✈∩╕Å","","","⚠∩╕Å","","","","","P","∩╕Å",""].map(i => ({ value: i, label: i }))} />
               </div>
               <div style={{ flex: 1, minWidth: 180 }}>
                 <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Module Name</label>
@@ -4715,7 +4715,7 @@ const SuperuserModule = () => {
                 <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Description</label>
                 <input value={newAddOn.desc} onChange={ev => setNewAddOn(p => ({ ...p, desc: ev.target.value }))} placeholder="Brief description of the module's purpose" style={{ width: "100%", padding: 8, borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} />
               </div>
-              <Btn variant="primary" onClick={() => { if (newAddOn.name) { setAddOnModules(prev => [...prev, { id: `ADDON-${Date.now().toString(36)}`, ...newAddOn, status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: new Date().toISOString().split("T")[0] }]); setNewAddOn({ name: "", desc: "", icon: "=���" }); } }}>+ Create Module</Btn>
+              <Btn variant="primary" onClick={() => { if (newAddOn.name) { setAddOnModules(prev => [...prev, { id: `ADDON-${Date.now().toString(36)}`, ...newAddOn, status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: new Date().toISOString().split("T")[0] }]); setNewAddOn({ name: "", desc: "", icon: "" }); } }}>+ Create Module</Btn>
             </div>
           </Card>
 
@@ -4728,7 +4728,7 @@ const SuperuserModule = () => {
                     <span style={{ fontSize: 24 }}>{mod.icon}</span>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{mod.name}</div>
-                      <div style={{ fontSize: 11, color: B.textMuted }}>{mod.id} ┬╖ Created {fmtDate(mod.created)}</div>
+                      <div style={{ fontSize: 11, color: B.textMuted }}>{mod.id}  · Created {fmtDate(mod.created)}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 4 }}>
@@ -4764,13 +4764,13 @@ const SuperuserModule = () => {
 
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 6 }}>
-                  <Btn variant="primary" size="sm" onClick={() => setShowAddOnAssign(mod.id)}>=��� Assign / Reassign</Btn>
+                  <Btn variant="primary" size="sm" onClick={() => setShowAddOnAssign(mod.id)}> Assign / Reassign</Btn>
                   {mod.status === "draft" ? (
                     <Btn variant="success" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "active" } : m))}>✓ Activate</Btn>
                   ) : (
                     <Btn variant="secondary" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "draft" } : m))}>⏸ Deactivate</Btn>
                   )}
-                  <Btn variant="ghost" size="sm" style={{ color: B.danger, marginLeft: "auto" }} onClick={() => setAddOnModules(prev => prev.filter(m => m.id !== mod.id))}>=���</Btn>
+                  <Btn variant="ghost" size="sm" style={{ color: B.danger, marginLeft: "auto" }} onClick={() => setAddOnModules(prev => prev.filter(m => m.id !== mod.id))}></Btn>
                 </div>
               </Card>
             ))}
@@ -4784,7 +4784,7 @@ const SuperuserModule = () => {
             <div style={{ marginBottom: 14 }}>
               <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 6, fontFamily: "Arial, sans-serif" }}>Assignment Scope</label>
               <div style={{ display: "flex", gap: 6 }}>
-                {[{ v: "all", l: "=��� All Staff", d: `All ${EMPLOYEES.length} employees` }, { v: "groups", l: "=��� Departments / Groups", d: "Select specific departments" }, { v: "individuals", l: "=��� Individual Employees", d: "Pick specific people" }].map(opt => (
+                {[{ v: "all", l: " All Staff", d: `All ${EMPLOYEES.length} employees` }, { v: "groups", l: " Departments / Groups", d: "Select specific departments" }, { v: "individuals", l: " Individual Employees", d: "Pick specific people" }].map(opt => (
                   <div key={opt.v} onClick={() => setAssignTarget(opt.v)} style={{ flex: 1, padding: "10px 12px", borderRadius: 8, border: `2px solid ${assignTarget === opt.v ? B.accent : B.border}`, background: assignTarget === opt.v ? B.accentBg : B.white, cursor: "pointer", transition: "all 0.15s" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: assignTarget === opt.v ? B.accent : B.textPrimary }}>{opt.l}</div>
                     <div style={{ fontSize: 11, color: B.textMuted }}>{opt.d}</div>
@@ -4808,7 +4808,7 @@ const SuperuserModule = () => {
                     );
                   })}
                 </div>
-                <div style={{ fontSize: 11, color: B.textMuted, marginTop: 6 }}>Selected: {assignDepts.length} departments ┬╖ {assignDepts.reduce((s, d) => s + EMPLOYEES.filter(e => e.department === d).length, 0)} employees</div>
+                <div style={{ fontSize: 11, color: B.textMuted, marginTop: 6 }}>Selected: {assignDepts.length} departments  · {assignDepts.reduce((s, d) => s + EMPLOYEES.filter(e => e.department === d).length, 0)} employees</div>
               </div>
             )}
 
@@ -4863,7 +4863,7 @@ const SuperuserModule = () => {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             {/* Employee Master Data */}
             <Card style={{ borderTop: `4px solid ${B.accent}` }}>
-              <SectionTitle>=��� Employee Master Data</SectionTitle>
+              <SectionTitle> Employee Master Data</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Initial population or bulk update of employee records: personal info, employment details, compensation, and reporting structure.</div>
               <BatchUpload module="employee data" color={B.accent}
                 fields={["Employee ID", "First Name", "Last Name", "Email", "Country", "Entity", "Department", "Title", "Level", "Manager ID", "Hire Date", "Salary", "Currency", "Bonus", "Status"]}
@@ -4872,7 +4872,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Compensation / Payroll */}
             <Card style={{ borderTop: `4px solid ${B.teal}` }}>
-              <SectionTitle>=��� Compensation & Payroll</SectionTitle>
+              <SectionTitle> Compensation & Payroll</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Batch upload salary changes, bonus payments, COLA adjustments, or full compensation history.</div>
               <BatchUpload module="compensation data" color={B.teal}
                 fields={["Employee ID", "Effective Date", "Change Type", "Old Salary", "New Salary", "Currency", "Reason", "Approved By"]}
@@ -4881,7 +4881,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Leave / Time */}
             <Card style={{ borderTop: `4px solid ${B.blue}` }}>
-              <SectionTitle>=��� Leave & Time Records</SectionTitle>
+              <SectionTitle> Leave & Time Records</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import historical leave records, time entries, or leave balance adjustments.</div>
               <BatchUpload module="leave records" color={B.blue}
                 fields={["Employee ID", "Leave Type", "Start Date", "End Date", "Days", "Status", "Approved By"]}
@@ -4899,7 +4899,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Onboarding */}
             <Card style={{ borderTop: `4px solid ${B.orange}` }}>
-              <SectionTitle>=��� Onboarding Journeys</SectionTitle>
+              <SectionTitle> Onboarding Journeys</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Batch-create onboarding journeys for multiple new hires at once.</div>
               <BatchUpload module="onboarding data" color={B.orange}
                 fields={["Name", "Role", "Country", "Department", "Start Date", "Manager", "Template", "Buddy"]}
@@ -4908,7 +4908,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Survey Responses */}
             <Card style={{ borderTop: `4px solid ${B.pink}` }}>
-              <SectionTitle>=��� Survey Results / History</SectionTitle>
+              <SectionTitle> Survey Results / History</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import historical survey responses, engagement scores, or prior-year results for YoY comparison.</div>
               <BatchUpload module="survey data" color={B.pink}
                 fields={["Survey ID", "Employee ID", "Question ID", "Response", "Score", "Timestamp", "Anonymous"]}
@@ -4917,7 +4917,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Grant Allocations */}
             <Card style={{ borderTop: `4px solid ${B.dkTeal}` }}>
-              <SectionTitle>=��� Grant / Project Allocations</SectionTitle>
+              <SectionTitle> Grant / Project Allocations</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import grant allocation percentages, timesheet data, or project assignments.</div>
               <BatchUpload module="grant allocation data" color={B.dkTeal}
                 fields={["Employee ID", "Grant Code", "Grant Name", "Allocation %", "Period", "Hours", "Status"]}
@@ -4926,7 +4926,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Allowance Claims */}
             <Card style={{ borderTop: `4px solid ${B.ltPurple}` }}>
-              <SectionTitle>=��� Allowance Claims (H&W / L&D)</SectionTitle>
+              <SectionTitle> Allowance Claims (H&W / L&D)</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Batch import historical allowance claims and reimbursement records.</div>
               <BatchUpload module="allowance claims" color={B.ltPurple}
                 fields={["Employee ID", "Type", "Description", "Amount", "Currency", "Date", "Status"]}
@@ -4956,11 +4956,11 @@ const SuperuserModule = () => {
                       {role.locked && <Badge color={B.danger} bg={B.dangerBg}>SYSTEM LOCKED</Badge>}
                     </div>
                     <div style={{ fontSize: 12, color: B.textMuted, marginTop: 2 }}>{role.desc}</div>
-                    <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{role.id} ┬╖ {role.users} user(s) assigned</div>
+                    <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{role.id}  · {role.users} user(s) assigned</div>
                   </div>
                   <div style={{ display: "flex", gap: 4 }}>
                     <Btn variant="secondary" size="sm" onClick={() => { setEditRole({ ...role }); setShowRoleModal(role.id); }}>✏∩╕Å Edit</Btn>
-                    {!role.locked && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { if (role.users === 0) { setSecurityRoles(prev => prev.filter(r => r.id !== role.id)); } else { alert(`Cannot delete "${role.name}" — ${role.users} user(s) are still assigned. Reassign them first.`); } }}>=���</Btn>}
+                    {!role.locked && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { if (role.users === 0) { setSecurityRoles(prev => prev.filter(r => r.id !== role.id)); } else { alert(`Cannot delete "${role.name}" — ${role.users} user(s) are still assigned. Reassign them first.`); } }}></Btn>}
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -5009,7 +5009,7 @@ const SuperuserModule = () => {
                   }
                   setShowRoleModal(null);
                   alert(showRoleModal === "new" ? `Security role "${editRole.name}" created` : `Security role "${editRole.name}" updated`);
-                }}>=��� {showRoleModal === "new" ? "Create Role" : "Save Changes"}</Btn>
+                }}> {showRoleModal === "new" ? "Create Role" : "Save Changes"}</Btn>
               </div>
             </div>
           </Modal>
@@ -5034,7 +5034,7 @@ const SuperuserModule = () => {
                         <span style={{ fontSize: 20 }}>{ent.flag}</span>
                         <span style={{ fontSize: 15, fontWeight: 700, color: B.textPrimary }}>{ent.name}</span>
                       </div>
-                      <div style={{ fontSize: 12, color: B.textMuted, marginTop: 2 }}>{ent.country} ┬╖ {ent.id}</div>
+                      <div style={{ fontSize: 12, color: B.textMuted, marginTop: 2 }}>{ent.country}  · {ent.id}</div>
                     </div>
                     <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                       <Badge color={typeColors[ent.type]} bg={`${typeColors[ent.type]}14`}>{ent.type}</Badge>
@@ -5051,7 +5051,7 @@ const SuperuserModule = () => {
                   <div style={{ display: "flex", gap: 4 }}>
                     <Btn variant="secondary" size="sm" onClick={() => { setEditEntity({ ...ent }); setShowEntityModal(ent.id); }}>✏∩╕Å Edit</Btn>
                     {ent.headcount === 0 && ent.type !== "HQ" && (
-                      <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { setEntities(prev => prev.filter(e => e.id !== ent.id)); alert(`Entity "${ent.name}" removed`); }}>=��� Remove</Btn>
+                      <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { setEntities(prev => prev.filter(e => e.id !== ent.id)); alert(`Entity "${ent.name}" removed`); }}> Remove</Btn>
                     )}
                     {ent.status === "Active" && ent.type !== "HQ" && (
                       <Btn variant="ghost" size="sm" style={{ color: B.warning }} onClick={() => { setEntities(prev => prev.map(e => e.id === ent.id ? { ...e, status: "Inactive" } : e)); alert(`Entity "${ent.name}" deactivated`); }}>⏸ Deactivate</Btn>
@@ -5090,13 +5090,13 @@ const SuperuserModule = () => {
                 <Btn variant="secondary" onClick={() => setShowEntityModal(null)}>Cancel</Btn>
                 <Btn variant="primary" onClick={() => {
                   if (showEntityModal === "new") {
-                    setEntities(prev => [...prev, { ...editEntity, id: `ENT-${editEntity.code || Date.now().toString(36)}`, flag: "=���", status: "Active", headcount: 0, registrationNo: `NI-${editEntity.code}-${Math.floor(1000 + Math.random() * 9000)}`, established: new Date().toISOString().split("T")[0] }]);
+                    setEntities(prev => [...prev, { ...editEntity, id: `ENT-${editEntity.code || Date.now().toString(36)}`, flag: "", status: "Active", headcount: 0, registrationNo: `NI-${editEntity.code}-${Math.floor(1000 + Math.random() * 9000)}`, established: new Date().toISOString().split("T")[0] }]);
                   } else {
                     setEntities(prev => prev.map(e => e.id === showEntityModal ? { ...e, ...editEntity } : e));
                   }
                   setShowEntityModal(null);
                   alert(showEntityModal === "new" ? `Entity "${editEntity.name}" created and available for assignment` : `Entity "${editEntity.name}" updated`);
-                }}>=��� {showEntityModal === "new" ? "Create Entity" : "Save Changes"}</Btn>
+                }}> {showEntityModal === "new" ? "Create Entity" : "Save Changes"}</Btn>
               </div>
             </div>
           </Modal>
@@ -5136,7 +5136,7 @@ const SuperuserModule = () => {
                 <Select value={formatSettings[s.key]} onChange={v => setFormatSettings(prev => ({ ...prev, [s.key]: v }))} style={{ width: "100%" }} options={s.options} />
               </div>
             ))}
-            <Btn variant="primary" style={{ width: "100%", marginTop: 8 }} onClick={() => alert("Formatting saved and applied globally")}>=��� Save Formatting Changes</Btn>
+            <Btn variant="primary" style={{ width: "100%", marginTop: 8 }} onClick={() => alert("Formatting saved and applied globally")}> Save Formatting Changes</Btn>
           </Card>
         </div>
       )}
@@ -5156,7 +5156,7 @@ const SuperuserModule = () => {
             { label: "Actions", render: r => (
               <div style={{ display: "flex", gap: 4 }}>
                 <Btn variant="ghost" size="sm" onClick={() => alert('Edit user: modify role, permissions, MFA, and country assignment')}>✏∩╕Å</Btn>
-                {r.role !== "Superuser" && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => alert(`Account locked for ${r.name}. They will be logged out immediately.`)}>=���</Btn>}
+                {r.role !== "Superuser" && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => alert(`Account locked for ${r.name}. They will be logged out immediately.`)}></Btn>}
               </div>
             )},
           ]} data={users} />
@@ -5175,7 +5175,7 @@ const SuperuserModule = () => {
                 <Avatar name={u.name} size={28} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{u.name}</div>
-                  <div style={{ fontSize: 11, color: B.textMuted }}>{u.role} ┬╖ {COUNTRIES.find(c => c.code === u.country)?.flag} {u.ip}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>{u.role}  · {COUNTRIES.find(c => c.code === u.country)?.flag} {u.ip}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: B.textPrimary }}>{duration} min</div>
@@ -5199,7 +5199,7 @@ const SuperuserModule = () => {
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <Btn variant="secondary" onClick={() => setShowConfirm(null)}>Cancel</Btn>
           <Btn variant={featureToggles[showConfirm] ? "danger" : "success"} onClick={confirmToggle}>
-            {featureToggles[showConfirm] ? "=��� Disable Feature" : "✓ Enable Feature"}
+            {featureToggles[showConfirm] ? " Disable Feature" : "✓ Enable Feature"}
           </Btn>
         </div>
       </Modal>
@@ -5295,7 +5295,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                     <Badge color={goalTypeColors[g.type] || B.textMuted} bg={`${goalTypeColors[g.type] || B.textMuted}14`}>{g.type}</Badge>
                   </div>
                   <ProgressBar value={g.progress} max={100} color={g.progress >= 80 ? B.success : g.progress >= 50 ? B.blue : B.warning} />
-                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{g.owner} ┬╖ {g.progress}% complete</div>
+                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{g.owner}  · {g.progress}% complete</div>
                 </div>
               ))}
             </Card>
@@ -5308,7 +5308,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                     <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`} style={{ marginLeft: "auto", fontSize: 8 }}>{f.type}</Badge>
                   </div>
                   <div style={{ fontSize: 11, color: B.textSecondary, lineHeight: 1.5 }}>"{f.text}"</div>
-                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{f.competency} ┬╖ {fmtDate(f.date)}</div>
+                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{f.competency}  · {fmtDate(f.date)}</div>
                 </div>
               ))}
             </Card>
@@ -5316,7 +5316,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
               <SectionTitle>Review Cycle Progress</SectionTitle>
               {CYCLES.map(c => (
                 <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: c.id === selectedCycle ? B.accentBg : B.bgHover, marginBottom: 4, cursor: "pointer", border: `1px solid ${c.id === selectedCycle ? B.accent : "transparent"}20` }} onClick={() => setSelectedCycle(c.id)}>
-                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{c.period} ┬╖ Due {fmtDate(c.due)}</div></div>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{c.period}  · Due {fmtDate(c.due)}</div></div>
                   <div style={{ width: 50 }}><ProgressBar value={c.completion} max={100} color={c.completion === 100 ? B.success : B.accent} /></div>
                   <span style={{ fontSize: 11, fontWeight: 700, width: 32, textAlign: "right" }}>{c.completion}%</span>
                   <StatusBadge status={c.status === "Active" ? "Active" : "Approved"} />
@@ -5325,10 +5325,10 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
             </Card>
             <Card>
               <SectionTitle>Action Items</SectionTitle>
-              {[{ action: "Complete self-assessment", count: activeCycle.total - activeCycle.selfDone, urgency: "High", icon: "=���" },
+              {[{ action: "Complete self-assessment", count: activeCycle.total - activeCycle.selfDone, urgency: "High", icon: "" },
                 { action: "Manager reviews pending", count: activeCycle.total - activeCycle.mgrDone, urgency: "Medium", icon: "\u{1F465}" },
-                { action: "Goals at risk (< 50% progress)", count: EMPLOYEE_GOALS.reduce((s, eg) => s + eg.goals.filter(g => g.progress < 50).length, 0), urgency: "High", icon: "=���" },
-                { action: "Development plans needing update", count: 6, urgency: "Low", icon: "=���" },
+                { action: "Goals at risk (< 50% progress)", count: EMPLOYEE_GOALS.reduce((s, eg) => s + eg.goals.filter(g => g.progress < 50).length, 0), urgency: "High", icon: "" },
+                { action: "Development plans needing update", count: 6, urgency: "Low", icon: "" },
               ].map((a, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: a.urgency === "High" ? B.dangerBg : a.urgency === "Medium" ? B.warningBg : B.bgHover, marginBottom: 4, border: `1px solid ${a.urgency === "High" ? B.danger : a.urgency === "Medium" ? B.warning : B.border}15` }}>
                   <span style={{ fontSize: 16 }}>{a.icon}</span>
@@ -5345,7 +5345,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
       {tab === "goals" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 14 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Goal Title, Type, Aligned To, Target Date")}>=��� Batch Upload Goals</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Goal Title, Type, Aligned To, Target Date")}> Batch Upload Goals</Btn>
             <Btn variant="primary" size="sm" onClick={() => setShowGoalModal(true)}>+ Create Goal</Btn>
           </div>
           {/* Org goals cascade */}
@@ -5439,7 +5439,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 14 }}>
             <Btn variant="primary" size="sm" onClick={() => setShowFeedback(true)}>+ Give Feedback</Btn>
-            <Btn variant="secondary" size="sm" onClick={() => setShow360(true)}>=��� Request 360┬░</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => setShow360(true)}> Request 360┬░</Btn>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card style={{ borderTop: `4px solid ${B.success}` }}>
@@ -5512,7 +5512,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                   <Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...EMPLOYEES.slice(0, 14).map(emp => ({ value: emp.id, label: `${emp.first} ${emp.last}` }))]} />
                 </div>
               ))}
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setShow360(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("360┬░ feedback requests sent!"); setShow360(false); }}>=��� Launch 360┬░</Btn></div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setShow360(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("360┬░ feedback requests sent!"); setShow360(false); }}> Launch 360┬░</Btn></div>
             </div>
           </Modal>
         </div>
@@ -5558,7 +5558,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                 <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Type</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "weekly", label: "Weekly 1:1" }, { value: "monthly", label: "Monthly" }, { value: "quarterly", label: "Quarterly Review" }, { value: "probation", label: "Probation" }]} /></div>
               </div>
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Topics / Agenda</label><textarea rows={3} placeholder="Key topics to discuss..." style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", resize: "vertical", boxSizing: "border-box" }} /></div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}><Btn variant="secondary" onClick={() => setShowCheckin(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("Check-in scheduled! Calendar invite sent."); setShowCheckin(false); }}>=��� Schedule</Btn></div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}><Btn variant="secondary" onClick={() => setShowCheckin(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("Check-in scheduled! Calendar invite sent."); setShowCheckin(false); }}> Schedule</Btn></div>
             </div>
           </Modal>
         </div>
@@ -5650,7 +5650,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                   <span style={{ fontWeight: 700, color: goalTypeColors[type] }}>{avg}%</span>
                 </div>
                 <ProgressBar value={avg} max={100} color={goalTypeColors[type]} />
-                <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{goals.length} goals ┬╖ {goals.filter(g => g.status === "On Track").length} on track ┬╖ {goals.filter(g => g.status === "At Risk").length} at risk</div>
+                <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{goals.length} goals  · {goals.filter(g => g.status === "On Track").length} on track  · {goals.filter(g => g.status === "At Risk").length} at risk</div>
               </div>);
             })}
           </Card>
@@ -5768,7 +5768,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: 4, background: p.color, flexShrink: 0 }} />
                   <span style={{ fontSize: 12, flex: 1, fontWeight: 600 }}>{p.name}</span>
-                  <span style={{ fontSize: 11, color: B.textMuted }}>{p.courses} courses ┬╖ {p.hours}</span>
+                  <span style={{ fontSize: 11, color: B.textMuted }}>{p.courses} courses  · {p.hours}</span>
                   <div style={{ width: 60 }}><ProgressBar value={p.completion} max={100} color={p.completion >= 80 ? B.success : p.completion >= 60 ? B.blue : B.warning} /></div>
                   <span style={{ fontSize: 11, fontWeight: 700, width: 32, textAlign: "right" }}>{p.completion}%</span>
                 </div>
@@ -5823,7 +5823,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
             <div style={{ flex: 1, minWidth: 200 }}><SearchBar value={searchQ} onChange={setSearchQ} placeholder="Search courses, competencies, providers..." /></div>
             <Select value={catalogFilter} onChange={setCatalogFilter} options={[{ value: "ALL", label: "All Categories" }, ...categories.map(c => ({ value: c, label: c }))]} />
             <Select value={audienceFilter} onChange={setAudienceFilter} options={[{ value: "ALL", label: "All Audiences" }, ...audiences.map(a => ({ value: a, label: a }))]} />
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag SCORM package or Excel course list")}>=��� Import Courses</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag SCORM package or Excel course list")}> Import Courses</Btn>
           </div>
           <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>{filtered.length} courses</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -5868,7 +5868,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 <div style={{ flex: 1, textAlign: "center", padding: 12, borderRadius: 8, background: B.bgHover }}><div style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: B.success }}>{c.completed}</div><div style={{ fontSize: 10, color: B.textMuted }}>Completed</div></div>
                 <div style={{ flex: 1, textAlign: "center", padding: 12, borderRadius: 8, background: B.bgHover }}><div style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: B.orange }}>★ {c.rating}</div><div style={{ fontSize: 10, color: B.textMuted }}>Rating</div></div>
               </div>
-              <div style={{ display: "flex", gap: 8 }}><Btn variant="primary" style={{ flex: 1 }}onClick={() => alert('Launching course: ' + c.title)}>▶ Launch Course</Btn><Btn variant="secondary" onClick={() => alert('Assign course to staff — select employees, departments, or all staff')}>=��� Assign to Staff</Btn><Btn variant="secondary" onClick={() => alert('Course analytics: enrollment, completion rates, avg score, and feedback')}>=��� View Report</Btn></div>
+              <div style={{ display: "flex", gap: 8 }}><Btn variant="primary" style={{ flex: 1 }} onClick={() => { setSelectedCourse(null); alert("Launching: " + c.title); }}>&#9654; Launch Course</Btn><Btn variant="secondary" onClick={() => { setSelectedCourse(null); setAssignSelected([]); setAssignDept("ALL"); setAssignDue(""); setAssignSent(false); setAssignModal(c); }}>Assign to Staff</Btn><Btn variant="secondary" onClick={() => { setSelectedCourse(null); setReportModal(c); }}>View Report</Btn></div>
             </div>); })()}
           </Modal>
 
@@ -6032,7 +6032,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{p.name}</div>
                 {p.mandatory && <Badge color={B.danger} bg={B.dangerBg}>Mandatory</Badge>}
               </div>
-              <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 8 }}>{p.audience} ┬╖ {p.courses} courses ┬╖ {p.hours}</div>
+              <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 8 }}>{p.audience}  · {p.courses} courses  · {p.hours}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <div style={{ flex: 1 }}><ProgressBar value={p.completion} max={100} color={p.completion >= 80 ? B.success : p.completion >= 60 ? B.blue : B.warning} /></div>
                 <span style={{ fontSize: 13, fontWeight: 700, color: p.completion >= 80 ? B.success : p.completion >= 60 ? B.blue : B.warning }}>{p.completion}%</span>
@@ -6099,12 +6099,12 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 <StatusBadge status={ev.status === "Upcoming" ? "Active" : "Approved"} />
               </div>
               <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary, marginBottom: 2 }}>{ev.title}</div>
-              <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 6 }}>{fmtDate(ev.date)} ┬╖ {ev.time} ┬╖ {ev.speaker}</div>
+              <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 6 }}>{fmtDate(ev.date)}  · {ev.time}  · {ev.speaker}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
                 <span>{ev.registered}/{ev.capacity} registered</span>
                 <ProgressBar value={ev.registered} max={ev.capacity} color={ev.registered >= ev.capacity * 0.8 ? B.warning : B.blue} />
               </div>
-              {ev.status === "Upcoming" && <Btn variant="primary" size="sm" style={{ width: "100%", marginTop: 8 }}onClick={() => alert('Registered! Calendar invite sent to your email.')}>=��� Register / Add to Calendar</Btn>}
+              {ev.status === "Upcoming" && <Btn variant="primary" size="sm" style={{ width: "100%", marginTop: 8 }}onClick={() => alert('Registered! Calendar invite sent to your email.')}> Register / Add to Calendar</Btn>}
             </Card>
           ))}
         </div>
@@ -6198,7 +6198,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{p.portal}</span>
                   <StatusBadge status={p.status === "Active" ? "Active" : "Pending"} />
                 </div>
-                <div style={{ fontSize: 11, color: B.textMuted }}>{p.audience} ┬╖ {p.users} users ┬╖ Theme: {p.brand}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>{p.audience}  · {p.users} users  · Theme: {p.brand}</div>
               </div>
             ))}
           </Card>
@@ -6243,7 +6243,7 @@ const OnboardingModule = () => {
   ];
 
   const PREBOARD_TASKS = [
-    { cat: "Documents & Compliance", icon: "=���", tasks: [
+    { cat: "Documents & Compliance", icon: "", tasks: [
       { name: "Signed offer letter (e-signature)", owner: "New Hire", due: "T-21", status: "done" },
       { name: "Employment contract execution", owner: "HR", due: "T-18", status: "done" },
       { name: "ID & work authorization copies", owner: "New Hire", due: "T-14", status: "done" },
@@ -6253,7 +6253,7 @@ const OnboardingModule = () => {
       { name: "Code of conduct acknowledgment", owner: "New Hire", due: "T-7", status: "pending" },
       { name: "Country-specific compliance forms", owner: "HR", due: "T-7", status: "pending" },
     ]},
-    { cat: "IT & Access Provisioning", icon: "=���", tasks: [
+    { cat: "IT & Access Provisioning", icon: "", tasks: [
       { name: "Laptop / hardware request submitted", owner: "IT", due: "T-14", status: "done" },
       { name: "Email & SSO account created", owner: "IT", due: "T-7", status: "done" },
       { name: "HRIS profile created", owner: "HR", due: "T-7", status: "done" },
@@ -6261,7 +6261,7 @@ const OnboardingModule = () => {
       { name: "Role-based system permissions set", owner: "IT", due: "T-3", status: "pending" },
       { name: "VPN & security credentials", owner: "IT", due: "T-3", status: "pending" },
     ]},
-    { cat: "Communication & Engagement", icon: "=���", tasks: [
+    { cat: "Communication & Engagement", icon: "", tasks: [
       { name: "Welcome email from HR (T-21)", owner: "HR", due: "T-21", status: "done" },
       { name: "Manager intro email (T-14)", owner: "Manager", due: "T-14", status: "done" },
       { name: "Team welcome message (T-7)", owner: "Buddy", due: "T-7", status: "progress" },
@@ -6269,7 +6269,7 @@ const OnboardingModule = () => {
       { name: "Calendar: Week 1 manager meetings", owner: "Manager", due: "T-3", status: "pending" },
       { name: "Pre-boarding portal access sent", owner: "System", due: "T-21", status: "done" },
     ]},
-    { cat: "Culture & Content", icon: "=���", tasks: [
+    { cat: "Culture & Content", icon: "", tasks: [
       { name: "Watch: NI mission & values video", owner: "New Hire", due: "T-7", status: "progress" },
       { name: "Read: Employee handbook", owner: "New Hire", due: "T-3", status: "pending" },
       { name: "Complete: 'Get to know you' questionnaire", owner: "New Hire", due: "T-5", status: "pending" },
@@ -6312,12 +6312,12 @@ const OnboardingModule = () => {
     const ph = journey.phase;
     const pre = PREBOARD_TASKS.flatMap(c => c.tasks.filter(t => t.owner === "New Hire").map(t => ({ ...t, cat: c.cat, icon: c.icon })));
     const onb = ph !== "Pre-boarding" ? [
-      { name: "Complete safeguarding & code of conduct training", status: ph === "Week 1" ? "progress" : "done", cat: "Learning", icon: "=���", due: "Day 1", owner: "New Hire" },
-      { name: "Set up all tools & confirm access working", status: ph === "Week 1" ? "progress" : "done", cat: "IT", icon: "=���", due: "Week 1", owner: "New Hire" },
-      { name: "Complete role-specific learning path", status: ["30-Day","60-Day","90-Day"].includes(ph) ? "progress" : ph === "Week 1" ? "pending" : "done", cat: "Learning", icon: "=���", due: "30 Days", owner: "New Hire" },
-      { name: "Submit 30-day pulse survey", status: ["60-Day","90-Day"].includes(ph) ? "done" : ph === "30-Day" ? "progress" : "pending", cat: "Feedback", icon: "=���", due: "30 Days", owner: "New Hire" },
-      { name: "Begin first project / deliverable", status: ["60-Day","90-Day"].includes(ph) ? "progress" : "pending", cat: "Work", icon: "=���", due: "60 Days", owner: "New Hire" },
-      { name: "Submit 90-day NPS survey", status: ph === "90-Day" ? "progress" : "pending", cat: "Feedback", icon: "=���", due: "90 Days", owner: "New Hire" },
+      { name: "Complete safeguarding & code of conduct training", status: ph === "Week 1" ? "progress" : "done", cat: "Learning", icon: "", due: "Day 1", owner: "New Hire" },
+      { name: "Set up all tools & confirm access working", status: ph === "Week 1" ? "progress" : "done", cat: "IT", icon: "", due: "Week 1", owner: "New Hire" },
+      { name: "Complete role-specific learning path", status: ["30-Day","60-Day","90-Day"].includes(ph) ? "progress" : ph === "Week 1" ? "pending" : "done", cat: "Learning", icon: "", due: "30 Days", owner: "New Hire" },
+      { name: "Submit 30-day pulse survey", status: ["60-Day","90-Day"].includes(ph) ? "done" : ph === "30-Day" ? "progress" : "pending", cat: "Feedback", icon: "", due: "30 Days", owner: "New Hire" },
+      { name: "Begin first project / deliverable", status: ["60-Day","90-Day"].includes(ph) ? "progress" : "pending", cat: "Work", icon: "", due: "60 Days", owner: "New Hire" },
+      { name: "Submit 90-day NPS survey", status: ph === "90-Day" ? "progress" : "pending", cat: "Feedback", icon: "", due: "90 Days", owner: "New Hire" },
     ] : [];
     return [...pre, ...onb];
   };
@@ -6326,10 +6326,10 @@ const OnboardingModule = () => {
     <div>
       {/* VIEW AS TOGGLE */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, padding: "8px 14px", borderRadius: 8, background: viewAs !== "admin" ? `linear-gradient(135deg, ${B.charcoal}, ${B.grey})` : B.bgHover, border: `1px solid ${viewAs !== "admin" ? B.charcoal : B.border}` }}>
-        <span style={{ fontSize: 14 }}>{viewAs === "admin" ? "⚙∩╕Å" : "=���"}</span>
+        <span style={{ fontSize: 14 }}>{viewAs === "admin" ? "⚙∩╕Å" : ""}</span>
         <span style={{ fontSize: 12, fontWeight: 700, color: viewAs !== "admin" ? "#fff" : B.textSecondary }}>View As:</span>
         <Select value={viewAs} onChange={handleViewAs} style={{ fontSize: 12, background: viewAs !== "admin" ? B.grey : B.white, color: viewAs !== "admin" ? "#fff" : B.textPrimary, borderColor: viewAs !== "admin" ? B.grey : B.border, minWidth: 240 }}
-          options={[{ value: "admin", label: "⚙∩╕Å HR Admin / Manager View" }, ...activeJourneys.map(j => ({ value: j.id, label: `=��� ${j.name} — ${j.role} (${j.phase})` }))]} />
+          options={[{ value: "admin", label: "⚙∩╕Å HR Admin / Manager View" }, ...activeJourneys.map(j => ({ value: j.id, label: ` ${j.name} — ${j.role} (${j.phase})` }))]} />
         {viewAs !== "admin" && <Badge color={B.yellow} bg="rgba(255,184,28,0.25)" style={{ color: "#fff" }}>EMPLOYEE PREVIEW</Badge>}
       </div>
 
@@ -6347,8 +6347,8 @@ const OnboardingModule = () => {
               <Avatar name={j.name} size={64} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "Georgia, serif" }}>Welcome{!isPreboard ? ` back, ${j.name.split(" ")[0]}` : " to Nutrition International"}!</div>
-                <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>{j.role} ┬╖ {j.dept} ┬╖ {c?.flag} {c?.name}</div>
-                <div style={{ fontSize: 12, opacity: 0.7, marginTop: 2 }}>Manager: {j.manager} ┬╖ Buddy: {j.buddy}</div>
+                <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>{j.role}  · {j.dept}  · {c?.flag} {c?.name}</div>
+                <div style={{ fontSize: 12, opacity: 0.7, marginTop: 2 }}>Manager: {j.manager}  · Buddy: {j.buddy}</div>
               </div>
               {isPreboard && (<div style={{ textAlign: "center", padding: "12px 20px", borderRadius: 10, background: "rgba(255,255,255,0.1)" }}>
                 <div style={{ fontSize: 32, fontWeight: 700, fontFamily: "Georgia, serif" }}>{daysUntilStart}</div>
@@ -6367,7 +6367,7 @@ const OnboardingModule = () => {
                 <div style={{ width: 72, height: 72, borderRadius: 36, background: `conic-gradient(${j.progress >= 80 ? B.success : B.blue} ${j.progress * 3.6}deg, ${B.bgHover} 0deg)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <div style={{ width: 52, height: 52, borderRadius: 26, background: B.white, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", color: j.progress >= 80 ? B.success : B.blue }}>{j.progress}%</div>
                 </div>
-                <div><div style={{ fontSize: 14, fontWeight: 700 }}>Phase: <span style={{ color: phaseColors[j.phase] }}>{j.phase}</span></div><div style={{ fontSize: 12, color: B.textMuted }}>{doneTasks}/{myTasks.length} personal tasks ┬╖ Template: {j.template}</div></div>
+                <div><div style={{ fontSize: 14, fontWeight: 700 }}>Phase: <span style={{ color: phaseColors[j.phase] }}>{j.phase}</span></div><div style={{ fontSize: 12, color: B.textMuted }}>{doneTasks}/{myTasks.length} personal tasks  · Template: {j.template}</div></div>
               </div>
               <div style={{ display: "flex", gap: 0 }}>{["Pre-boarding","Week 1","30-Day","60-Day","90-Day","Complete"].map((ph, pi) => {
                 const cur = ph === j.phase; const past = ["Pre-boarding","Week 1","30-Day","60-Day","90-Day","Complete"].indexOf(j.phase) > pi;
@@ -6406,12 +6406,12 @@ const OnboardingModule = () => {
           {/* Content + FAQ + Pulse */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card>
-              <SectionTitle>=��� Welcome Content</SectionTitle>
-              {[{ t: "Our Mission: Nourish Life", type: "Video ┬╖ 4 min", icon: "=���", done: true },
-                { t: "NI Values & Culture", type: "Video ┬╖ 6 min", icon: "=���", done: false },
-                { t: "Employee Handbook 2026", type: "PDF ┬╖ 45 pages", icon: "=���", done: false },
-                { t: `Benefits Guide — ${c?.name}`, type: "Guide ┬╖ 12 pages", icon: "=���", done: false },
-                { t: "Safeguarding Training", type: "E-learning ┬╖ 30 min", icon: "=���∩╕Å", done: false },
+              <SectionTitle> Welcome Content</SectionTitle>
+              {[{ t: "Our Mission: Nourish Life", type: "Video  · 4 min", icon: "", done: true },
+                { t: "NI Values & Culture", type: "Video  · 6 min", icon: "", done: false },
+                { t: "Employee Handbook 2026", type: "PDF  · 45 pages", icon: "", done: false },
+                { t: `Benefits Guide — ${c?.name}`, type: "Guide  · 12 pages", icon: "", done: false },
+                { t: "Safeguarding Training", type: "E-learning  · 30 min", icon: "∩╕Å", done: false },
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 3, cursor: "pointer" }}
                   onMouseEnter={ev => ev.currentTarget.style.background = B.accentBg} onMouseLeave={ev => ev.currentTarget.style.background = B.bgHover}>
@@ -6430,9 +6430,9 @@ const OnboardingModule = () => {
                 ].map((f, i) => (<div key={i} style={{ padding: "6px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 3 }}><div style={{ fontSize: 11, fontWeight: 700 }}>{f.q}</div><div style={{ fontSize: 10, color: B.textMuted }}>{f.a}</div></div>))}
               </Card>
               <Card>
-                <SectionTitle>=��� How are you feeling?</SectionTitle>
+                <SectionTitle> How are you feeling?</SectionTitle>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", margin: "8px 0" }}>
-                  {["=���","=���","=���","=���","=���"].map((em, i) => (
+                  {["","","","",""].map((em, i) => (
                     <button key={i} onClick={() => alert("Thanks for your feedback!")} style={{ fontSize: 26, background: "none", border: `2px solid ${B.border}`, borderRadius: 10, padding: "4px 8px", cursor: "pointer" }}
                       onMouseEnter={ev => { ev.currentTarget.style.borderColor = B.accent; ev.currentTarget.style.transform = "scale(1.15)"; }}
                       onMouseLeave={ev => { ev.currentTarget.style.borderColor = B.border; ev.currentTarget.style.transform = "scale(1)"; }}>{em}</button>
@@ -6470,7 +6470,7 @@ const OnboardingModule = () => {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card style={{ borderTop: `4px solid ${B.accent}` }}>
-              <SectionTitle action={<div style={{display:"flex",gap:6}}><Btn variant="secondary" size="sm" onClick={()=>alert("Batch upload: drag Excel with Name, Role, Country, Dept, Start Date, Manager, Template columns")}>=��� Batch Upload</Btn><Btn variant="primary" size="sm" onClick={() => setShowNewHire(true)}>+ New Hire</Btn></div>}>Active New Hires</SectionTitle>
+              <SectionTitle action={<div style={{display:"flex",gap:6}}><Btn variant="secondary" size="sm" onClick={()=>alert("Batch upload: drag Excel with Name, Role, Country, Dept, Start Date, Manager, Template columns")}> Batch Upload</Btn><Btn variant="primary" size="sm" onClick={() => setShowNewHire(true)}>+ New Hire</Btn></div>}>Active New Hires</SectionTitle>
               {JOURNEYS.filter(j => j.status !== "Complete").map(j => (
                 <div key={j.id} onClick={() => { setSelectedJourney(j); setTab("preboard"); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6, cursor: "pointer", border: `1px solid ${B.border}` }}
                   onMouseEnter={ev => ev.currentTarget.style.borderColor = B.accent} onMouseLeave={ev => ev.currentTarget.style.borderColor = B.border}>
@@ -6480,7 +6480,7 @@ const OnboardingModule = () => {
                       <span style={{ fontSize: 13, fontWeight: 700 }}>{j.name}</span>
                       <Badge color={phaseColors[j.phase] || B.textMuted} bg={`${phaseColors[j.phase] || B.textMuted}14`}>{j.phase}</Badge>
                     </div>
-                    <div style={{ fontSize: 11, color: B.textMuted }}>{j.role} ┬╖ {COUNTRIES.find(c => c.code === j.country)?.flag} {j.country} ┬╖ Starts {fmtDate(j.startDate)}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>{j.role}  · {COUNTRIES.find(c => c.code === j.country)?.flag} {j.country}  · Starts {fmtDate(j.startDate)}</div>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: j.progress >= 80 ? B.success : j.progress >= 50 ? B.blue : B.orange }}>{j.progress}%</div>
@@ -6507,11 +6507,11 @@ const OnboardingModule = () => {
                 {JOURNEYS.filter(j => j.tasks.overdue > 0).map(j => (
                   <div key={j.id} style={{ padding: "8px 12px", borderRadius: 6, background: B.dangerBg, border: `1px solid ${B.danger}20`, marginBottom: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>=���</span>
+                      <span style={{ fontSize: 14 }}></span>
                       <span style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary }}>{j.name}</span>
                       <Badge color={B.danger} bg={B.dangerBg}>{j.tasks.overdue} overdue</Badge>
                     </div>
-                    <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{j.role} ┬╖ Phase: {j.phase}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{j.role}  · Phase: {j.phase}</div>
                   </div>
                 ))}
                 {JOURNEYS.every(j => j.tasks.overdue === 0) && <div style={{ textAlign: "center", padding: 12, fontSize: 12, color: B.success }}>✅ No overdue tasks</div>}
@@ -6536,7 +6536,7 @@ const OnboardingModule = () => {
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Assign Buddy</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select buddy..." }, ...EMPLOYEES.slice(0, 10).map(e => ({ value: e.id, label: `${e.first} ${e.last} (${e.department})` }))]} /></div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
                 <Btn variant="secondary" onClick={() => setShowNewHire(false)}>Cancel</Btn>
-                <Btn variant="primary" onClick={() => { alert("Onboarding journey initiated! Welcome email & pre-boarding tasks generated."); setShowNewHire(false); }}>=��� Launch Pre-boarding</Btn>
+                <Btn variant="primary" onClick={() => { alert("Onboarding journey initiated! Welcome email & pre-boarding tasks generated."); setShowNewHire(false); }}> Launch Pre-boarding</Btn>
               </div>
             </div>
           </Modal>
@@ -6556,14 +6556,14 @@ const OnboardingModule = () => {
                     <Badge color={phaseColors[j.phase]} bg={`${phaseColors[j.phase]}14`}>{j.phase}</Badge>
                     <StatusBadge status={j.status === "Complete" ? "Approved" : j.tasks.overdue > 0 ? "Open" : "Active"} />
                   </div>
-                  <div style={{ fontSize: 12, color: B.textSecondary }}>{j.role} ┬╖ {j.dept} ┬╖ {COUNTRIES.find(c => c.code === j.country)?.flag} {j.country}</div>
-                  <div style={{ fontSize: 11, color: B.textMuted }}>Manager: {j.manager} ┬╖ Buddy: {j.buddy} ┬╖ Template: {j.template}</div>
-                  <div style={{ fontSize: 11, color: B.textMuted }}>Offer: {fmtDate(j.offer)} ┬╖ Start: {fmtDate(j.startDate)}</div>
+                  <div style={{ fontSize: 12, color: B.textSecondary }}>{j.role}  · {j.dept}  · {COUNTRIES.find(c => c.code === j.country)?.flag} {j.country}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Manager: {j.manager}  · Buddy: {j.buddy}  · Template: {j.template}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Offer: {fmtDate(j.offer)}  · Start: {fmtDate(j.startDate)}</div>
                 </div>
                 <div style={{ width: 100, textAlign: "center", flexShrink: 0 }}>
                   <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "Georgia, serif", color: j.progress === 100 ? B.success : j.progress >= 70 ? B.blue : B.orange }}>{j.progress}%</div>
                   <ProgressBar value={j.progress} max={100} color={j.progress === 100 ? B.success : j.progress >= 70 ? B.blue : B.orange} />
-                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 3 }}>{j.tasks.done}/{j.tasks.total} tasks{j.tasks.overdue > 0 ? ` ┬╖ ${j.tasks.overdue} overdue` : ""}</div>
+                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 3 }}>{j.tasks.done}/{j.tasks.total} tasks{j.tasks.overdue > 0 ? `  · ${j.tasks.overdue} overdue` : ""}</div>
                 </div>
               </div>
             </Card>
@@ -6645,8 +6645,8 @@ const OnboardingModule = () => {
               </div>
               <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 8 }}>{t.desc}</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontSize: 11, color: B.textMuted }}>
-                <span>=��� {t.countries}</span><span>┬╖</span><span>=��� {t.roles}</span><span>┬╖</span>
-                <span>=��� {t.phases} phases</span><span>┬╖</span><span>✅ {t.tasks} tasks</span>
+                <span> {t.countries}</span><span> ·</span><span> {t.roles}</span><span> ·</span>
+                <span> {t.phases} phases</span><span> ·</span><span>✅ {t.tasks} tasks</span>
               </div>
               <Btn variant="secondary" size="sm" style={{ marginTop: 8, width: "100%" }} onClick={() => alert("Template editor: modify phases, tasks, owners, and due dates for this journey template")}>✏∩╕Å Edit Template</Btn>
             </Card>);
@@ -6671,7 +6671,7 @@ const OnboardingModule = () => {
                   <span style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{s.timing}</span>
                   <Badge color={B.teal} bg={B.successBg}>{s.response} response</Badge>
                 </div>
-                <div style={{ fontSize: 11, color: B.textMuted }}>{s.questions} questions ┬╖ {s.focus}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>{s.questions} questions  · {s.focus}</div>
               </div>
             ))}
           </Card>
@@ -6829,7 +6829,7 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
           </div>
           <div style={{ textAlign: "right", flexShrink: 0 }}>
             <div style={{ fontSize: 12, color: B.textPrimary }}>{emp.flag} {emp.countryName}</div>
-            <div style={{ fontSize: 10, color: B.textMuted }}>{emp.department} ┬╖ {emp.level}</div>
+            <div style={{ fontSize: 10, color: B.textMuted }}>{emp.department}  · {emp.level}</div>
           </div>
           {reports.length > 0 && (
             <Badge color={B.textMuted} bg={B.bgHover} style={{ fontSize: 9, flexShrink: 0 }}>{reports.length}</Badge>
@@ -6860,7 +6860,7 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
           </div>
         </div>
         <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 2 }}>{emp.title}</div>
-        <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>{emp.department} ┬╖ {emp.level}</div>
+        <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>{emp.department}  · {emp.level}</div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: 12 }}>{emp.flag} {emp.countryName}</span>
           {reports.length > 0 && <Badge color={B.blue} bg={`${B.blue}12`} style={{ fontSize: 9 }}>{reports.length} reports</Badge>}
@@ -6894,7 +6894,7 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
                   <Avatar name={`${emp.first} ${emp.last}`} size={28} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 700 }}>{emp.first} {emp.last}</div>
-                    <div style={{ fontSize: 10, color: B.textMuted }}>{emp.title} ┬╖ {emp.department}</div>
+                    <div style={{ fontSize: 10, color: B.textMuted }}>{emp.title}  · {emp.department}</div>
                   </div>
                   <span style={{ fontSize: 12 }}>{emp.flag}</span>
                 </div>
@@ -6906,7 +6906,7 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
         <Select value={filterCountry} onChange={setFilterCountry} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
         <Select value={filterDept} onChange={setFilterDept} options={[{ value: "ALL", label: "All Departments" }, ...DEPARTMENTS.map(d => ({ value: d, label: d }))]} />
         <div style={{ display: "flex", gap: 2, background: B.bgHover, borderRadius: 6, padding: 2, border: `1px solid ${B.border}` }}>
-          {[{ k: "tree", l: "=��� Tree" }, { k: "grid", l: "▦ Grid" }].map(v => (
+          {[{ k: "tree", l: " Tree" }, { k: "grid", l: "▦ Grid" }].map(v => (
             <button key={v.k} onClick={() => setViewMode(v.k)} style={{ padding: "5px 12px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: viewMode === v.k ? B.accent : "transparent", color: viewMode === v.k ? "#fff" : B.textMuted, fontFamily: "Arial, sans-serif" }}>{v.l}</button>
           ))}
         </div>
@@ -6920,11 +6920,11 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
       {/* Stats bar */}
       <div style={{ display: "flex", gap: 12, marginBottom: 14, fontSize: 12, color: B.textMuted, flexWrap: "wrap" }}>
         <span>{allFiltered.length} people shown</span>
-        <span>┬╖</span>
+        <span> ·</span>
         <span>{filteredManagers.length} managers</span>
-        <span>┬╖</span>
+        <span> ·</span>
         <span>{new Set(allFiltered.map(e => e.country)).size} countries</span>
-        <span>┬╖</span>
+        <span> ·</span>
         <span>{new Set(allFiltered.map(e => e.department)).size} departments</span>
       </div>
 
@@ -6934,7 +6934,7 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
           {/* CEO / Top-level node */}
           <Card style={{ marginBottom: 10, padding: 14, borderTop: `4px solid ${B.accent}`, textAlign: "center" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: B.accent, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 2 }}>Nutrition International</div>
-            <div style={{ fontSize: 11, color: B.textMuted }}>Global Organization Structure ┬╖ {EMPLOYEES.length} employees ┬╖ {COUNTRIES.length} countries</div>
+            <div style={{ fontSize: 11, color: B.textMuted }}>Global Organization Structure  · {EMPLOYEES.length} employees  · {COUNTRIES.length} countries</div>
           </Card>
           {filteredManagers.map(m => (
             <OrgNode key={m.id} emp={m} isRoot />
@@ -6994,10 +6994,10 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
           <div>
             <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 6, fontFamily: "Arial, sans-serif" }}>Export Format</label>
             <div style={{ display: "flex", gap: 6 }}>
-              {[{ v: "pdf", l: "PDF", icon: "=���", desc: "Best for sharing and printing" },
-                { v: "pptx", l: "PowerPoint", icon: "=���", desc: "Editable slides for presentations" },
-                { v: "docx", l: "Word", icon: "=���", desc: "Editable document with org table" },
-                { v: "vsdx", l: "Visio", icon: "=���", desc: "Editable diagram for restructuring" },
+              {[{ v: "pdf", l: "PDF", icon: "", desc: "Best for sharing and printing" },
+                { v: "pptx", l: "PowerPoint", icon: "", desc: "Editable slides for presentations" },
+                { v: "docx", l: "Word", icon: "", desc: "Editable document with org table" },
+                { v: "vsdx", l: "Visio", icon: "", desc: "Editable diagram for restructuring" },
               ].map(f => (
                 <div key={f.v} onClick={() => setExportFormat(f.v)} style={{ flex: 1, padding: "10px 8px", borderRadius: 8, border: `2px solid ${exportFormat === f.v ? B.accent : B.border}`, background: exportFormat === f.v ? B.accentBg : B.white, cursor: "pointer", textAlign: "center", transition: "all 0.15s" }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>{f.icon}</div>
