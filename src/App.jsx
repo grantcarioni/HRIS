@@ -5691,6 +5691,12 @@ const LMSModule = ({ employee: empProp } = {}) => {
   const [audienceFilter, setAudienceFilter] = useState("ALL");
   const [searchQ, setSearchQ] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [assignModal, setAssignModal] = useState(null);   // course being assigned
+  const [reportModal, setReportModal] = useState(null);   // course for report
+  const [assignSelected, setAssignSelected] = useState([]); // employee ids selected
+  const [assignDept, setAssignDept] = useState("ALL");
+  const [assignDue, setAssignDue] = useState("");
+  const [assignSent, setAssignSent] = useState(false);
 
   // Course catalog
   const COURSES = [
@@ -5832,7 +5838,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                   <span style={{ fontSize: 11, color: B.orange, fontWeight: 700 }}>★ {c.rating}</span>
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary, marginBottom: 2 }}>{c.title}</div>
-                <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>{c.provider} ┬╖ {c.duration} ┬╖ {c.language.join(", ")} ┬╖ {c.competency}</div>
+                <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>{c.provider} &middot; {c.duration} &middot; {c.language.join(", ")} &middot; {c.competency}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
                   <span style={{ color: B.textMuted }}>Enrolled: <strong style={{ color: B.textPrimary }}>{c.enrolled}</strong></span>
                   <span style={{ color: B.textMuted }}>Completed: <strong style={{ color: B.success }}>{c.completed}</strong></span>
@@ -5865,6 +5871,155 @@ const LMSModule = ({ employee: empProp } = {}) => {
               <div style={{ display: "flex", gap: 8 }}><Btn variant="primary" style={{ flex: 1 }}onClick={() => alert('Launching course: ' + c.title)}>▶ Launch Course</Btn><Btn variant="secondary" onClick={() => alert('Assign course to staff — select employees, departments, or all staff')}>=��� Assign to Staff</Btn><Btn variant="secondary" onClick={() => alert('Course analytics: enrollment, completion rates, avg score, and feedback')}>=��� View Report</Btn></div>
             </div>); })()}
           </Modal>
+
+          {/* ── ASSIGN TO STAFF MODAL ── */}
+          <Modal open={!!assignModal} onClose={() => { setAssignModal(null); setAssignSent(false); }} title={assignModal ? `Assign: ${assignModal.title}` : ""} width={620}>
+            {assignModal && (() => {
+              const deptFiltered = EMPLOYEES.filter(e => assignDept === "ALL" || e.department === assignDept);
+              const toggleEmp = (id) => setAssignSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+              const selectAll = () => setAssignSelected(deptFiltered.map(e => e.id));
+              const clearAll  = () => setAssignSelected([]);
+              return assignSent ? (
+                <div style={{ textAlign: "center", padding: "32px 0" }}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>&#10003;</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: B.success, marginBottom: 8 }}>Assignment Sent!</div>
+                  <div style={{ fontSize: 13, color: B.textMuted, marginBottom: 20 }}>
+                    <strong>{assignSelected.length} staff member{assignSelected.length !== 1 ? "s" : ""}</strong> have been enrolled in <strong>{assignModal.title}</strong>.
+                    {assignDue && <span> Due date: <strong>{assignDue}</strong>.</span>} Notification emails queued.
+                  </div>
+                  <Btn variant="primary" onClick={() => { setAssignModal(null); setAssignSent(false); }}>Done</Btn>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: B.accentBg, border: `1px solid ${B.accent}22`, fontSize: 12, color: B.textSecondary }}>
+                    Assigning: <strong style={{ color: B.accent }}>{assignModal.title}</strong> &middot; {assignModal.duration} &middot; {assignModal.format}
+                  </div>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                    <Select value={assignDept} onChange={setAssignDept}
+                      options={[{ value: "ALL", label: "All Departments" }, ...DEPARTMENTS.map(d => ({ value: d, label: d }))]}
+                      style={{ flex: 1, minWidth: 160 }}
+                    />
+                    <input type="date" value={assignDue} onChange={e => setAssignDue(e.target.value)}
+                      placeholder="Due date (optional)"
+                      style={{ padding: "8px 12px", borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, color: B.textPrimary, outline: "none" }}
+                    />
+                    <Btn variant="ghost" size="sm" onClick={selectAll}>Select All</Btn>
+                    <Btn variant="ghost" size="sm" onClick={clearAll}>Clear</Btn>
+                  </div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>{assignSelected.length} of {deptFiltered.length} selected</div>
+                  <div style={{ maxHeight: 260, overflowY: "auto", border: `1px solid ${B.border}`, borderRadius: 8 }}>
+                    {deptFiltered.map(e => {
+                      const checked = assignSelected.includes(e.id);
+                      return (
+                        <div key={e.id} onClick={() => toggleEmp(e.id)}
+                          style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", borderBottom: `1px solid ${B.borderLight}`, cursor: "pointer", background: checked ? `${B.accent}08` : "transparent", transition: "background 0.12s" }}
+                        >
+                          <input type="checkbox" checked={checked} readOnly style={{ accentColor: B.accent, width: 15, height: 15, cursor: "pointer", flexShrink: 0 }} />
+                          <Avatar name={`${e.first} ${e.last}`} size={28} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600 }}>{e.first} {e.last}</div>
+                            <div style={{ fontSize: 11, color: B.textMuted }}>{e.title} &middot; {e.department}</div>
+                          </div>
+                          <Badge color={B.textMuted} bg={B.bgHover}>{e.country}</Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", paddingTop: 4 }}>
+                    <Btn variant="secondary" onClick={() => setAssignModal(null)}>Cancel</Btn>
+                    <Btn variant="primary" disabled={assignSelected.length === 0} onClick={() => setAssignSent(true)}>
+                      Assign to {assignSelected.length} Staff Member{assignSelected.length !== 1 ? "s" : ""}
+                    </Btn>
+                  </div>
+                </div>
+              );
+            })()}
+          </Modal>
+
+          {/* ── COURSE REPORT MODAL ── */}
+          <Modal open={!!reportModal} onClose={() => setReportModal(null)} title={reportModal ? `Report: ${reportModal.title}` : ""} width={640}>
+            {reportModal && (() => {
+              const c = reportModal;
+              const rate = Math.round((c.completed / c.enrolled) * 100);
+              const notStarted = c.enrolled - c.completed - Math.round(c.enrolled * 0.12);
+              const inProgress = c.enrolled - c.completed - Math.max(0, notStarted);
+              const sampleStaff = EMPLOYEES.slice(0, 8).map((e, i) => ({
+                name: `${e.first} ${e.last}`,
+                dept: e.department,
+                status: i < c.completed ? "Completed" : i < c.completed + 2 ? "In Progress" : "Not Started",
+                score: i < c.completed ? (70 + Math.round(Math.random() * 28)) + "%" : "—",
+                date: i < c.completed ? `${["Jan","Feb","Mar","Apr"][i % 4]} ${10 + i}, 2026` : "—",
+              }));
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {/* KPI row */}
+                  <div style={{ display: "flex", gap: 10 }}>
+                    {[
+                      { label: "Enrolled",   value: c.enrolled,  color: B.blue },
+                      { label: "Completed",  value: c.completed, color: B.success },
+                      { label: "Completion", value: rate + "%",   color: rate >= 80 ? B.success : rate >= 60 ? B.warning : B.danger },
+                      { label: "Rating",     value: "\u2605 " + c.rating, color: B.orange },
+                    ].map((k, i) => (
+                      <div key={i} style={{ flex: 1, textAlign: "center", padding: "14px 8px", borderRadius: 10, background: B.bgHover, border: `1px solid ${B.border}` }}>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: k.color, fontFamily: "Georgia, serif" }}>{k.value}</div>
+                        <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>{k.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Progress bar breakdown */}
+                  <div style={{ padding: "12px 14px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}` }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 }}>Completion Breakdown</div>
+                    <div style={{ display: "flex", gap: 0, height: 18, borderRadius: 9, overflow: "hidden", marginBottom: 8 }}>
+                      <div style={{ width: `${rate}%`, background: B.success, transition: "width 0.5s" }} />
+                      <div style={{ width: `${Math.round((inProgress / c.enrolled) * 100)}%`, background: B.warning, transition: "width 0.5s" }} />
+                      <div style={{ flex: 1, background: B.border }} />
+                    </div>
+                    <div style={{ display: "flex", gap: 16, fontSize: 11 }}>
+                      <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, background: B.success, marginRight: 4, verticalAlign: "middle" }} />{c.completed} Completed</span>
+                      <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, background: B.warning, marginRight: 4, verticalAlign: "middle" }} />{inProgress < 0 ? 0 : inProgress} In Progress</span>
+                      <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, background: B.border, marginRight: 4, verticalAlign: "middle" }} />{Math.max(0, notStarted)} Not Started</span>
+                    </div>
+                  </div>
+                  {/* Per-employee table */}
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 }}>Staff Completion Detail</div>
+                    <div style={{ border: `1px solid ${B.border}`, borderRadius: 8, overflow: "hidden" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
+                        <thead>
+                          <tr style={{ background: B.bg }}>
+                            {["Staff Member", "Department", "Status", "Score", "Completed"].map(h => (
+                              <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontWeight: 700, fontSize: 9, letterSpacing: 0.8, textTransform: "uppercase", color: B.textMuted, borderBottom: `2px solid ${B.border}` }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sampleStaff.map((s, i) => (
+                            <tr key={i} style={{ borderBottom: `1px solid ${B.borderLight}` }}>
+                              <td style={{ padding: "8px 10px", fontWeight: 600 }}>{s.name}</td>
+                              <td style={{ padding: "8px 10px", color: B.textMuted }}>{s.dept}</td>
+                              <td style={{ padding: "8px 10px" }}>
+                                <Badge
+                                  color={s.status === "Completed" ? B.success : s.status === "In Progress" ? B.warning : B.textMuted}
+                                  bg={s.status === "Completed" ? B.successBg : s.status === "In Progress" ? B.warningBg : B.bgHover}
+                                >{s.status}</Badge>
+                              </td>
+                              <td style={{ padding: "8px 10px", fontWeight: 700, color: s.score !== "\u2014" ? B.blue : B.textMuted }}>{s.score}</td>
+                              <td style={{ padding: "8px 10px", color: B.textMuted }}>{s.date}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                    <Btn variant="secondary" onClick={() => setReportModal(null)}>Close</Btn>
+                    <Btn variant="primary" onClick={() => { alert(`Exporting full report for "${c.title}" as CSV...`); }}>&#8595; Export CSV</Btn>
+                  </div>
+                </div>
+              );
+            })()}
+          </Modal>
+
         </div>
       )}
 
