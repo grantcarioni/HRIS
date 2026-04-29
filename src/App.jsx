@@ -6987,12 +6987,12 @@ export default function App() {
       case "people":      return <PeopleModule setSelectedEmployee={handleEmployeeSelect} />;
       case "orgchart":    return <OrgChartModule setSelectedEmployee={role === "employee" ? () => {} : handleEmployeeSelect} readOnly={role === "employee"} />;
       case "onboarding":  return <OnboardingModule />;
-      case "time":        return <TimeModule />;
+      case "time":        return <TimeModule role={role} />;
       case "approvals":   return <ApprovalsModule />;
-      case "allowances":  return <AllowanceModule />;
+      case "allowances":  return <AllowanceModule role={role} />;
       case "compplan":    return <CompPlanningModule role={role} />;
-      case "lms":         return <LMSModule />;
-      case "performance": return <PerformanceModule />;
+      case "lms":         return <LMSModule role={role} />;
+      case "performance": return <PerformanceModule role={role} />;
       case "surveys":     return <SurveyModule />;
       case "workflows":   return <WorkflowModule />;
       case "analytics":   return <AnalyticsModule />;
