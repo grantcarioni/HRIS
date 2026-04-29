@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
-// ΓöÇΓöÇΓöÇ NI BRAND COLORS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── NI BRAND COLORS ────────────────────────────────────────────────────────
 const B = {
   charcoal: "#253746", carmine: "#A4343A", white: "#FFFFFF",
   // Secondary
@@ -22,7 +22,7 @@ const B = {
   danger: "#D14124", dangerBg: "rgba(209,65,36,0.08)",
 };
 
-// ΓöÇΓöÇΓöÇ ENTITIES / COUNTRIES ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── ENTITIES / COUNTRIES ───────────────────────────────────────────────────
 const COUNTRIES = [
   { code: "CA", name: "Canada",       currency: "CAD", locale: "en-CA", flag: "\u{1F1E8}\u{1F1E6}", entity: "Nutrition International HQ",  tz: "America/Toronto" },
   { code: "GB", name: "United Kingdom",currency: "GBP", locale: "en-GB", flag: "\u{1F1EC}\u{1F1E7}", entity: "NI UK Ltd",                   tz: "Europe/London" },
@@ -69,7 +69,7 @@ const HOLIDAY_CALENDARS = {
   BD: [{ name: "International Mother Language Day", date: "2026-02-21" }, { name: "Independence Day", date: "2026-03-26" }, { name: "Bengali New Year", date: "2026-04-14" }, { name: "May Day", date: "2026-05-01" }, { name: "Victory Day", date: "2026-12-16" }, { name: "Eid al-Fitr", date: "2026-03-20" }, { name: "Eid al-Adha", date: "2026-06-07" }, { name: "Durga Puja", date: "2026-10-07" }],
 };
 
-// ΓöÇΓöÇΓöÇ NI EMPLOYMENT CLASSIFICATIONS (per Contracting at NI policy) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── NI EMPLOYMENT CLASSIFICATIONS (per Contracting at NI policy) ────────────
 const EMPLOYMENT_CATEGORIES = [
   { code: "NAT", label: "National", scope: "National", comp: "National salary structure", desc: "Locally hired staff in entity country" },
   { code: "NATP", label: "National Plus", scope: "Regional or Global", comp: "National salary + Regional/Global Premium", desc: "National staff with regional or global responsibilities" },
@@ -78,13 +78,13 @@ const EMPLOYMENT_CATEGORIES = [
 ];
 
 const CONTRACT_MODALITIES = [
-  { code: "FT", label: "Fixed Term", duration: "3ΓÇô12 months", nature: "Project-specific, seasonal", contractType: "Fixed Term FT/PT", benefits: "Flexibility, quick deployment" },
+  { code: "FT", label: "Fixed Term", duration: "3–12 months", nature: "Project-specific, seasonal", contractType: "Fixed Term FT/PT", benefits: "Flexibility, quick deployment" },
   { code: "OE", label: "Open Ended", duration: "Permanent/indefinite", nature: "Core functions, strategic roles", contractType: "Permanent", benefits: "Stability, institutional memory" },
-  { code: "EOR", label: "Employer of Record", duration: "1ΓÇô3 years", nature: "All types (non-entity)", contractType: "Fixed Term or Permanent", benefits: "Legal compliance, taxes at source" },
+  { code: "EOR", label: "Employer of Record", duration: "1–3 years", nature: "All types (non-entity)", contractType: "Fixed Term or Permanent", benefits: "Legal compliance, taxes at source" },
   { code: "SEC-OUT", label: "Secondment (from NI)", duration: "Variable", nature: "Embedded in partner org", contractType: "Employment + Secondment Agreement", benefits: "Track seconded staff, cost-sharing" },
-  { code: "FIELD", label: "Field Staff Direct Hire", duration: "DaysΓÇô1 year", nature: "Local field implementation", contractType: "Consultant", benefits: "Front-line field engagement" },
-  { code: "SEC-IN", label: "Seconded to NI (via IP/Agency)", duration: "DaysΓÇô1 year", nature: "Partner staff under NI supervision", contractType: "Secondment Agreement", benefits: "Integrated program delivery" },
-  { code: "CON", label: "Consultant", duration: "DaysΓÇô6 months", nature: "Specific deliverables", contractType: "Consultant", benefits: "Short-term expertise, no employment structure" },
+  { code: "FIELD", label: "Field Staff Direct Hire", duration: "Days–1 year", nature: "Local field implementation", contractType: "Consultant", benefits: "Front-line field engagement" },
+  { code: "SEC-IN", label: "Seconded to NI (via IP/Agency)", duration: "Days–1 year", nature: "Partner staff under NI supervision", contractType: "Secondment Agreement", benefits: "Integrated program delivery" },
+  { code: "CON", label: "Consultant", duration: "Days–6 months", nature: "Specific deliverables", contractType: "Consultant", benefits: "Short-term expertise, no employment structure" },
   { code: "AGT", label: "Agent", duration: "Variable", nature: "Authorized representative / intermediary", contractType: "Agency Agreement", benefits: "External representation, distribution, liaison" },
 ];
 
@@ -124,12 +124,12 @@ const generateEmployees = () => {
     const hireDateStr = hireDate.toISOString().split("T")[0];
     // Generate effective-dated employment history
     const employmentHistory = [
-      { effectiveDate: hireDateStr, field: "Status", oldValue: "ΓÇö", newValue: "Active", reason: "New Hire", changedBy: "System" },
-      { effectiveDate: hireDateStr, field: "Title", oldValue: "ΓÇö", newValue: isManager ? `${dept} Officer` : `${dept} Associate`, reason: "New Hire", changedBy: "System" },
-      { effectiveDate: hireDateStr, field: "Level", oldValue: "ΓÇö", newValue: prevLevel, reason: "New Hire", changedBy: "System" },
-      { effectiveDate: hireDateStr, field: "Department", oldValue: "ΓÇö", newValue: dept, reason: "New Hire", changedBy: "System" },
-      { effectiveDate: hireDateStr, field: "Entity", oldValue: "ΓÇö", newValue: country.entity, reason: "New Hire", changedBy: "System" },
-      { effectiveDate: hireDateStr, field: "Compensation", oldValue: "ΓÇö", newValue: Math.round(baseSalary * 0.86).toString(), reason: "New Hire", changedBy: "HR Admin" },
+      { effectiveDate: hireDateStr, field: "Status", oldValue: "—", newValue: "Active", reason: "New Hire", changedBy: "System" },
+      { effectiveDate: hireDateStr, field: "Title", oldValue: "—", newValue: isManager ? `${dept} Officer` : `${dept} Associate`, reason: "New Hire", changedBy: "System" },
+      { effectiveDate: hireDateStr, field: "Level", oldValue: "—", newValue: prevLevel, reason: "New Hire", changedBy: "System" },
+      { effectiveDate: hireDateStr, field: "Department", oldValue: "—", newValue: dept, reason: "New Hire", changedBy: "System" },
+      { effectiveDate: hireDateStr, field: "Entity", oldValue: "—", newValue: country.entity, reason: "New Hire", changedBy: "System" },
+      { effectiveDate: hireDateStr, field: "Compensation", oldValue: "—", newValue: Math.round(baseSalary * 0.86).toString(), reason: "New Hire", changedBy: "HR Admin" },
       { effectiveDate: new Date(hireDate.getTime() + 180 * 86400000).toISOString().split("T")[0], field: "Status", oldValue: "Probation", newValue: "Active", reason: "Probation Completed", changedBy: "Manager" },
       { effectiveDate: "2023-01-01", field: "Compensation", oldValue: Math.round(baseSalary * 0.86).toString(), newValue: Math.round(baseSalary * 0.90).toString(), reason: "Annual Review 2023", changedBy: "HR Admin" },
       { effectiveDate: "2023-07-01", field: "Title", oldValue: isManager ? `${dept} Officer` : `${dept} Associate`, newValue: isManager ? `${dept} Senior Officer` : `${dept} Officer`, reason: "Promotion", changedBy: "HR Admin" },
@@ -173,9 +173,9 @@ const generateEmployees = () => {
     ];
     // Allowance claim history
     const allowanceHistory = [
-      { id: `AC-${i}-01`, type: "H&W", desc: "Gym membership (JanΓÇôMar)", amount: 135, date: "2025-03-15", status: "Reimbursed" },
+      { id: `AC-${i}-01`, type: "H&W", desc: "Gym membership (Jan–Mar)", amount: 135, date: "2025-03-15", status: "Reimbursed" },
       { id: `AC-${i}-02`, type: "L&D", desc: "Online certification course", amount: 450, date: "2025-04-20", status: "Reimbursed" },
-      { id: `AC-${i}-03`, type: "H&W", desc: "Gym membership (AprΓÇôJun)", amount: 135, date: "2025-06-15", status: "Reimbursed" },
+      { id: `AC-${i}-03`, type: "H&W", desc: "Gym membership (Apr–Jun)", amount: 135, date: "2025-06-15", status: "Reimbursed" },
       { id: `AC-${i}-04`, type: "L&D", desc: "Conference registration", amount: 680, date: "2025-09-10", status: "Reimbursed" },
       { id: `AC-${i}-05`, type: "H&W", desc: "Running shoes", amount: 160, date: "2025-10-05", status: "Reimbursed" },
       { id: `AC-${i}-06`, type: "H&W", desc: "Yoga subscription (Q1)", amount: 90, date: "2026-03-01", status: "Reimbursed" },
@@ -224,18 +224,18 @@ const generateLeaveRequests = () => [
 const LEAVE_REQUESTS = generateLeaveRequests();
 
 const CASES = [
-  { id: "CSE-001", employee: "NI-01000", subject: "Payslip discrepancy ΓÇö March", category: "Payroll", status: "Open", priority: "High", created: "2026-04-18", sla: "2026-04-21", assignee: "People & Culture" },
-  { id: "CSE-002", employee: "NI-01003", subject: "Visa renewal ΓÇö Italy assignment", category: "Compliance", status: "In Progress", priority: "Critical", created: "2026-04-15", sla: "2026-04-20", assignee: "Global Mobility" },
+  { id: "CSE-001", employee: "NI-01000", subject: "Payslip discrepancy — March", category: "Payroll", status: "Open", priority: "High", created: "2026-04-18", sla: "2026-04-21", assignee: "People & Culture" },
+  { id: "CSE-002", employee: "NI-01003", subject: "Visa renewal — Italy assignment", category: "Compliance", status: "In Progress", priority: "Critical", created: "2026-04-15", sla: "2026-04-20", assignee: "Global Mobility" },
   { id: "CSE-003", employee: "NI-01007", subject: "Benefits enrollment correction", category: "Benefits", status: "Resolved", priority: "Medium", created: "2026-04-10", sla: "2026-04-17", assignee: "Benefits Team" },
   { id: "CSE-004", employee: "NI-01025", subject: "Grant timesheet allocation question", category: "Grants", status: "Open", priority: "Medium", created: "2026-04-20", sla: "2026-04-25", assignee: "Finance" },
 ];
 
 const PENDING_APPROVALS = [
-  { id: "APR-001", type: "Leave Request", employee: "Priya Patel", detail: "Annual Leave: Apr 28 ΓÇô May 2 (5 days)", submitted: "2026-04-20", urgency: "Normal" },
-  { id: "APR-002", type: "H&W Allowance", employee: "Oliver Wright", detail: "Gym membership ΓÇö ┬ú45/month", submitted: "2026-04-19", urgency: "Normal" },
-  { id: "APR-003", type: "L&D Allowance", employee: "Mei Wong", detail: "Data Science course ΓÇö CA$890", submitted: "2026-04-18", urgency: "Normal" },
-  { id: "APR-004", type: "Comp Change", employee: "Joseph Mwangi", detail: "Salary: KES 180,000 ΓåÆ KES 210,000", submitted: "2026-04-17", urgency: "High" },
-  { id: "APR-005", type: "Leave Request", employee: "Amina Diallo", detail: "Cong├⌐ Annuel: May 12ΓÇô23 (10 days)", submitted: "2026-04-18", urgency: "Normal" },
+  { id: "APR-001", type: "Leave Request", employee: "Priya Patel", detail: "Annual Leave: Apr 28 – May 2 (5 days)", submitted: "2026-04-20", urgency: "Normal" },
+  { id: "APR-002", type: "H&W Allowance", employee: "Oliver Wright", detail: "Gym membership — ┬ú45/month", submitted: "2026-04-19", urgency: "Normal" },
+  { id: "APR-003", type: "L&D Allowance", employee: "Mei Wong", detail: "Data Science course — CA$890", submitted: "2026-04-18", urgency: "Normal" },
+  { id: "APR-004", type: "Comp Change", employee: "Joseph Mwangi", detail: "Salary: KES 180,000 → KES 210,000", submitted: "2026-04-17", urgency: "High" },
+  { id: "APR-005", type: "Leave Request", employee: "Amina Diallo", detail: "Cong├⌐ Annuel: May 12–23 (10 days)", submitted: "2026-04-18", urgency: "Normal" },
 ];
 
 const WORKFLOWS = [
@@ -248,14 +248,14 @@ const WORKFLOWS = [
   { id: "WF-007", name: "Grant Timesheet Approval", trigger: "End of pay period", steps: [{ role: "Employee", action: "Submit allocation" }, { role: "Manager", action: "Verify" }, { role: "Grants Finance", action: "Post to grant" }], sla: "3 days", status: "Active", countries: "All" },
 ];
 
-// ΓöÇΓöÇΓöÇ FORMAT HELPERS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── FORMAT HELPERS ─────────────────────────────────────────────────────────
 const fmt = (amount, currency, locale) => {
   try { return new Intl.NumberFormat(locale || "en-CA", { style: "currency", currency: currency || "CAD", maximumFractionDigits: 0 }).format(amount); }
   catch { return `${currency} ${amount.toLocaleString()}`; }
 };
-const fmtDate = (d) => { if (!d) return "ΓÇö"; try { return new Date(d + "T00:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); } catch { return d; } };
+const fmtDate = (d) => { if (!d) return "—"; try { return new Date(d + "T00:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); } catch { return d; } };
 
-// ΓöÇΓöÇΓöÇ REUSABLE COMPONENTS (Premium Visual Design) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── REUSABLE COMPONENTS (Premium Visual Design) ────────────────────────────
 const Badge = ({ children, color = B.accent, bg, style }) => (
   <span style={{ display: "inline-flex", alignItems: "center", padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, color, background: bg || `${color}12`, whiteSpace: "nowrap", fontFamily: "Arial, sans-serif", textTransform: "uppercase", lineHeight: 1.6, ...style }}>{children}</span>
 );
@@ -278,7 +278,7 @@ const MetricCard = ({ label, value, sub, color = B.accent, trend }) => (
     <div style={{ fontSize: 10, color: B.textMuted, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, fontFamily: "Arial, sans-serif" }}>{label}</div>
     <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
       <span style={{ fontSize: 26, fontWeight: 700, color: B.textPrimary, fontFamily: "Georgia, serif", letterSpacing: -0.5 }}>{value}</span>
-      {trend && <span style={{ fontSize: 11, fontWeight: 700, color: trend > 0 ? B.success : B.danger, background: trend > 0 ? B.successBg : B.dangerBg, padding: "1px 6px", borderRadius: 10 }}>{trend > 0 ? "Γåæ" : "Γåô"}{Math.abs(trend)}%</span>}
+      {trend && <span style={{ fontSize: 11, fontWeight: 700, color: trend > 0 ? B.success : B.danger, background: trend > 0 ? B.successBg : B.dangerBg, padding: "1px 6px", borderRadius: 10 }}>{trend > 0 ? "↑" : "↓"}{Math.abs(trend)}%</span>}
     </div>
     {sub && <div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>{sub}</div>}
   </Card>
@@ -341,7 +341,7 @@ const Avatar = ({ name, size = 36, photo, photoPos, onClick }) => {
   return <div onClick={onClick} style={{ width: size, height: size, borderRadius: size, background: `linear-gradient(135deg, hsl(${hue}, 45%, 48%), hsl(${(hue + 30) % 360}, 40%, 38%))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.34, fontWeight: 700, color: "#fff", fontFamily: "Arial, sans-serif", flexShrink: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.12)", letterSpacing: 0.3, cursor: onClick ? "pointer" : "default" }}>{initials}</div>;
 };
 
-// Photo storage (shared across the app) ΓÇö stores { url, pos: { x, y, scale } }
+// Photo storage (shared across the app) — stores { url, pos: { x, y, scale } }
 const photoStore = {};
 const usePhotos = () => {
   const [photos, setPhotos] = useState({...photoStore});
@@ -383,7 +383,7 @@ const Modal = ({ open, onClose, title, children, width = 600 }) => {
       <div style={{ background: B.white, border: `1px solid ${B.border}`, borderRadius: 10, width: "92%", maxWidth: width, maxHeight: "85vh", overflow: "auto", padding: 24 }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, paddingBottom: 14, borderBottom: `2px solid ${B.border}` }}>
           <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: B.accent, fontFamily: "Arial, sans-serif" }}>{title}</h3>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: B.textMuted, padding: 4 }}>Γ£ò</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: B.textMuted, padding: 4 }}>✕</button>
         </div>
         {children}
       </div>
@@ -391,7 +391,7 @@ const Modal = ({ open, onClose, title, children, width = 600 }) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ BATCH UPLOAD COMPONENT (Reusable) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── BATCH UPLOAD COMPONENT (Reusable) ──────────────────────────────────────
 const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent }) => {
   const [dragOver, setDragOver] = useState(false);
   const [uploaded, setUploaded] = useState(null);
@@ -406,7 +406,7 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
       const f = files[0];
       setUploaded({ name: f.name, size: (f.size / 1024).toFixed(1) + " KB", type: f.name.split(".").pop().toUpperCase() });
       setTimeout(() => {
-        setMappedFields(fields.map((field, i) => ({ field, detected: field, confidence: Math.random() > 0.15 ? "High" : "Medium", sample: sampleRows[0]?.[i] || "ΓÇö" })));
+        setMappedFields(fields.map((field, i) => ({ field, detected: field, confidence: Math.random() > 0.15 ? "High" : "Medium", sample: sampleRows[0]?.[i] || "—" })));
       }, 500);
     }
   };
@@ -424,22 +424,22 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
       {!uploaded && (
         <div onDragOver={ev => { ev.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleDrop}
           style={{ border: `2px dashed ${dragOver ? color : B.border}`, borderRadius: 8, padding: 28, textAlign: "center", background: dragOver ? `${color}06` : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>≡ƒôñ</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>=���</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>Drag & drop {module} file here</div>
-          <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Accepts .xlsx, .csv, .tsv ΓÇö headers will be auto-mapped to system fields</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Accepts .xlsx, .csv, .tsv — headers will be auto-mapped to system fields</div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 10 }}>
             {[".xlsx", ".csv", ".tsv"].map(ext => <span key={ext} style={{ padding: "2px 8px", borderRadius: 4, background: B.bgCard, border: `1px solid ${B.border}`, fontSize: 10, fontWeight: 600, color: B.textMuted }}>{ext}</span>)}
           </div>
         </div>
       )}
 
-      {/* File uploaded ΓÇö mapping */}
+      {/* File uploaded — mapping */}
       {uploaded && !validated && (
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 6, background: `${color}08`, border: `1px solid ${color}20`, marginBottom: 12 }}>
-            <span style={{ fontSize: 20 }}>≡ƒôÄ</span>
+            <span style={{ fontSize: 20 }}>=���</span>
             <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{uploaded.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{uploaded.type} ┬╖ {uploaded.size}</div></div>
-            <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={reset}>Γ£ò Remove</Btn>
+            <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={reset}>✕ Remove</Btn>
           </div>
           {mappedFields && (
             <div>
@@ -462,26 +462,26 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
               </div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                 <Btn variant="secondary" onClick={reset}>Cancel</Btn>
-                <Btn variant="primary" onClick={handleValidate} disabled={validating}>{validating ? "Validating..." : "Γ£ô Validate & Preview"}</Btn>
+                <Btn variant="primary" onClick={handleValidate} disabled={validating}>{validating ? "Validating..." : "✓ Validate & Preview"}</Btn>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Validated ΓÇö ready to import */}
+      {/* Validated — ready to import */}
       {validated && (
         <div>
           <div style={{ padding: 14, borderRadius: 8, background: B.successBg, border: `1px solid ${B.success}20`, marginBottom: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 22 }}>Γ£à</span>
-              <div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>Validation Passed ΓÇö Ready to Import</div>
+              <span style={{ fontSize: 22 }}>✅</span>
+              <div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>Validation Passed — Ready to Import</div>
                 <div style={{ fontSize: 12, color: B.textSecondary }}>{uploaded.name} ┬╖ {sampleRows.length} records detected ┬╖ {mappedFields?.length} fields mapped ┬╖ 0 errors, {Math.floor(Math.random() * 3)} warnings</div></div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <Btn variant="secondary" onClick={reset}>Start Over</Btn>
-            <Btn variant="primary" onClick={() => { onUpload?.(sampleRows.length); reset(); }}>≡ƒÜÇ Import {sampleRows.length} Records</Btn>
+            <Btn variant="primary" onClick={() => { onUpload?.(sampleRows.length); reset(); }}>=��� Import {sampleRows.length} Records</Btn>
           </div>
         </div>
       )}
@@ -489,7 +489,7 @@ const BatchUpload = ({ module, fields, sampleRows, onUpload, color = B.accent })
   );
 };
 
-// ΓöÇΓöÇΓöÇ NI LOGO SVG ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── NI LOGO SVG ────────────────────────────────────────────────────────────
 const NILogo = ({ size = 28 }) => (
   <svg width={size * 3.5} height={size} viewBox="0 0 140 40" fill="none">
     <rect x="2" y="10" width="22" height="22" rx="3" fill={B.accent} />
@@ -508,7 +508,7 @@ const NILogoCompact = () => (
   </svg>
 );
 
-// ΓöÇΓöÇΓöÇ CIRCLE-SQUARE BRAND ELEMENT ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── CIRCLE-SQUARE BRAND ELEMENT ────────────────────────────────────────────
 const BrandElement = ({ style }) => (
   <svg width="120" height="120" viewBox="0 0 120 120" style={{ position: "absolute", opacity: 0.06, ...style }}>
     <circle cx="40" cy="40" r="40" fill={B.accent} />
@@ -836,7 +836,7 @@ const DashboardModule = ({ setModule, role }) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ PEOPLE DIRECTORY ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── PEOPLE DIRECTORY ───────────────────────────────────────────────────────
 const PeopleModule = ({ setSelectedEmployee }) => {
   const [search, setSearch] = useState("");
   const [countryFilter, setCountryFilter] = useState("ALL");
@@ -850,7 +850,7 @@ const PeopleModule = ({ setSelectedEmployee }) => {
       <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: 200 }}><SearchBar value={search} onChange={setSearch} placeholder="Search by name, ID, email, department..." /></div>
         <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
-        <Btn variant="secondary" size="sm" onClick={() => setShowUpload(!showUpload)}>≡ƒôñ Batch Upload</Btn>
+        <Btn variant="secondary" size="sm" onClick={() => setShowUpload(!showUpload)}>=��� Batch Upload</Btn>
       </div>
       {showUpload && (
         <Card style={{ marginBottom: 14, borderTop: `4px solid ${B.accent}` }}>
@@ -875,29 +875,29 @@ const PeopleModule = ({ setSelectedEmployee }) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ BENEFITS PACKAGES BY COUNTRY ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── BENEFITS PACKAGES BY COUNTRY ────────────────────────────────────────────
 const BENEFITS_PACKAGES = {
   CA: { health: "Sun Life Extended Health", dental: "Sun Life Dental", pension: "Group RRSP 5% match", life: "2├ù salary", disability: "LTD 66.7%", eap: "Homewood Health", extras: ["Paramedical $2,000/yr", "Vision $400/2yr", "Maternity top-up 93% ├ù 17wk"] },
   GB: { health: "Bupa Private Medical", dental: "Denplan Level 3", pension: "Workplace Pension 8% employer", life: "4├ù salary", disability: "Group Income Protection", eap: "Health Assured", extras: ["Cycle to Work Scheme", "Season Ticket Loan", "Enhanced Parental 26wk full pay"] },
   KE: { health: "AAR Healthcare (Inpatient + Outpatient)", dental: "Included in AAR", pension: "NSSF + Provident Fund 10%", life: "3├ù salary", disability: "GLA Rider", eap: "LifeWorks Africa", extras: ["Optical KES 20,000/yr", "Maternity Cover", "Last Expense Cover KES 200,000"] },
-  NG: { health: "HMO ΓÇö Hygeia / Leadway", dental: "Included in HMO", pension: "Pension Fund Admin (PFA) 18%", life: "Group Life 3├ù salary", disability: "Included in GLA", eap: "Workplace Options", extras: ["Optical Γéª50,000/yr", "Maternity Cover", "Housing Allowance 40%"] },
-  IN: { health: "Group Mediclaim Γé╣5L family", dental: "Included in Mediclaim", pension: "EPF 12% + Gratuity", life: "EDLI + Group Term 3├ù", disability: "ESI (if applicable)", eap: "Optum EAP India", extras: ["Top-up Γé╣10L", "Parental Insurance Γé╣3L", "NPS employer 10%"] },
+  NG: { health: "HMO — Hygeia / Leadway", dental: "Included in HMO", pension: "Pension Fund Admin (PFA) 18%", life: "Group Life 3├ù salary", disability: "Included in GLA", eap: "Workplace Options", extras: ["Optical ₦50,000/yr", "Maternity Cover", "Housing Allowance 40%"] },
+  IN: { health: "Group Mediclaim ₹5L family", dental: "Included in Mediclaim", pension: "EPF 12% + Gratuity", life: "EDLI + Group Term 3├ù", disability: "ESI (if applicable)", eap: "Optum EAP India", extras: ["Top-up ₹10L", "Parental Insurance ₹3L", "NPS employer 10%"] },
   BD: { health: "Group Health Insurance", dental: "Basic dental included", pension: "Provident Fund 10%", life: "Group Life 2├ù", disability: "Not statutory", eap: "Internal support", extras: ["Festival Bonus (2├ù)", "Gratuity after 5yr", "Mobile Allowance"] },
   DEFAULT: { health: "Group Health Plan", dental: "Basic Dental", pension: "Employer Pension Contribution", life: "Group Life Insurance", disability: "Disability Coverage", eap: "Employee Assistance Program", extras: ["Wellness Allowance", "L&D Allowance", "Flexible Work"] },
 };
 
-// ΓöÇΓöÇΓöÇ WORKABLE ATS MOCK DATA ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── WORKABLE ATS MOCK DATA ─────────────────────────────────────────────────
 const WORKABLE_REQUISITIONS = [
-  { id: "WK-4521", title: "Senior Nutrition Advisor", dept: "Programs", country: "KE", status: "Published", candidates: 34, shortlisted: 8, interviews: 3, daysOpen: 22, hiringMgr: "Sarah Chen", salary: "KES 250,000ΓÇô320,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4521" },
-  { id: "WK-4488", title: "Finance Officer ΓÇö Grants", dept: "Finance", country: "NG", status: "Published", candidates: 18, shortlisted: 5, interviews: 2, daysOpen: 35, hiringMgr: "Marcus Johnson", salary: "Γéª650,000ΓÇô850,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4488" },
-  { id: "WK-4502", title: "M&E Specialist", dept: "Research & Evidence", country: "BD", status: "Interview", candidates: 27, shortlisted: 6, interviews: 4, daysOpen: 18, hiringMgr: "Priya Patel", salary: "BDT 95,000ΓÇô120,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4502" },
-  { id: "WK-4510", title: "Communications Coordinator", dept: "External Relations", country: "CA", status: "Published", candidates: 42, shortlisted: 10, interviews: 0, daysOpen: 8, hiringMgr: "Oliver Wright", salary: "CAD 65,000ΓÇô78,000/yr", url: "https://apply.workable.com/nutrition-intl/j/4510" },
-  { id: "WK-4495", title: "IT Systems Administrator", dept: "IT & Digital", country: "CA", status: "Offer", candidates: 15, shortlisted: 4, interviews: 3, daysOpen: 45, hiringMgr: "Lars M├╝ller", salary: "CAD 72,000ΓÇô88,000/yr", url: "https://apply.workable.com/nutrition-intl/j/4495" },
-  { id: "WK-4530", title: "Adolescent Nutrition Officer", dept: "Programs", country: "IN", status: "Published", candidates: 21, shortlisted: 3, interviews: 1, daysOpen: 12, hiringMgr: "Fatima Al-Hassan", salary: "Γé╣80,000ΓÇô110,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4530" },
-  { id: "WK-4477", title: "Country Director ΓÇö Tanzania", dept: "Executive Office", country: "TZ", status: "Interview", candidates: 12, shortlisted: 4, interviews: 3, daysOpen: 52, hiringMgr: "Ana Silva", salary: "TZS 6,500,000ΓÇô8,000,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4477" },
+  { id: "WK-4521", title: "Senior Nutrition Advisor", dept: "Programs", country: "KE", status: "Published", candidates: 34, shortlisted: 8, interviews: 3, daysOpen: 22, hiringMgr: "Sarah Chen", salary: "KES 250,000–320,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4521" },
+  { id: "WK-4488", title: "Finance Officer — Grants", dept: "Finance", country: "NG", status: "Published", candidates: 18, shortlisted: 5, interviews: 2, daysOpen: 35, hiringMgr: "Marcus Johnson", salary: "₦650,000–850,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4488" },
+  { id: "WK-4502", title: "M&E Specialist", dept: "Research & Evidence", country: "BD", status: "Interview", candidates: 27, shortlisted: 6, interviews: 4, daysOpen: 18, hiringMgr: "Priya Patel", salary: "BDT 95,000–120,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4502" },
+  { id: "WK-4510", title: "Communications Coordinator", dept: "External Relations", country: "CA", status: "Published", candidates: 42, shortlisted: 10, interviews: 0, daysOpen: 8, hiringMgr: "Oliver Wright", salary: "CAD 65,000–78,000/yr", url: "https://apply.workable.com/nutrition-intl/j/4510" },
+  { id: "WK-4495", title: "IT Systems Administrator", dept: "IT & Digital", country: "CA", status: "Offer", candidates: 15, shortlisted: 4, interviews: 3, daysOpen: 45, hiringMgr: "Lars M├╝ller", salary: "CAD 72,000–88,000/yr", url: "https://apply.workable.com/nutrition-intl/j/4495" },
+  { id: "WK-4530", title: "Adolescent Nutrition Officer", dept: "Programs", country: "IN", status: "Published", candidates: 21, shortlisted: 3, interviews: 1, daysOpen: 12, hiringMgr: "Fatima Al-Hassan", salary: "₹80,000–110,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4530" },
+  { id: "WK-4477", title: "Country Director — Tanzania", dept: "Executive Office", country: "TZ", status: "Interview", candidates: 12, shortlisted: 4, interviews: 3, daysOpen: 52, hiringMgr: "Ana Silva", salary: "TZS 6,500,000–8,000,000/mo", url: "https://apply.workable.com/nutrition-intl/j/4477" },
 ];
 
-// ΓöÇΓöÇΓöÇ EMPLOYEE PROFILE (ENHANCED) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── EMPLOYEE PROFILE (ENHANCED) ────────────────────────────────────────────
 const EmployeeProfile = ({ employee: e, onBack, role }) => {
   const [tab, setTab] = useState("overview");
   const [showLetter, setShowLetter] = useState(false);
@@ -964,7 +964,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
 
   return (
     <div>
-      <button onClick={onBack} style={{ background: "none", border: "none", color: B.accent, cursor: "pointer", fontSize: 13, fontWeight: 700, marginBottom: 14, padding: 0, fontFamily: "Arial, sans-serif" }}>ΓåÉ Back to Directory</button>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: B.accent, cursor: "pointer", fontSize: 13, fontWeight: 700, marginBottom: 14, padding: 0, fontFamily: "Arial, sans-serif" }}>← Back to Directory</button>
       <div style={{ position: "relative", marginBottom: 18 }}>
         <Card style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap", position: "relative" }}>
           <div style={{ position: "absolute", right: -30, top: -30, pointerEvents: "none" }}><BrandElement /></div>
@@ -985,23 +985,23 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <div style={{ fontSize: 12, color: B.textMuted }}>{e.flag} {country?.entity} ┬╖ {e.email}</div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <Btn variant="primary" onClick={() => setShowLetter(true)}>≡ƒôä Verification Letter</Btn>
-            <Btn variant="secondary" onClick={() => setShowEdit(true)}>Γ£Å∩╕Å Edit</Btn>
-            <Btn variant="secondary" onClick={() => setShowActions(!showActions)}>Actions Γû╛</Btn>
+            <Btn variant="primary" onClick={() => setShowLetter(true)}>=��� Verification Letter</Btn>
+            <Btn variant="secondary" onClick={() => setShowEdit(true)}>✏∩╕Å Edit</Btn>
+            <Btn variant="secondary" onClick={() => setShowActions(!showActions)}>Actions ▾</Btn>
           </div>
         </Card>
-        {/* Actions dropdown ΓÇö positioned outside the Card so it's not clipped */}
+        {/* Actions dropdown — positioned outside the Card so it's not clipped */}
         {showActions && (<>
           <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setShowActions(false)} />
           <div style={{ position: "absolute", top: "100%", right: 20, marginTop: -6, background: B.white, border: `1px solid ${B.border}`, borderRadius: 10, boxShadow: "0 12px 36px rgba(37,55,70,0.15), 0 4px 12px rgba(37,55,70,0.08)", zIndex: 50, minWidth: 230, overflow: "hidden" }}>
-            {[{ label: "≡ƒôï View Change History", action: () => setTab("history") },
-              { label: "≡ƒÆ░ View Total Rewards", action: () => setTab("totalrewards") },
-              { label: "≡ƒöä Transfer / Reassign", action: () => alert("Transfer workflow initiated for " + e.first + " " + e.last) },
-              { label: "≡ƒôè Performance Review", action: () => alert("Performance review form opened for " + e.first) },
-              { label: "≡ƒÄô Assign Training", action: () => setTab("learning") },
-              { label: "ΓÅ╕∩╕Å Place on Leave", action: () => setShowLeaveOfAbsence(true) },
-              { label: "≡ƒôñ Export Profile (PDF)", action: () => alert("Employee profile exported as PDF") },
-              ...(role === "hr" || role === "superuser" ? [{ label: "≡ƒöÆ Deactivate Employee", action: () => alert("Deactivation requires confirmation ΓÇö this would trigger offboarding workflow"), danger: true }] : []),
+            {[{ label: "=��� View Change History", action: () => setTab("history") },
+              { label: "=��� View Total Rewards", action: () => setTab("totalrewards") },
+              { label: "=��� Transfer / Reassign", action: () => alert("Transfer workflow initiated for " + e.first + " " + e.last) },
+              { label: "=��� Performance Review", action: () => alert("Performance review form opened for " + e.first) },
+              { label: "=��� Assign Training", action: () => setTab("learning") },
+              { label: "⏸∩╕Å Place on Leave", action: () => setShowLeaveOfAbsence(true) },
+              { label: "=��� Export Profile (PDF)", action: () => alert("Employee profile exported as PDF") },
+              ...(role === "hr" || role === "superuser" ? [{ label: "=��� Deactivate Employee", action: () => alert("Deactivation requires confirmation — this would trigger offboarding workflow"), danger: true }] : []),
             ].map((item, i) => (
               <button key={i} onClick={() => { item.action(); setShowActions(false); }}
                 style={{ display: "block", width: "100%", padding: "10px 16px", border: "none", borderBottom: `1px solid ${B.borderLight}`, background: "transparent", textAlign: "left", cursor: "pointer", fontSize: 12, fontWeight: 600, color: item.danger ? B.danger : B.textPrimary, fontFamily: "Arial, sans-serif", transition: "background 0.12s" }}
@@ -1015,7 +1015,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
       </div>
 
       {/* Edit Employee Modal */}
-      <Modal open={showEdit} onClose={() => setShowEdit(false)} title={`Edit Employee ΓÇö ${e.first} ${e.last}`} width={580}>
+      <Modal open={showEdit} onClose={() => setShowEdit(false)} title={`Edit Employee — ${e.first} ${e.last}`} width={580}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[{ label: "Job Title", key: "title", ph: e.title },
             { label: "Department", key: "department", type: "select", options: DEPARTMENTS },
@@ -1043,12 +1043,12 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
           <Btn variant="secondary" onClick={() => setShowEdit(false)}>Cancel</Btn>
-          <Btn variant="primary" onClick={() => { alert(`Changes saved for ${e.first} ${e.last}. Effective-dated record created.`); setShowEdit(false); }}>≡ƒÆ╛ Save Changes</Btn>
+          <Btn variant="primary" onClick={() => { alert(`Changes saved for ${e.first} ${e.last}. Effective-dated record created.`); setShowEdit(false); }}>=��� Save Changes</Btn>
         </div>
       </Modal>
 
       {/* Photo Upload Modal with Centering */}
-      <Modal open={showPhotoUpload} onClose={() => { setShowPhotoUpload(false); setPhotoCropMode(false); }} title={`Profile Photo ΓÇö ${e.first} ${e.last}`} width={480}>
+      <Modal open={showPhotoUpload} onClose={() => { setShowPhotoUpload(false); setPhotoCropMode(false); }} title={`Profile Photo — ${e.first} ${e.last}`} width={480}>
         {/* Crop / Center Mode */}
         {photoCropMode && empPhoto ? (
           <div>
@@ -1063,34 +1063,34 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "14px 16px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}` }}>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>ΓåÉ Horizontal Position ΓåÆ</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>← Horizontal Position →</label>
                   <span style={{ fontSize: 11, fontWeight: 700, color: B.accent }}>{cropPos.x}%</span>
                 </div>
                 <input type="range" min="0" max="100" value={cropPos.x} onChange={ev => setCropPos(p => ({ ...p, x: parseInt(ev.target.value) }))} style={{ width: "100%", accentColor: B.accent }} />
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>Γåæ Vertical Position Γåô</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>↑ Vertical Position ↓</label>
                   <span style={{ fontSize: 11, fontWeight: 700, color: B.accent }}>{cropPos.y}%</span>
                 </div>
                 <input type="range" min="0" max="100" value={cropPos.y} onChange={ev => setCropPos(p => ({ ...p, y: parseInt(ev.target.value) }))} style={{ width: "100%", accentColor: B.accent }} />
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>≡ƒöì Zoom</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, fontFamily: "Arial, sans-serif" }}>=��� Zoom</label>
                   <span style={{ fontSize: 11, fontWeight: 700, color: B.accent }}>{cropPos.scale}%</span>
                 </div>
                 <input type="range" min="100" max="250" value={cropPos.scale} onChange={ev => setCropPos(p => ({ ...p, scale: parseInt(ev.target.value) }))} style={{ width: "100%", accentColor: B.accent }} />
               </div>
               <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 4 }}>
-                <Btn variant="ghost" size="sm" onClick={() => setCropPos({ x: 50, y: 50, scale: 100 })}>Γå║ Reset to Center</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => setCropPos({ x: 50, y: 50, scale: 100 })}>↺ Reset to Center</Btn>
                 <Btn variant="ghost" size="sm" onClick={() => setCropPos(p => ({ ...p, y: 30 }))}>Face (top)</Btn>
                 <Btn variant="ghost" size="sm" onClick={() => setCropPos(p => ({ ...p, x: 50, y: 50 }))}>Center</Btn>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
               <Btn variant="secondary" onClick={() => { setPhoto(e.id, null); setPhotoCropMode(false); }}>Cancel & Remove</Btn>
-              <Btn variant="primary" onClick={() => { setPhotoPos(e.id, { ...cropPos }); setPhotoCropMode(false); setShowPhotoUpload(false); }}>Γ£ô Save & Apply</Btn>
+              <Btn variant="primary" onClick={() => { setPhotoPos(e.id, { ...cropPos }); setPhotoCropMode(false); setShowPhotoUpload(false); }}>✓ Save & Apply</Btn>
             </div>
           </div>
         ) : (
@@ -1098,7 +1098,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             {/* Current photo preview */}
             <div style={{ textAlign: "center", marginBottom: 16 }}>
               <Avatar name={`${e.first} ${e.last}`} size={100} photo={empPhoto} photoPos={empPhotoPos} />
-              <div style={{ fontSize: 12, color: B.textMuted, marginTop: 8 }}>{empPhoto ? "Current photo" : "No photo uploaded ΓÇö showing initials"}</div>
+              <div style={{ fontSize: 12, color: B.textMuted, marginTop: 8 }}>{empPhoto ? "Current photo" : "No photo uploaded — showing initials"}</div>
             </div>
             {/* Drag & drop zone */}
             <div onDragOver={ev => { ev.preventDefault(); setPhotoDragOver(true); }} onDragLeave={() => setPhotoDragOver(false)}
@@ -1111,7 +1111,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 <rect x="13" y="4" width="10" height="5" rx="2" fill={B.accent} opacity="0.3" />
               </svg>
               <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>Drag & drop a photo here</div>
-              <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>or click to browse ΓÇö JPG, PNG, max 5 MB</div>
+              <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>or click to browse — JPG, PNG, max 5 MB</div>
               <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 10 }}>
                 {[".jpg", ".png", ".webp"].map(ext => <span key={ext} style={{ padding: "2px 8px", borderRadius: 4, background: B.bgCard, border: `1px solid ${B.border}`, fontSize: 10, fontWeight: 600, color: B.textMuted }}>{ext}</span>)}
               </div>
@@ -1119,9 +1119,9 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             </div>
             {empPhoto && (
               <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 14 }}>
-                <Btn variant="danger" onClick={() => { setPhoto(e.id, null); }}>≡ƒùæ Remove</Btn>
-                <Btn variant="secondary" onClick={() => { setCropPos(empPhotoPos); setPhotoCropMode(true); }}>Γ£é Reposition</Btn>
-                <Btn variant="secondary" onClick={() => photoInputRef.current?.click()}>≡ƒô╖ Replace</Btn>
+                <Btn variant="danger" onClick={() => { setPhoto(e.id, null); }}>=��� Remove</Btn>
+                <Btn variant="secondary" onClick={() => { setCropPos(empPhotoPos); setPhotoCropMode(true); }}>✂ Reposition</Btn>
+                <Btn variant="secondary" onClick={() => photoInputRef.current?.click()}>=��� Replace</Btn>
               </div>
             )}
             <div style={{ marginTop: 14, padding: 10, borderRadius: 6, background: B.bgHover, border: `1px solid ${B.border}`, fontSize: 11, color: B.textMuted, textAlign: "center" }}>
@@ -1132,10 +1132,10 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
       </Modal>
 
       {/* Leave of Absence Modal */}
-      <Modal open={showLeaveOfAbsence} onClose={() => setShowLeaveOfAbsence(false)} title={`Place on Leave ΓÇö ${e.first} ${e.last}`} width={640}>
+      <Modal open={showLeaveOfAbsence} onClose={() => setShowLeaveOfAbsence(false)} title={`Place on Leave — ${e.first} ${e.last}`} width={640}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}`, marginBottom: 16 }}>
           <Avatar name={`${e.first} ${e.last}`} size={40} photo={empPhoto} photoPos={empPhotoPos} />
-          <div><div style={{ fontSize: 14, fontWeight: 700 }}>{e.first} {e.last}</div><div style={{ fontSize: 12, color: B.textMuted }}>{e.title} ┬╖ {e.department} ┬╖ {e.flag} {e.countryName}</div><div style={{ fontSize: 11, color: B.textMuted }}>Manager: {manager ? `${manager.first} ${manager.last}` : "ΓÇö"} ┬╖ Status: <strong style={{ color: B.success }}>{e.status}</strong></div></div>
+          <div><div style={{ fontSize: 14, fontWeight: 700 }}>{e.first} {e.last}</div><div style={{ fontSize: 12, color: B.textMuted }}>{e.title} ┬╖ {e.department} ┬╖ {e.flag} {e.countryName}</div><div style={{ fontSize: 11, color: B.textMuted }}>Manager: {manager ? `${manager.first} ${manager.last}` : "—"} ┬╖ Status: <strong style={{ color: B.success }}>{e.status}</strong></div></div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1182,7 +1182,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
           )}
 
           {/* Comments / Reason */}
-          <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Comments / Reason (Confidential ΓÇö visible to HR only)</label>
+          <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Comments / Reason (Confidential — visible to HR only)</label>
             <textarea value={loaData.comments} onChange={ev => setLoaData(p => ({ ...p, comments: ev.target.value }))} rows={3} placeholder="Provide context for the leave, any special arrangements, accommodation needs, or handover notes. This information is stored confidentially and only visible to HR Admin and Superuser." style={{ width: "100%", padding: 10, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", resize: "vertical", boxSizing: "border-box" }} /></div>
 
           {/* Notifications & Alerts */}
@@ -1191,7 +1191,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, cursor: "pointer" }}>
                 <input type="checkbox" checked={loaData.notifyManager} onChange={ev => setLoaData(p => ({ ...p, notifyManager: ev.target.checked }))} />
-                <span>Notify manager ({manager ? `${manager.first} ${manager.last}` : "ΓÇö"}) of leave placement</span>
+                <span>Notify manager ({manager ? `${manager.first} ${manager.last}` : "—"}) of leave placement</span>
               </label>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, cursor: "pointer" }}>
                 <input type="checkbox" checked={loaData.notifyHR} onChange={ev => setLoaData(p => ({ ...p, notifyHR: ev.target.checked }))} />
@@ -1224,10 +1224,10 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
               <div><strong>Action:</strong> Place on Leave</div>
               <div><strong>Employee:</strong> {e.first} {e.last} ({e.id})</div>
               <div><strong>Type:</strong> {loaData.type}</div>
-              <div><strong>Period:</strong> {loaData.startDate || "ΓÇö"} to {loaData.endDate || "ΓÇö"} ({loaData.startDate && loaData.endDate ? Math.round((new Date(loaData.endDate) - new Date(loaData.startDate)) / 86400000) + " days" : "ΓÇö"})</div>
-              <div><strong>Expected Return:</strong> {loaData.returnDate || "ΓÇö"}</div>
+              <div><strong>Period:</strong> {loaData.startDate || "—"} to {loaData.endDate || "—"} ({loaData.startDate && loaData.endDate ? Math.round((new Date(loaData.endDate) - new Date(loaData.startDate)) / 86400000) + " days" : "—"})</div>
+              <div><strong>Expected Return:</strong> {loaData.returnDate || "—"}</div>
               <div><strong>Pay Status:</strong> {loaData.payStatus}</div>
-              <div><strong>Return Alert:</strong> {loaData.returnAlert ? `${loaData.returnAlertDays} days before return ΓåÆ Manager + HR` : "Disabled"}</div>
+              <div><strong>Return Alert:</strong> {loaData.returnAlert ? `${loaData.returnAlertDays} days before return → Manager + HR` : "Disabled"}</div>
               <div><strong>Initiated By:</strong> {role === "superuser" ? "Grant Carioni (Superuser)" : "Admin User (HR Admin)"}</div>
               <div><strong>Timestamp:</strong> {new Date().toISOString()}</div>
               <div><strong>Confidential Notes:</strong> {loaData.comments ? "Yes (HR-only)" : "None"}</div>
@@ -1239,35 +1239,35 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <Btn variant="secondary" onClick={() => setShowLeaveOfAbsence(false)}>Cancel</Btn>
             <Btn variant="primary" onClick={() => {
               if (!loaData.startDate || !loaData.endDate) { alert("Please enter both start and end dates."); return; }
-              const msgs = [`Γ£à ${e.first} ${e.last} has been placed on ${loaData.type} (${loaData.payStatus}).`, `≡ƒôà Period: ${fmtDate(loaData.startDate)} ΓÇö ${fmtDate(loaData.endDate)}`];
-              if (loaData.returnDate) msgs.push(`≡ƒöö Return date: ${fmtDate(loaData.returnDate)}`);
-              if (loaData.notifyManager && manager) msgs.push(`≡ƒôº Manager notification sent to ${manager.first} ${manager.last}`);
-              if (loaData.notifyHR) msgs.push(`≡ƒôº HR notification sent to People & Culture`);
-              if (loaData.returnAlert && loaData.returnDate) msgs.push(`ΓÅ░ Return-to-work alert scheduled for ${loaData.returnAlertDays} days before return (${fmtDate(new Date(new Date(loaData.returnDate).getTime() - loaData.returnAlertDays * 86400000).toISOString().split("T")[0])})`);
-              if (loaData.backfill) msgs.push(`≡ƒöä Role flagged for temporary backfill`);
-              msgs.push(`\n≡ƒôï Audit log entry created. Employee status changed to "On Leave".`);
+              const msgs = [`✅ ${e.first} ${e.last} has been placed on ${loaData.type} (${loaData.payStatus}).`, `=��� Period: ${fmtDate(loaData.startDate)} — ${fmtDate(loaData.endDate)}`];
+              if (loaData.returnDate) msgs.push(`=��� Return date: ${fmtDate(loaData.returnDate)}`);
+              if (loaData.notifyManager && manager) msgs.push(`=��� Manager notification sent to ${manager.first} ${manager.last}`);
+              if (loaData.notifyHR) msgs.push(`=��� HR notification sent to People & Culture`);
+              if (loaData.returnAlert && loaData.returnDate) msgs.push(`⏰ Return-to-work alert scheduled for ${loaData.returnAlertDays} days before return (${fmtDate(new Date(new Date(loaData.returnDate).getTime() - loaData.returnAlertDays * 86400000).toISOString().split("T")[0])})`);
+              if (loaData.backfill) msgs.push(`=��� Role flagged for temporary backfill`);
+              msgs.push(`\n=��� Audit log entry created. Employee status changed to "On Leave".`);
               alert(msgs.join("\n"));
               setShowLeaveOfAbsence(false);
               setLoaData({ type: "Medical", startDate: "", endDate: "", returnDate: "", comments: "", notifyManager: true, notifyHR: true, returnAlert: true, returnAlertDays: 7, payStatus: "Full Pay", backfill: false });
-            }}>ΓÅ╕∩╕Å Confirm Leave Placement</Btn>
+            }}>⏸∩╕Å Confirm Leave Placement</Btn>
           </div>
         </div>
       </Modal>
 
       <Tabs tabs={profileTabs} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉ OVERVIEW ΓòÉΓòÉΓòÉ */}
+      {/* ═══ OVERVIEW ═══ */}
       {tab === "overview" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card><SectionTitle>Personal Information</SectionTitle><InfoRow label="ID" value={e.id} /><InfoRow label="Name" value={`${e.first} ${e.last}`} /><InfoRow label="Email" value={e.email} /><InfoRow label="Phone" value={e.phone} /><InfoRow label="Emergency Contact" value={`${e.emergencyContact.name} (${e.emergencyContact.relationship})`} /></Card>
-          <Card><SectionTitle>Employment Details</SectionTitle><InfoRow label="Country" value={`${e.flag} ${e.countryName}`} /><InfoRow label="Entity" value={e.entity} /><InfoRow label="Department" value={e.department} /><InfoRow label="Level" value={e.level} /><InfoRow label="Hire Date" value={fmtDate(e.hireDate)} /><InfoRow label="Tenure" value={`${tenure} years`} /><InfoRow label="Timezone" value={e.tz} /><InfoRow label="Manager" value={manager ? `${manager.first} ${manager.last}` : "ΓÇö"} /></Card>
+          <Card><SectionTitle>Employment Details</SectionTitle><InfoRow label="Country" value={`${e.flag} ${e.countryName}`} /><InfoRow label="Entity" value={e.entity} /><InfoRow label="Department" value={e.department} /><InfoRow label="Level" value={e.level} /><InfoRow label="Hire Date" value={fmtDate(e.hireDate)} /><InfoRow label="Tenure" value={`${tenure} years`} /><InfoRow label="Timezone" value={e.tz} /><InfoRow label="Manager" value={manager ? `${manager.first} ${manager.last}` : "—"} /></Card>
           <Card><SectionTitle>Classification & Contract</SectionTitle><InfoRow label="Employment Category" value={EMPLOYMENT_CATEGORIES.find(c => c.code === e.employmentCategory)?.label || e.employmentCategory} /><InfoRow label="Contract Modality" value={CONTRACT_MODALITIES.find(m => m.code === e.contractModality)?.label || e.contractModality} /><InfoRow label="Premium" value={e.premiumPct > 0 ? `${PREMIUM_TYPES.find(p => p.code === e.premiumType)?.label} (${e.premiumPct}%)` : "None"} />{e.contractEndDate && <InfoRow label="Contract End" value={fmtDate(e.contractEndDate)} />}</Card>
           <Card><SectionTitle>Skills</SectionTitle><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{e.skills.map(s => <Badge key={s} color={B.teal} bg={B.successBg}>{s}</Badge>)}</div></Card>
           <Card><SectionTitle>Performance</SectionTitle><div style={{ display: "flex", alignItems: "center", gap: 14 }}><span style={{ fontSize: 36, fontWeight: 700, fontFamily: "Georgia, serif", color: B.textPrimary }}>{e.performanceRating.toFixed(1)}</span><div><div style={{ display: "flex", gap: 3 }}>{[1,2,3,4,5].map(n => <div key={n} style={{ width: 28, height: 5, borderRadius: 3, background: n <= Math.round(e.performanceRating) ? B.accent : B.bgHover }} />)}</div><div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Q1 2026 Rating</div></div></div></Card>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ EMPLOYMENT HISTORY (Full Effective-Dated Timeline) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ EMPLOYMENT HISTORY (Full Effective-Dated Timeline) ═══ */}
       {tab === "history" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Change Timeline */}
@@ -1291,9 +1291,9 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                         <span style={{ fontSize: 11, color: B.textMuted, marginLeft: "auto" }}>{fmtDate(h.effectiveDate)}</span>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
-                        {h.oldValue !== "ΓÇö" && (
+                        {h.oldValue !== "—" && (
                           <><span style={{ color: B.textMuted, textDecoration: "line-through" }}>{h.field === "Compensation" ? fmt(parseInt(h.oldValue), e.currency, e.locale) : h.oldValue}</span>
-                          <span style={{ color: B.textMuted }}>ΓåÆ</span></>
+                          <span style={{ color: B.textMuted }}>→</span></>
                         )}
                         <span style={{ fontWeight: 700, color: B.textPrimary }}>{h.field === "Compensation" ? fmt(parseInt(h.newValue), e.currency, e.locale) : h.newValue}</span>
                       </div>
@@ -1398,7 +1398,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ MY LEARNING (LMS Integration) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ MY LEARNING (LMS Integration) ═══ */}
       {tab === "learning" && (() => {
         const myCourses = [
           { title: "Safeguarding & Child Protection", status: "Completed", date: "2026-01-20", score: 92, path: "Onboarding Essentials", cat: "Mandatory" },
@@ -1423,7 +1423,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
               <SectionTitle>My Courses</SectionTitle>
               {myCourses.map((c, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 6, background: c.status === "Completed" ? B.successBg : c.status === "In Progress" ? B.warningBg : B.bgHover, marginBottom: 4, border: `1px solid ${c.status === "Completed" ? `${B.success}15` : c.status === "In Progress" ? `${B.warning}15` : B.borderLight}` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 11, background: c.status === "Completed" ? B.success : c.status === "In Progress" ? B.warning : B.bgCard, border: `2px solid ${c.status === "Completed" ? B.success : c.status === "In Progress" ? B.warning : B.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0 }}>{c.status === "Completed" ? "Γ£ô" : c.status === "In Progress" ? "ΓùÅ" : ""}</div>
+                  <div style={{ width: 22, height: 22, borderRadius: 11, background: c.status === "Completed" ? B.success : c.status === "In Progress" ? B.warning : B.bgCard, border: `2px solid ${c.status === "Completed" ? B.success : c.status === "In Progress" ? B.warning : B.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0 }}>{c.status === "Completed" ? "✓" : c.status === "In Progress" ? "●" : ""}</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{c.title}</span>
@@ -1445,9 +1445,9 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 { title: "Cross-Cultural Management in INGOs", reason: `Recommended for ${e.countryName}-based staff`, hours: "3 hrs" },
               ].map((r, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4 }}>
-                  <span style={{ fontSize: 18 }}>≡ƒÆí</span>
+                  <span style={{ fontSize: 18 }}>=���</span>
                   <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{r.title}</div><div style={{ fontSize: 10, color: B.textMuted }}>{r.reason} ┬╖ {r.hours}</div></div>
-                  <Btn variant="ghost" size="sm" style={{ color: B.accent }} onClick={() => alert(`Enrolled in: ${r.title}`)}>Enroll ΓåÆ</Btn>
+                  <Btn variant="ghost" size="sm" style={{ color: B.accent }} onClick={() => alert(`Enrolled in: ${r.title}`)}>Enroll →</Btn>
                 </div>
               ))}
             </Card>
@@ -1455,18 +1455,18 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         );
       })()}
 
-      {/* ΓòÉΓòÉΓòÉ BENEFITS ΓòÉΓòÉΓòÉ */}
+      {/* ═══ BENEFITS ═══ */}
       {tab === "benefits" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.teal}` }}>
-            <SectionTitle>Core Benefits ΓÇö {e.flag} {e.countryName}</SectionTitle>
+            <SectionTitle>Core Benefits — {e.flag} {e.countryName}</SectionTitle>
             {[
-              { label: "Health Insurance", value: benefits.health, icon: "≡ƒÅÑ" },
-              { label: "Dental", value: benefits.dental, icon: "≡ƒª╖" },
-              { label: "Pension / Retirement", value: benefits.pension, icon: "≡ƒÅª" },
-              { label: "Life Insurance", value: benefits.life, icon: "≡ƒ¢í∩╕Å" },
-              { label: "Disability", value: benefits.disability, icon: "ΓÖ┐" },
-              { label: "Employee Assistance (EAP)", value: benefits.eap, icon: "≡ƒÆ¼" },
+              { label: "Health Insurance", value: benefits.health, icon: "=���" },
+              { label: "Dental", value: benefits.dental, icon: "=���" },
+              { label: "Pension / Retirement", value: benefits.pension, icon: "=���" },
+              { label: "Life Insurance", value: benefits.life, icon: "=���∩╕Å" },
+              { label: "Disability", value: benefits.disability, icon: "♿" },
+              { label: "Employee Assistance (EAP)", value: benefits.eap, icon: "=���" },
             ].map((b, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
                 <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{b.icon}</span>
@@ -1500,7 +1500,7 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ COMPENSATION ΓòÉΓòÉΓòÉ */}
+      {/* ═══ COMPENSATION ═══ */}
       {tab === "compensation" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card><SectionTitle>Current Compensation</SectionTitle><InfoRow label="Base Salary" value={fmt(e.salary, e.currency, e.locale)} /><InfoRow label="Bonus Target" value={fmt(e.bonus, e.currency, e.locale)} /><InfoRow label="Total Comp" value={fmt(e.salary + e.bonus, e.currency, e.locale)} /><InfoRow label="Currency" value={e.currency} /><InfoRow label="Frequency" value="Monthly" /></Card>
@@ -1508,28 +1508,28 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ LEAVE ΓòÉΓòÉΓòÉ */}
+      {/* ═══ LEAVE ═══ */}
       {tab === "leave" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <Card><SectionTitle>Leave Balances</SectionTitle>{Object.entries(e.leaveBalance).map(([type, bal]) => (<div key={type} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span style={{ fontSize: 13, fontWeight: 600, textTransform: "capitalize" }}>{type}</span><span style={{ fontSize: 13, fontWeight: 700, color: B.accent }}>{bal} days</span></div><ProgressBar value={bal} max={25} color={bal < 5 ? B.warning : B.accent} /></div>))}<Btn variant="primary" style={{ width: "100%", marginTop: 8 }}onClick={() => alert('Leave request form ΓÇö select leave type, dates, and grant to charge')}>Request Leave</Btn></Card>
-          <Card><SectionTitle>Leave Types ΓÇö {e.flag} {e.countryName}</SectionTitle>{leaveTypes.map((lt, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4 }}><div style={{ width: 6, height: 6, borderRadius: 3, background: [B.accent, B.teal, B.blue, B.purple, B.orange][i % 5] }} /><span style={{ fontSize: 13 }}>{lt}</span></div>))}</Card>
+          <Card><SectionTitle>Leave Balances</SectionTitle>{Object.entries(e.leaveBalance).map(([type, bal]) => (<div key={type} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span style={{ fontSize: 13, fontWeight: 600, textTransform: "capitalize" }}>{type}</span><span style={{ fontSize: 13, fontWeight: 700, color: B.accent }}>{bal} days</span></div><ProgressBar value={bal} max={25} color={bal < 5 ? B.warning : B.accent} /></div>))}<Btn variant="primary" style={{ width: "100%", marginTop: 8 }}onClick={() => alert('Leave request form — select leave type, dates, and grant to charge')}>Request Leave</Btn></Card>
+          <Card><SectionTitle>Leave Types — {e.flag} {e.countryName}</SectionTitle>{leaveTypes.map((lt, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4 }}><div style={{ width: 6, height: 6, borderRadius: 3, background: [B.accent, B.teal, B.blue, B.purple, B.orange][i % 5] }} /><span style={{ fontSize: 13 }}>{lt}</span></div>))}</Card>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ GRANTS ΓòÉΓòÉΓòÉ */}
+      {/* ═══ GRANTS ═══ */}
       {tab === "grants" && (
         <Card><SectionTitle>Grant Allocations</SectionTitle><Table columns={[{ label: "Grant", render: r => <span style={{ fontWeight: 700 }}>{r.name}</span> }, { label: "Code", key: "code" }, { label: "Allocation", render: r => `${(r.allocation * 100).toFixed(0)}%` }]} data={e.grants} /></Card>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ ALLOWANCES ΓòÉΓòÉΓòÉ */}
+      {/* ═══ ALLOWANCES ═══ */}
       {tab === "allowances" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <Card><SectionTitle>Health & Wellness Allowance</SectionTitle><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span style={{ fontSize: 13 }}>Used</span><span style={{ fontSize: 13, fontWeight: 700 }}>{fmt(e.hwAllowance.used, e.currency, e.locale)} / {fmt(e.hwAllowance.total, e.currency, e.locale)}</span></div><ProgressBar value={e.hwAllowance.used} max={e.hwAllowance.total} color={B.teal} /><div style={{ fontSize: 12, color: B.textMuted, marginTop: 6 }}>Remaining: {fmt(e.hwAllowance.total - e.hwAllowance.used, e.currency, e.locale)}</div><Btn variant="primary" style={{ width: "100%", marginTop: 10 }}onClick={() => alert('H&W claim submission ΓÇö upload receipt and enter amount')}>Submit H&W Claim</Btn></Card>
-          <Card><SectionTitle>Learning & Development Allowance</SectionTitle><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span style={{ fontSize: 13 }}>Used</span><span style={{ fontSize: 13, fontWeight: 700 }}>{fmt(e.ldAllowance.used, e.currency, e.locale)} / {fmt(e.ldAllowance.total, e.currency, e.locale)}</span></div><ProgressBar value={e.ldAllowance.used} max={e.ldAllowance.total} color={B.blue} /><div style={{ fontSize: 12, color: B.textMuted, marginTop: 6 }}>Remaining: {fmt(e.ldAllowance.total - e.ldAllowance.used, e.currency, e.locale)}</div><Btn variant="primary" style={{ width: "100%", marginTop: 10 }}onClick={() => alert('L&D claim submission ΓÇö upload receipt and enter course details')}>Submit L&D Claim</Btn></Card>
+          <Card><SectionTitle>Health & Wellness Allowance</SectionTitle><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span style={{ fontSize: 13 }}>Used</span><span style={{ fontSize: 13, fontWeight: 700 }}>{fmt(e.hwAllowance.used, e.currency, e.locale)} / {fmt(e.hwAllowance.total, e.currency, e.locale)}</span></div><ProgressBar value={e.hwAllowance.used} max={e.hwAllowance.total} color={B.teal} /><div style={{ fontSize: 12, color: B.textMuted, marginTop: 6 }}>Remaining: {fmt(e.hwAllowance.total - e.hwAllowance.used, e.currency, e.locale)}</div><Btn variant="primary" style={{ width: "100%", marginTop: 10 }}onClick={() => alert('H&W claim submission — upload receipt and enter amount')}>Submit H&W Claim</Btn></Card>
+          <Card><SectionTitle>Learning & Development Allowance</SectionTitle><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span style={{ fontSize: 13 }}>Used</span><span style={{ fontSize: 13, fontWeight: 700 }}>{fmt(e.ldAllowance.used, e.currency, e.locale)} / {fmt(e.ldAllowance.total, e.currency, e.locale)}</span></div><ProgressBar value={e.ldAllowance.used} max={e.ldAllowance.total} color={B.blue} /><div style={{ fontSize: 12, color: B.textMuted, marginTop: 6 }}>Remaining: {fmt(e.ldAllowance.total - e.ldAllowance.used, e.currency, e.locale)}</div><Btn variant="primary" style={{ width: "100%", marginTop: 10 }}onClick={() => alert('L&D claim submission — upload receipt and enter course details')}>Submit L&D Claim</Btn></Card>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ MY TOTAL REWARDS STATEMENT ΓòÉΓòÉΓòÉ */}
+      {/* ═══ MY TOTAL REWARDS STATEMENT ═══ */}
       {tab === "totalrewards" && (() => {
         const healthPremium = Math.round(e.salary * 0.08);
         const dentalPremium = Math.round(e.salary * 0.015);
@@ -1551,23 +1551,23 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         const prevYearTotal = Math.round(grandTotal * 0.93);
         const yoyGrowth = +((grandTotal - prevYearTotal) / prevYearTotal * 100).toFixed(1);
         const sections = [
-          { title: "Direct Compensation", subtitle: "Your cash earnings for the statement period", icon: "≡ƒÆ░", color: B.accent, total: directComp, items: [
+          { title: "Direct Compensation", subtitle: "Your cash earnings for the statement period", icon: "=���", color: B.accent, total: directComp, items: [
             { label: "Annual Base Salary", value: e.salary, explain: "Your fixed annual pay before deductions, paid monthly" },
             { label: "Performance Bonus (Target)", value: e.bonus, explain: `Based on your ${e.performanceRating.toFixed(1)} performance rating and organizational results` },
           ]},
-          { title: "Employer-Paid Benefits", subtitle: "NI pays these premiums on your behalf ΓÇö you don't see them on your payslip, but they protect you and your family", icon: "≡ƒ¢í∩╕Å", color: B.teal, total: benefitsTotal, items: [
+          { title: "Employer-Paid Benefits", subtitle: "NI pays these premiums on your behalf — you don't see them on your payslip, but they protect you and your family", icon: "=���∩╕Å", color: B.teal, total: benefitsTotal, items: [
             { label: "Health Insurance Premium", value: healthPremium, explain: `Employer-paid ${(benefits || {}).health || "Group Health"} coverage for you and eligible dependents` },
             { label: "Dental Coverage", value: dentalPremium, explain: "Annual dental plan including preventive and major services" },
             { label: "Life Insurance", value: lifePremium, explain: `Group life coverage at ${e.country === "KE" ? "3" : "2"}├ù your annual salary` },
             { label: "Disability Insurance", value: disabilityPremium, explain: "Long-term disability coverage protecting your income if you're unable to work" },
-            { label: "Pension / Retirement Contribution", value: pensionContrib, explain: `NI contributes this to your retirement plan ΓÇö this is in addition to any employee contributions you make` },
+            { label: "Pension / Retirement Contribution", value: pensionContrib, explain: `NI contributes this to your retirement plan — this is in addition to any employee contributions you make` },
           ]},
-          { title: "Time-Based Rewards", subtitle: "The value of your paid time away from work ΓÇö these days are yours to use for rest, health, and personal needs", icon: "≡ƒôà", color: B.blue, total: timeBasedTotal, items: [
+          { title: "Time-Based Rewards", subtitle: "The value of your paid time away from work — these days are yours to use for rest, health, and personal needs", icon: "=���", color: B.blue, total: timeBasedTotal, items: [
             { label: `Annual Leave (${e.leaveBalance.annual} days)`, value: annualLeaveValue, explain: "Paid vacation days based on your entitlement and country policy" },
-            { label: `Sick Leave (${e.leaveBalance.sick} days)`, value: sickLeaveValue, explain: "Paid sick days ΓÇö use without worry when you need them" },
+            { label: `Sick Leave (${e.leaveBalance.sick} days)`, value: sickLeaveValue, explain: "Paid sick days — use without worry when you need them" },
             { label: `Personal Days (${e.leaveBalance.personal} days)`, value: personalLeaveValue, explain: "Flexible days for personal matters, appointments, or family needs" },
           ]},
-          { title: "Perks, Growth & Wellbeing", subtitle: "Investments in your development, health, and quality of life", icon: "≡ƒî▒", color: B.purple, total: perksTotal, items: [
+          { title: "Perks, Growth & Wellbeing", subtitle: "Investments in your development, health, and quality of life", icon: "=���", color: B.purple, total: perksTotal, items: [
             { label: "Health & Wellness Allowance", value: hwAllow, explain: "Annual budget for gym, fitness, mental health, or wellness activities" },
             { label: "Learning & Development Allowance", value: ldAllow, explain: "Annual budget for courses, certifications, conferences, and books" },
             { label: "Employee Assistance Program (EAP)", value: eapValue, explain: "Confidential counseling, legal advice, and support services for you and family" },
@@ -1583,12 +1583,12 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 <Avatar name={`${e.first} ${e.last}`} size={56} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "Georgia, serif" }}>{e.first}, here's the full picture of your rewards at Nutrition International</div>
-                  <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Statement Period: January 1 ΓÇô December 31, 2026 ┬╖ {e.flag} {e.entity} ┬╖ {e.title}</div>
+                  <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Statement Period: January 1 – December 31, 2026 ┬╖ {e.flag} {e.entity} ┬╖ {e.title}</div>
                 </div>
               </div>
               <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.1)", backdropFilter: "blur(4px)" }}>
                 <div style={{ fontSize: 12, opacity: 0.9, lineHeight: 1.7 }}>
-                  Your total rewards reflect NI's commitment to competitive pay, meaningful benefits, and investment in your growth. This statement shows everything NI provides ΓÇö well beyond your payslip ΓÇö so you can see the full value of being part of our mission to nourish life.
+                  Your total rewards reflect NI's commitment to competitive pay, meaningful benefits, and investment in your growth. This statement shows everything NI provides — well beyond your payslip — so you can see the full value of being part of our mission to nourish life.
                 </div>
               </div>
             </Card>
@@ -1597,9 +1597,9 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <Card style={{ marginBottom: 14, borderTop: `4px solid ${B.accent}`, textAlign: "center", padding: 24 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Your Total Rewards Value</div>
               <div style={{ fontSize: 42, fontWeight: 700, fontFamily: "Georgia, serif", color: B.accent, letterSpacing: -1 }}>{fmt(grandTotal, e.currency, e.locale)}</div>
-              <div style={{ fontSize: 13, color: B.textSecondary, marginTop: 4 }}>This is the total investment NI makes in you each year ΓÇö {Math.round(grandTotal / e.salary * 100 - 100)}% more than your base salary alone</div>
+              <div style={{ fontSize: 13, color: B.textSecondary, marginTop: 4 }}>This is the total investment NI makes in you each year — {Math.round(grandTotal / e.salary * 100 - 100)}% more than your base salary alone</div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 14px", borderRadius: 20, background: B.successBg, border: `1px solid ${B.success}20` }}>
-                <span style={{ color: B.success, fontWeight: 700, fontSize: 13 }}>Γåæ {yoyGrowth}% year-over-year growth</span>
+                <span style={{ color: B.success, fontWeight: 700, fontSize: 13 }}>↑ {yoyGrowth}% year-over-year growth</span>
                 <span style={{ color: B.textMuted, fontSize: 11 }}>(vs {fmt(prevYearTotal, e.currency, e.locale)} in 2025)</span>
               </div>
               {/* Visual mix bar */}
@@ -1649,9 +1649,9 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
             <Card style={{ borderTop: `4px solid ${B.teal}` }}>
               <SectionTitle>What This Means For You</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 14 }}>
-                {[{ icon: "≡ƒöÆ", title: "Security", desc: "Health, life, and disability coverage protect you and your family. Your pension builds long-term financial stability." },
-                  { icon: "≡ƒôê", title: "Growth", desc: `Your L&D allowance of ${fmt(ldAllow, e.currency, e.locale)} and our career development programs support your professional journey.` },
-                  { icon: "ΓÜû∩╕Å", title: "Balance", desc: `${e.leaveBalance.annual + e.leaveBalance.sick + e.leaveBalance.personal} days of paid leave plus flexible work arrangements help you manage work and life.` },
+                {[{ icon: "=���", title: "Security", desc: "Health, life, and disability coverage protect you and your family. Your pension builds long-term financial stability." },
+                  { icon: "=���", title: "Growth", desc: `Your L&D allowance of ${fmt(ldAllow, e.currency, e.locale)} and our career development programs support your professional journey.` },
+                  { icon: "⚖∩╕Å", title: "Balance", desc: `${e.leaveBalance.annual + e.leaveBalance.sick + e.leaveBalance.personal} days of paid leave plus flexible work arrangements help you manage work and life.` },
                 ].map((m, i) => (
                   <div key={i} style={{ padding: 14, borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}`, textAlign: "center" }}>
                     <div style={{ fontSize: 24, marginBottom: 6 }}>{m.icon}</div>
@@ -1661,27 +1661,27 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 ))}
               </div>
               <div style={{ padding: 14, borderRadius: 8, background: B.accentBg, border: `1px solid ${B.accent}20`, fontSize: 12, color: B.textSecondary, lineHeight: 1.7 }}>
-                <strong style={{ color: B.accent }}>Our Total Rewards Philosophy:</strong> Nutrition International is committed to market-competitive compensation, strong retirement and health benefits, meaningful development opportunities, and flexible work ΓÇö because investing in you enables our mission to nourish life around the world. If you have questions about any part of your rewards, please contact People & Culture at hr@nutritionintl.org.
+                <strong style={{ color: B.accent }}>Our Total Rewards Philosophy:</strong> Nutrition International is committed to market-competitive compensation, strong retirement and health benefits, meaningful development opportunities, and flexible work — because investing in you enables our mission to nourish life around the world. If you have questions about any part of your rewards, please contact People & Culture at hr@nutritionintl.org.
               </div>
             </Card>
 
             {/* Actions */}
             <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-              <Btn variant="primary" onClick={() => alert("Total Rewards Statement downloaded as PDF")}>Γ¼ç Download PDF Statement</Btn>
-              <Btn variant="secondary" onClick={() => alert(`Statement emailed to ${e.email}`)}>Γ£ë Email My Statement</Btn>
+              <Btn variant="primary" onClick={() => alert("Total Rewards Statement downloaded as PDF")}>⬇ Download PDF Statement</Btn>
+              <Btn variant="secondary" onClick={() => alert(`Statement emailed to ${e.email}`)}>✉ Email My Statement</Btn>
               <span style={{ marginLeft: "auto", color: B.textMuted, fontSize: 12 }}>Statement generated: {todayStr}</span>
             </div>
           </div>
         );
       })()}
 
-      {/* ΓòÉΓòÉΓòÉ RECRUITING / WORKABLE (Manager Only) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ RECRUITING / WORKABLE (Manager Only) ═══ */}
       {tab === "recruiting" && e.isManager && (
         <div>
           <div style={{ padding: "10px 14px", borderRadius: 6, background: `${B.blue}08`, border: `1px solid ${B.blue}20`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 18 }}>≡ƒöù</span>
+            <span style={{ fontSize: 18 }}>=���</span>
             <div style={{ flex: 1, fontSize: 12, color: B.textSecondary }}>
-              <strong>Workable ATS Integration</strong> ΓÇö Connected via Open API. Data syncs every 15 minutes. <a href="https://nutrition-intl.workable.com" target="_blank" rel="noopener noreferrer" style={{ color: B.blue, fontWeight: 700 }}>Open Workable Dashboard ΓåÆ</a>
+              <strong>Workable ATS Integration</strong> — Connected via Open API. Data syncs every 15 minutes. <a href="https://nutrition-intl.workable.com" target="_blank" rel="noopener noreferrer" style={{ color: B.blue, fontWeight: 700 }}>Open Workable Dashboard →</a>
             </div>
             <Badge color={B.success} bg={B.successBg}>API Connected</Badge>
           </div>
@@ -1712,16 +1712,16 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 ))}
               </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url, "_blank")}>≡ƒôï View Candidates</Btn>
-                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url + "/description", "_blank")}>≡ƒôä Job Description</Btn>
-                <Btn variant="ghost" size="sm" style={{ color: B.blue }}onClick={() => alert('Opening requisition in Workable ATS...')}>Γåù Open in Workable</Btn>
+                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url, "_blank")}>=��� View Candidates</Btn>
+                <Btn variant="secondary" size="sm" onClick={() => window.open(req.url + "/description", "_blank")}>=��� Job Description</Btn>
+                <Btn variant="ghost" size="sm" style={{ color: B.blue }}onClick={() => alert('Opening requisition in Workable ATS...')}>↗ Open in Workable</Btn>
               </div>
             </Card>
           ))}
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ DOCUMENTS (with Verification Letter) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ DOCUMENTS (with Verification Letter) ═══ */}
       {tab === "documents" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.accent}` }}>
@@ -1746,12 +1746,12 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
                 <input placeholder="e.g. Canadian Embassy, Immigration Division" style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, boxSizing: "border-box" }} />
               </div>
             )}
-            <Btn variant="primary" style={{ width: "100%" }} onClick={() => { setShowLetter(true); setLetterGenerated(true); }}>≡ƒôä Generate & Preview Letter</Btn>
+            <Btn variant="primary" style={{ width: "100%" }} onClick={() => { setShowLetter(true); setLetterGenerated(true); }}>=��� Generate & Preview Letter</Btn>
           </Card>
           <Card>
             <SectionTitle>Employee Documents on File</SectionTitle>
             <Table columns={[
-              { label: "Document", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 14 }}>≡ƒôä</span><span style={{ fontWeight: 600 }}>{r.name}</span></div> },
+              { label: "Document", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 14 }}>=���</span><span style={{ fontWeight: 600 }}>{r.name}</span></div> },
               { label: "Date", render: r => fmtDate(r.date) },
               { label: "Status", render: r => <StatusBadge status={r.status} /> },
             ]} data={[
@@ -1766,8 +1766,8 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ VERIFICATION LETTER MODAL ΓòÉΓòÉΓòÉ */}
-      <Modal open={showLetter} onClose={() => setShowLetter(false)} title="Employment Verification Letter ΓÇö Preview" width={680}>
+      {/* ═══ VERIFICATION LETTER MODAL ═══ */}
+      <Modal open={showLetter} onClose={() => setShowLetter(false)} title="Employment Verification Letter — Preview" width={680}>
         <div style={{ background: B.white, border: `1px solid ${B.border}`, borderRadius: 8, padding: 32, fontFamily: "Georgia, serif", fontSize: 13, lineHeight: 1.8, color: B.textPrimary }}>
           {/* Letterhead */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, paddingBottom: 16, borderBottom: `2px solid ${B.accent}` }}>
@@ -1803,24 +1803,24 @@ const EmployeeProfile = ({ employee: e, onBack, role }) => {
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
           <Btn variant="secondary" onClick={() => setShowLetter(false)}>Close</Btn>
-          <Btn variant="primary" onClick={() => { alert("Letter downloaded as PDF"); setShowLetter(false); }}>Γ¼ç Download PDF</Btn>
-          <Btn variant="primary" style={{ background: B.teal }} onClick={() => { alert(`Letter emailed to ${e.email}`); setShowLetter(false); }}>Γ£ë Email to Employee</Btn>
+          <Btn variant="primary" onClick={() => { alert("Letter downloaded as PDF"); setShowLetter(false); }}>⬇ Download PDF</Btn>
+          <Btn variant="primary" style={{ background: B.teal }} onClick={() => { alert(`Letter emailed to ${e.email}`); setShowLetter(false); }}>✉ Email to Employee</Btn>
         </div>
       </Modal>
     </div>
   );
 };
 
-// ΓöÇΓöÇΓöÇ LABOR LAW COMPLIANCE DATA ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── LABOR LAW COMPLIANCE DATA ───────────────────────────────────────────────
 const LABOR_LAWS = {
   CA: { maxDaily: 8, maxWeekly: 44, otMultiplier: 1.5, restBreak: "30 min after 5h", minRest: "8h between shifts", notes: "Overtime after 44h/week at 1.5├ù. Ontario ESA governs. Statutory holidays paid at premium.", currency: "CAD", otRate: 37.50 },
-  GB: { maxDaily: 8, maxWeekly: 48, otMultiplier: 1.0, restBreak: "20 min after 6h", minRest: "11h between shifts", notes: "Working Time Regulations 1998. Opt-out available for 48h cap. No statutory OT premium ΓÇö contractual.", currency: "GBP", otRate: 22.00 },
+  GB: { maxDaily: 8, maxWeekly: 48, otMultiplier: 1.0, restBreak: "20 min after 6h", minRest: "11h between shifts", notes: "Working Time Regulations 1998. Opt-out available for 48h cap. No statutory OT premium — contractual.", currency: "GBP", otRate: 22.00 },
   IT: { maxDaily: 8, maxWeekly: 40, otMultiplier: 1.25, restBreak: "1h after 6h", minRest: "11h between shifts", notes: "D.Lgs. 66/2003. OT at 25% premium first 8h, 50% thereafter. Max 250h OT/year.", currency: "EUR", otRate: 28.00 },
   CH: { maxDaily: 9, maxWeekly: 45, otMultiplier: 1.25, restBreak: "15 min after 5.5h", minRest: "11h between shifts", notes: "Swiss Labor Act (ArG). Industrial workers 45h/week, others 50h. OT compensated 125% or time off.", currency: "CHF", otRate: 45.00 },
   MW: { maxDaily: 8, maxWeekly: 48, otMultiplier: 1.5, restBreak: "1h after 5h", minRest: "Consecutive 24h/week", notes: "Employment Act 2000. OT at 1.5├ù weekday, 2├ù Sunday/holiday. Max 12h OT/week.", currency: "MWK", otRate: 2500 },
   KE: { maxDaily: 8, maxWeekly: 52, otMultiplier: 1.5, restBreak: "1h after 6h continuous", minRest: "24 consecutive hours/week", notes: "Employment Act 2007. OT at 1.5├ù normal, 2├ù on rest days. Night workers limited to 8h.", currency: "KES", otRate: 750 },
   NG: { maxDaily: 8, maxWeekly: 40, otMultiplier: 1.5, restBreak: "1h after 6h", minRest: "24 consecutive hours/week", notes: "Labour Act Cap L1 LFN 2004. OT not mandatory but must be at 1.5├ù minimum. 12 days paid leave/year.", currency: "NGN", otRate: 3200 },
-  SN: { maxDaily: 8, maxWeekly: 40, otMultiplier: 1.15, restBreak: "1h after 4h", minRest: "24 consecutive hours/week", notes: "Code du Travail. First 8 OT hrs at 15%, next at 40%, night/holiday at 60ΓÇô100%. 24 working days leave.", currency: "XOF", otRate: 4500 },
+  SN: { maxDaily: 8, maxWeekly: 40, otMultiplier: 1.15, restBreak: "1h after 4h", minRest: "24 consecutive hours/week", notes: "Code du Travail. First 8 OT hrs at 15%, next at 40%, night/holiday at 60–100%. 24 working days leave.", currency: "XOF", otRate: 4500 },
   TZ: { maxDaily: 9, maxWeekly: 45, otMultiplier: 1.5, restBreak: "1h daily", minRest: "24 consecutive hours/week", notes: "Employment and Labour Relations Act 2004. OT at 1.5├ù weekday, 2├ù rest days. Max 50h OT/4-week cycle.", currency: "TZS", otRate: 15000 },
   BD: { maxDaily: 8, maxWeekly: 48, otMultiplier: 2.0, restBreak: "1h after 6h", minRest: "1 day/week", notes: "Bangladesh Labour Act 2006. OT at 2├ù basic wage. Max 10h/day including OT. Festival leave 11 days.", currency: "BDT", otRate: 800 },
   IN: { maxDaily: 9, maxWeekly: 48, otMultiplier: 2.0, restBreak: "30 min after 5h", minRest: "24 consecutive hours/week", notes: "Factories Act / Code on Wages 2019. OT at 2├ù ordinary rate. State-specific rules may apply. PF/ESI applicable.", currency: "INR", otRate: 600 },
@@ -1830,15 +1830,15 @@ const LABOR_LAWS = {
 };
 
 const GRANTS_PROJECTS = [
-  { id: "GA-2024-001", name: "GC ΓÇô Vitamin A Supplementation", donor: "Global Affairs Canada", budget: 2400000, currency: "CAD", color: B.accent },
-  { id: "GA-2024-015", name: "BMGF ΓÇô Food Fortification", donor: "Bill & Melinda Gates Foundation", budget: 1800000, currency: "USD", color: B.teal },
-  { id: "GA-2024-032", name: "USAID ΓÇô Maternal Nutrition", donor: "USAID", budget: 950000, currency: "USD", color: B.blue },
-  { id: "GA-2024-044", name: "FCDO ΓÇô Adolescent Girls", donor: "UK FCDO", budget: 620000, currency: "GBP", color: B.purple },
-  { id: "GA-2024-055", name: "EU ΓÇô Rice Fortification Bangladesh", donor: "European Commission", budget: 480000, currency: "EUR", color: B.orange },
-  { id: "GA-2024-061", name: "CIDA ΓÇô Zinc Supplementation", donor: "Govt of Canada", budget: 350000, currency: "CAD", color: B.yellow },
+  { id: "GA-2024-001", name: "GC – Vitamin A Supplementation", donor: "Global Affairs Canada", budget: 2400000, currency: "CAD", color: B.accent },
+  { id: "GA-2024-015", name: "BMGF – Food Fortification", donor: "Bill & Melinda Gates Foundation", budget: 1800000, currency: "USD", color: B.teal },
+  { id: "GA-2024-032", name: "USAID – Maternal Nutrition", donor: "USAID", budget: 950000, currency: "USD", color: B.blue },
+  { id: "GA-2024-044", name: "FCDO – Adolescent Girls", donor: "UK FCDO", budget: 620000, currency: "GBP", color: B.purple },
+  { id: "GA-2024-055", name: "EU – Rice Fortification Bangladesh", donor: "European Commission", budget: 480000, currency: "EUR", color: B.orange },
+  { id: "GA-2024-061", name: "CIDA – Zinc Supplementation", donor: "Govt of Canada", budget: 350000, currency: "CAD", color: B.yellow },
 ];
 
-// ΓöÇΓöÇΓöÇ ENHANCED TIME & ATTENDANCE MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── ENHANCED TIME & ATTENDANCE MODULE ──────────────────────────────────────
 const TimeModule = ({ employee: empProp } = {}) => {
   const emp = empProp || ME;
   const [tab, setTab] = useState("clock");
@@ -1921,7 +1921,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
 
   const timesheetData = EMPLOYEES.slice(0, 12).map((e, i) => generateTimesheetRow(e, i));
 
-  // ΓöÇΓöÇΓöÇ Sub-component: Inline field label ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ─── Sub-component: Inline field label ────────────────────────────────────
   const FieldLabel = ({ children }) => (
     <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.8, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>{children}</label>
   );
@@ -1939,7 +1939,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
         { key: "multicurrency", label: "Multi-Currency" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ CLOCK IN/OUT (Mobile-First, GPS, Offline) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ CLOCK IN/OUT (Mobile-First, GPS, Offline) ═══════ */}
       {tab === "clock" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           {/* Clock Card */}
@@ -1951,7 +1951,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
               <div onClick={() => setIsOnline(!isOnline)} style={{ width: 44, height: 24, borderRadius: 12, background: isOnline ? B.success : B.textMuted, cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                 <div style={{ width: 20, height: 20, borderRadius: 10, background: "#fff", position: "absolute", top: 2, left: isOnline ? 22 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: isOnline ? B.success : B.textMuted }}>{isOnline ? "≡ƒƒó ONLINE" : "≡ƒö┤ OFFLINE MODE"}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: isOnline ? B.success : B.textMuted }}>{isOnline ? "=��� ONLINE" : "=��� OFFLINE MODE"}</span>
             </div>
             {!isOnline && (
               <div style={{ padding: "8px 12px", borderRadius: 6, background: B.warningBg, border: `1px solid ${B.warning}30`, marginBottom: 12, fontSize: 12, color: B.textPrimary }}>
@@ -1976,8 +1976,8 @@ const TimeModule = ({ employee: empProp } = {}) => {
             {/* GPS Location */}
             {gpsLocation && clockedIn && (
               <div style={{ padding: "8px 12px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, marginBottom: 12, fontSize: 11, color: B.textSecondary, display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 14 }}>≡ƒôì</span>
-                GPS Verified: {gpsLocation.lat}, {gpsLocation.lng} ΓÇö Nairobi, Kenya
+                <span style={{ fontSize: 14 }}>=���</span>
+                GPS Verified: {gpsLocation.lat}, {gpsLocation.lng} — Nairobi, Kenya
               </div>
             )}
 
@@ -1986,11 +1986,11 @@ const TimeModule = ({ employee: empProp } = {}) => {
               {!clockedIn ? (
                 <button onClick={handleClockIn} style={{ flex: 1, padding: "14px 0", borderRadius: 8, border: "none", background: B.success, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "Arial, sans-serif", transition: "transform 0.1s" }}
                   onMouseDown={e => e.currentTarget.style.transform = "scale(0.97)"} onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}>
-                  Γû╢ CLOCK IN
+                  ▶ CLOCK IN
                 </button>
               ) : (
                 <button onClick={handleClockOut} style={{ flex: 1, padding: "14px 0", borderRadius: 8, border: "none", background: B.danger, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "Arial, sans-serif" }}>
-                  Γûá CLOCK OUT
+                  ■ CLOCK OUT
                 </button>
               )}
             </div>
@@ -1998,7 +1998,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
             {/* Sync Button (Offline) */}
             {!isOnline && offlineQueue.length > 0 && (
               <Btn variant="secondary" style={{ width: "100%", marginTop: 10 }} onClick={handleSync}>
-                Γå╗ Sync {offlineQueue.length} Queued Event{offlineQueue.length > 1 ? "s" : ""}
+                ↻ Sync {offlineQueue.length} Queued Event{offlineQueue.length > 1 ? "s" : ""}
               </Btn>
             )}
           </Card>
@@ -2008,10 +2008,10 @@ const TimeModule = ({ employee: empProp } = {}) => {
             <Card>
               <SectionTitle>Today's Activity Log</SectionTitle>
               {[
-                { time: "08:02 AM", action: "Clock In", grant: "GC ΓÇô Vitamin A", gps: "Nairobi, KE", mode: "Online", icon: "≡ƒƒó" },
-                { time: "12:05 PM", action: "Clock Out (Lunch)", grant: "ΓÇö", gps: "Nairobi, KE", mode: "Online", icon: "≡ƒƒí" },
-                { time: "12:58 PM", action: "Clock In", grant: "BMGF ΓÇô Fortification", gps: "Field Site, Kiambu", mode: "Offline", icon: "≡ƒö┤" },
-                { time: "03:30 PM", action: "Grant Switch", grant: "USAID ΓÇô Maternal", gps: "Kiambu", mode: "Offline", icon: "≡ƒö╡" },
+                { time: "08:02 AM", action: "Clock In", grant: "GC – Vitamin A", gps: "Nairobi, KE", mode: "Online", icon: "=���" },
+                { time: "12:05 PM", action: "Clock Out (Lunch)", grant: "—", gps: "Nairobi, KE", mode: "Online", icon: "=���" },
+                { time: "12:58 PM", action: "Clock In", grant: "BMGF – Fortification", gps: "Field Site, Kiambu", mode: "Offline", icon: "=���" },
+                { time: "03:30 PM", action: "Grant Switch", grant: "USAID – Maternal", gps: "Kiambu", mode: "Offline", icon: "=���" },
               ].map((log, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4, fontSize: 12 }}>
                   <span>{log.icon}</span>
@@ -2028,12 +2028,12 @@ const TimeModule = ({ employee: empProp } = {}) => {
               <SectionTitle>Offline Sync Queue</SectionTitle>
               {offlineQueue.length === 0 ? (
                 <div style={{ textAlign: "center", padding: 16, color: B.textMuted, fontSize: 13 }}>
-                  {isOnline ? "Γ£ô All events synced ΓÇö no items in queue" : "No queued events yet. Clock in/out while offline to queue events."}
+                  {isOnline ? "✓ All events synced — no items in queue" : "No queued events yet. Clock in/out while offline to queue events."}
                 </div>
               ) : (
                 offlineQueue.map((item, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: item.synced ? B.successBg : B.warningBg, border: `1px solid ${item.synced ? B.success : B.warning}20`, marginBottom: 4 }}>
-                    <span style={{ fontSize: 14 }}>{item.synced ? "Γ£à" : "ΓÅ│"}</span>
+                    <span style={{ fontSize: 14 }}>{item.synced ? "✅" : "⏳"}</span>
                     <div style={{ flex: 1, fontSize: 12 }}>
                       <span style={{ fontWeight: 700 }}>{item.action.replace("_", " ").toUpperCase()}</span>
                       <span style={{ color: B.textMuted }}> ┬╖ {new Date(item.time).toLocaleTimeString()}</span>
@@ -2065,14 +2065,14 @@ const TimeModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ WEEKLY TIMESHEET ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ WEEKLY TIMESHEET ════════════════════════════════ */}
       {tab === "attendance" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center", flexWrap: "wrap" }}>
             <FieldLabel>Pay Period</FieldLabel>
             <input type="week" value={timesheetWeek} onChange={e => setTimesheetWeek(e.target.value)} style={{ padding: "6px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif" }} />
             <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
-            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Employee ID, Week, Mon-Fri hours, Grant Code columns")}>≡ƒôñ Batch Upload Timesheets</Btn>
+            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Employee ID, Week, Mon-Fri hours, Grant Code columns")}>=��� Batch Upload Timesheets</Btn>
           </div>
           <div style={{ overflowX: "auto", borderRadius: 6, border: `1px solid ${B.border}` }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
@@ -2108,25 +2108,25 @@ const TimeModule = ({ employee: empProp } = {}) => {
                         <span style={{ fontWeight: 700, color: overMax ? B.danger : B.textPrimary }}>{r.total}h</span>
                       </td>
                       <td style={{ padding: "8px 6px", textAlign: "center" }}>
-                        {r.ot > 0 ? <Badge color={B.orange} bg={B.warningBg}>{r.ot}h @ {r.lawData.otMultiplier}├ù</Badge> : <span style={{ color: B.textMuted }}>ΓÇö</span>}
+                        {r.ot > 0 ? <Badge color={B.orange} bg={B.warningBg}>{r.ot}h @ {r.lawData.otMultiplier}├ù</Badge> : <span style={{ color: B.textMuted }}>—</span>}
                       </td>
                       <td style={{ padding: "8px 6px", fontSize: 10 }}>
                         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                             <div style={{ width: 6, height: 6, borderRadius: 3, background: B.accent }} />
-                            <span>{(r.g1Pct * 100).toFixed(0)}% {r.g1Name?.split(" ΓÇô ")[0]}</span>
+                            <span>{(r.g1Pct * 100).toFixed(0)}% {r.g1Name?.split(" – ")[0]}</span>
                           </div>
                           {r.g2Name && <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                             <div style={{ width: 6, height: 6, borderRadius: 3, background: B.teal }} />
-                            <span>{(r.g2Pct * 100).toFixed(0)}% {r.g2Name?.split(" ΓÇô ")[0]}</span>
+                            <span>{(r.g2Pct * 100).toFixed(0)}% {r.g2Name?.split(" – ")[0]}</span>
                           </div>}
                         </div>
                       </td>
                       <td style={{ padding: "8px 6px" }}>
                         {overMax ? (
-                          <Badge color={B.danger} bg={B.dangerBg}>ΓÜá Exceeds {r.lawData.maxWeekly}h</Badge>
+                          <Badge color={B.danger} bg={B.dangerBg}>⚠ Exceeds {r.lawData.maxWeekly}h</Badge>
                         ) : (
-                          <Badge color={B.success} bg={B.successBg}>Γ£ô Compliant</Badge>
+                          <Badge color={B.success} bg={B.successBg}>✓ Compliant</Badge>
                         )}
                       </td>
                       <td style={{ padding: "8px 6px" }}>
@@ -2141,11 +2141,11 @@ const TimeModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ GRANT / PROJECT TRACKING ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ GRANT / PROJECT TRACKING ════════════════════════ */}
       {tab === "grants" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Grant Code, Allocation %, Period, Hours columns")}>≡ƒôñ Batch Upload Allocations</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Grant Code, Allocation %, Period, Hours columns")}>=��� Batch Upload Allocations</Btn>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12, marginBottom: 16 }}>
             {GRANTS_PROJECTS.map(g => {
@@ -2175,11 +2175,11 @@ const TimeModule = ({ employee: empProp } = {}) => {
 
           {/* Detailed allocation table */}
           <Card>
-            <SectionTitle>Staff Allocation by Grant ΓÇö Current Period</SectionTitle>
+            <SectionTitle>Staff Allocation by Grant — Current Period</SectionTitle>
             <Table columns={[
               { label: "Employee", render: r => <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={`${r.first} ${r.last}`} size={24} /><div><span style={{ fontWeight: 600, fontSize: 12 }}>{r.first} {r.last}</span><div style={{ fontSize: 10, color: B.textMuted }}>{r.flag} {r.countryName} ┬╖ {r.currency}</div></div></div> },
-              { label: "Grant 1 (%)", render: r => (<div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: 4, background: B.accent }} /><span>{(r.grants[0]?.allocation * 100).toFixed(0)}% ΓÇö {r.grants[0]?.name?.split(" ΓÇô ")[0]}</span></div>) },
-              { label: "Grant 2 (%)", render: r => r.grants[1] ? (<div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: 4, background: B.teal }} /><span>{(r.grants[1]?.allocation * 100).toFixed(0)}% ΓÇö {r.grants[1]?.name?.split(" ΓÇô ")[0]}</span></div>) : <span style={{ color: B.textMuted }}>ΓÇö</span> },
+              { label: "Grant 1 (%)", render: r => (<div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: 4, background: B.accent }} /><span>{(r.grants[0]?.allocation * 100).toFixed(0)}% — {r.grants[0]?.name?.split(" – ")[0]}</span></div>) },
+              { label: "Grant 2 (%)", render: r => r.grants[1] ? (<div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: 4, background: B.teal }} /><span>{(r.grants[1]?.allocation * 100).toFixed(0)}% — {r.grants[1]?.name?.split(" – ")[0]}</span></div>) : <span style={{ color: B.textMuted }}>—</span> },
               { label: "Hours This Week", render: (_, i) => <span style={{ fontWeight: 700 }}>{35 + (i % 6)}h</span> },
               { label: "Total Alloc", render: () => <Badge color={B.success} bg={B.successBg}>100%</Badge> },
               { label: "Status", render: (_, i) => <StatusBadge status={i % 3 === 0 ? "Pending" : "Approved"} /> },
@@ -2216,7 +2216,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LABOR COMPLIANCE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ LABOR COMPLIANCE ════════════════════════════════ */}
       {tab === "compliance" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
@@ -2225,14 +2225,14 @@ const TimeModule = ({ employee: empProp } = {}) => {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card style={{ borderTop: `4px solid ${B.accent}` }}>
-              <SectionTitle>{compCountry?.flag} Labor Law Summary ΓÇö {compCountry?.name}</SectionTitle>
+              <SectionTitle>{compCountry?.flag} Labor Law Summary — {compCountry?.name}</SectionTitle>
               {[
-                { label: "Max Daily Hours", value: `${law.maxDaily}h`, icon: "ΓÅ▒" },
-                { label: "Max Weekly Hours", value: `${law.maxWeekly}h`, icon: "≡ƒôà" },
-                { label: "Overtime Multiplier", value: `${law.otMultiplier}├ù base rate`, icon: "≡ƒÆ░" },
-                { label: "Mandatory Rest Break", value: law.restBreak, icon: "Γÿò" },
-                { label: "Minimum Rest Between Shifts", value: law.minRest, icon: "≡ƒîÖ" },
-                { label: "OT Hourly Rate", value: fmt(law.otRate, law.currency), icon: "≡ƒÆ╡" },
+                { label: "Max Daily Hours", value: `${law.maxDaily}h`, icon: "⏱" },
+                { label: "Max Weekly Hours", value: `${law.maxWeekly}h`, icon: "=���" },
+                { label: "Overtime Multiplier", value: `${law.otMultiplier}├ù base rate`, icon: "=���" },
+                { label: "Mandatory Rest Break", value: law.restBreak, icon: "☕" },
+                { label: "Minimum Rest Between Shifts", value: law.minRest, icon: "=���" },
+                { label: "OT Hourly Rate", value: fmt(law.otRate, law.currency), icon: "=���" },
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
                   <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{item.icon}</span>
@@ -2252,10 +2252,10 @@ const TimeModule = ({ employee: empProp } = {}) => {
               {[
                 { name: "Joseph Mwangi", issue: "Approaching weekly max (46/48h)", severity: "warning" },
                 { name: "Hassan Khan", issue: "Missing rest break on Wednesday", severity: "danger" },
-                { name: "Grace Okafor", issue: "5 consecutive work days ΓÇö rest day required", severity: "warning" },
+                { name: "Grace Okafor", issue: "5 consecutive work days — rest day required", severity: "warning" },
               ].filter(() => true).map((alert, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 6, background: alert.severity === "danger" ? B.dangerBg : B.warningBg, border: `1px solid ${alert.severity === "danger" ? B.danger : B.warning}20`, marginBottom: 6 }}>
-                  <span style={{ fontSize: 14 }}>{alert.severity === "danger" ? "≡ƒÜ¿" : "ΓÜá∩╕Å"}</span>
+                  <span style={{ fontSize: 14 }}>{alert.severity === "danger" ? "=���" : "⚠∩╕Å"}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary }}>{alert.name}</div>
                     <div style={{ fontSize: 11, color: B.textSecondary }}>{alert.issue}</div>
@@ -2269,7 +2269,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
           </div>
           {/* All-country comparison */}
           <Card style={{ marginTop: 14 }}>
-            <SectionTitle>Labor Law Comparison ΓÇö All Entities</SectionTitle>
+            <SectionTitle>Labor Law Comparison — All Entities</SectionTitle>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, fontFamily: "Arial, sans-serif" }}>
                 <thead><tr style={{ background: B.bgHover }}>
@@ -2300,13 +2300,13 @@ const TimeModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LEAVE REQUESTS (Enhanced) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ LEAVE REQUESTS (Enhanced) ═══════════════════════ */}
       {tab === "requests" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, justifyContent: "space-between", flexWrap: "wrap" }}>
             <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
             <div style={{ display: "flex", gap: 6 }}>
-              <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Leave Type, Start Date, End Date, Days columns")}>≡ƒôñ Batch Upload</Btn>
+              <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Leave Type, Start Date, End Date, Days columns")}>=��� Batch Upload</Btn>
               <Btn variant="primary" onClick={() => setShowNewRequest(true)}>+ New Leave Request</Btn>
             </div>
           </div>
@@ -2319,15 +2319,15 @@ const TimeModule = ({ employee: empProp } = {}) => {
                     <span style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{r.employeeName}</span>
                     <StatusBadge status={r.status} />
                   </div>
-                  <div style={{ fontSize: 13, color: B.textSecondary }}>{r.type} ┬╖ {fmtDate(r.from)} ΓÇô {fmtDate(r.to)} ({r.days} days)</div>
+                  <div style={{ fontSize: 13, color: B.textSecondary }}>{r.type} ┬╖ {fmtDate(r.from)} – {fmtDate(r.to)} ({r.days} days)</div>
                   <div style={{ fontSize: 12, color: B.textMuted }}>{r.reason} ┬╖ Submitted {fmtDate(r.submitted)}</div>
                   {r.approvedBy && <div style={{ fontSize: 11, color: B.success, marginTop: 2 }}>Approved by {r.approvedBy} on {fmtDate(r.approvedDate)}</div>}
                   {r.rejectedReason && <div style={{ fontSize: 11, color: B.danger, marginTop: 2 }}>Rejected: {r.rejectedReason}</div>}
                 </div>
                 {r.status === "Pending" && (
                   <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                    <Btn variant="success" size="sm" onClick={() => handleApprove(r.id)}>Γ£ô Approve</Btn>
-                    <Btn variant="danger" size="sm" onClick={() => handleReject(r.id)}>Γ£ò Reject</Btn>
+                    <Btn variant="success" size="sm" onClick={() => handleApprove(r.id)}>✓ Approve</Btn>
+                    <Btn variant="danger" size="sm" onClick={() => handleReject(r.id)}>✕ Reject</Btn>
                   </div>
                 )}
               </Card>
@@ -2354,23 +2354,23 @@ const TimeModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ HOLIDAY CALENDARS (Editable) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ HOLIDAY CALENDARS (Editable) ═════════════════════ */}
       {tab === "calendars" && (
         <div>
           {/* Dec 1 Alert Banner */}
           {showDecAlert && (
             <div style={{ padding: "12px 16px", borderRadius: 8, background: B.dangerBg, border: `1px solid ${B.danger}25`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 22 }}>≡ƒöö</span>
+              <span style={{ fontSize: 22 }}>=���</span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: B.danger }}>Action Required: Review 2027 Public Holiday Calendars</div>
-                <div style={{ fontSize: 12, color: B.textSecondary }}>It's December ΓÇö please review and update public holiday dates for all countries for the 2027 calendar year. Ensure holidays are confirmed with local offices before year-end payroll processing.</div>
+                <div style={{ fontSize: 12, color: B.textSecondary }}>It's December — please review and update public holiday dates for all countries for the 2027 calendar year. Ensure holidays are confirmed with local offices before year-end payroll processing.</div>
               </div>
-              <Btn variant="danger" size="sm" onClick={() => { setCalendarYear("2027"); alert("Switched to 2027 calendar. Add holidays for each country."); }}>Set Up 2027 ΓåÆ</Btn>
+              <Btn variant="danger" size="sm" onClick={() => { setCalendarYear("2027"); alert("Switched to 2027 calendar. Add holidays for each country."); }}>Set Up 2027 →</Btn>
             </div>
           )}
           {/* Upcoming alert preview (always visible as reminder) */}
           <div style={{ padding: "10px 14px", borderRadius: 8, background: B.warningBg, border: `1px solid ${B.warning}20`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
-            <span style={{ fontSize: 16 }}>≡ƒôà</span>
+            <span style={{ fontSize: 16 }}>=���</span>
             <span style={{ color: B.textSecondary }}><strong>Annual Reminder:</strong> On December 1, {calendarYear} an alert will notify HR Admin and Superuser to review and publish holiday calendars for {parseInt(calendarYear) + 1}. All changes are audit-logged.</span>
           </div>
 
@@ -2379,7 +2379,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
             <Select value={holidayCountryFilter} onChange={setHolidayCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...Object.keys(holidays).map(code => { const c = COUNTRIES.find(x => x.code === code); return { value: code, label: `${c?.flag} ${c?.name}` }; })]} />
             <Select value={calendarYear} onChange={setCalendarYear} options={[{ value: "2025", label: "2025" }, { value: "2026", label: "2026" }, { value: "2027", label: "2027" }]} />
             <span style={{ fontSize: 12, color: B.textMuted }}>{Object.values(holidays).reduce((s, h) => s + h.length, 0)} holidays across {Object.keys(holidays).length} countries</span>
-            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Country Code, Holiday Name, Date columns")}>≡ƒôñ Batch Upload</Btn>
+            <Btn variant="secondary" size="sm" style={{ marginLeft: "auto" }} onClick={() => alert("Batch upload: drag Excel with Country Code, Holiday Name, Date columns")}>=��� Batch Upload</Btn>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -2388,7 +2388,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
               const countryHolidays = (holidays[code] || []).sort((a, b) => a.date.localeCompare(b.date));
               return (
                 <Card key={code}>
-                  <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => { setHolidayForm({ name: "", date: "" }); setShowHolidayEdit({ country: code, idx: "new" }); }}>+ Add Holiday</Btn>}>{c?.flag} {c?.name} ΓÇö {calendarYear} ({countryHolidays.length})</SectionTitle>
+                  <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => { setHolidayForm({ name: "", date: "" }); setShowHolidayEdit({ country: code, idx: "new" }); }}>+ Add Holiday</Btn>}>{c?.flag} {c?.name} — {calendarYear} ({countryHolidays.length})</SectionTitle>
                   {countryHolidays.map((h, i) => {
                     const isPast = new Date(h.date) < new Date();
                     const isUpcoming = !isPast && new Date(h.date) < new Date(Date.now() + 30 * 86400000);
@@ -2399,8 +2399,8 @@ const TimeModule = ({ employee: empProp } = {}) => {
                         <span style={{ fontSize: 11, color: B.textMuted, width: 90, textAlign: "right" }}>{fmtDate(h.date)}</span>
                         {isUpcoming && <Badge color={B.warning} bg={B.warningBg} style={{ fontSize: 7 }}>UPCOMING</Badge>}
                         {isPast && <Badge color={B.textMuted} bg={B.bgHover} style={{ fontSize: 7 }}>PAST</Badge>}
-                        <Btn variant="ghost" size="sm" onClick={() => { setHolidayForm({ name: h.name, date: h.date }); setShowHolidayEdit({ country: code, idx: i }); }}>Γ£Å∩╕Å</Btn>
-                        <button onClick={() => { setHolidays(prev => ({ ...prev, [code]: prev[code].filter((_, idx) => idx !== i) })); }} style={{ background: "none", border: "none", color: B.danger, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>Γ£ò</button>
+                        <Btn variant="ghost" size="sm" onClick={() => { setHolidayForm({ name: h.name, date: h.date }); setShowHolidayEdit({ country: code, idx: i }); }}>✏∩╕Å</Btn>
+                        <button onClick={() => { setHolidays(prev => ({ ...prev, [code]: prev[code].filter((_, idx) => idx !== i) })); }} style={{ background: "none", border: "none", color: B.danger, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
                       </div>
                     );
                   })}
@@ -2411,7 +2411,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
           </div>
 
           {/* Holiday Add/Edit Modal */}
-          <Modal open={!!showHolidayEdit} onClose={() => setShowHolidayEdit(null)} title={showHolidayEdit?.idx === "new" ? `Add Holiday ΓÇö ${COUNTRIES.find(c => c.code === showHolidayEdit?.country)?.name || ""}` : `Edit Holiday ΓÇö ${COUNTRIES.find(c => c.code === showHolidayEdit?.country)?.name || ""}`} width={450}>
+          <Modal open={!!showHolidayEdit} onClose={() => setShowHolidayEdit(null)} title={showHolidayEdit?.idx === "new" ? `Add Holiday — ${COUNTRIES.find(c => c.code === showHolidayEdit?.country)?.name || ""}` : `Edit Holiday — ${COUNTRIES.find(c => c.code === showHolidayEdit?.country)?.name || ""}`} width={450}>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Holiday Name</label>
                 <input value={holidayForm.name} onChange={ev => setHolidayForm(p => ({ ...p, name: ev.target.value }))} placeholder="e.g. National Day" style={{ width: "100%", padding: 10, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
@@ -2419,7 +2419,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                 <input type="date" value={holidayForm.date} onChange={ev => setHolidayForm(p => ({ ...p, date: ev.target.value }))} style={{ width: "100%", padding: 10, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
               <div style={{ padding: 10, borderRadius: 6, background: `${B.charcoal}06`, border: `1px solid ${B.charcoal}12`, fontSize: 11, color: B.textMuted, fontFamily: "monospace" }}>
                 <div><strong>Audit:</strong> {showHolidayEdit?.idx === "new" ? "Add" : "Edit"} holiday for {showHolidayEdit?.country}</div>
-                <div><strong>Holiday:</strong> {holidayForm.name || "ΓÇö"} on {holidayForm.date || "ΓÇö"}</div>
+                <div><strong>Holiday:</strong> {holidayForm.name || "—"} on {holidayForm.date || "—"}</div>
                 <div><strong>Changed by:</strong> HR Admin / Superuser</div>
                 <div><strong>Timestamp:</strong> {new Date().toISOString()}</div>
               </div>
@@ -2435,18 +2435,18 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   }
                   setShowHolidayEdit(null);
                   alert(`Holiday "${holidayForm.name}" ${showHolidayEdit.idx === "new" ? "added to" : "updated in"} ${COUNTRIES.find(x => x.code === cc)?.name} calendar. Audit log entry created.`);
-                }}>≡ƒÆ╛ {showHolidayEdit?.idx === "new" ? "Add Holiday" : "Save Changes"}</Btn>
+                }}>=��� {showHolidayEdit?.idx === "new" ? "Add Holiday" : "Save Changes"}</Btn>
               </div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ MULTI-CURRENCY PAYROLL ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════════════════ MULTI-CURRENCY PAYROLL ══════════════════════════ */}
       {tab === "multicurrency" && (
         <div>
           <Card style={{ marginBottom: 14 }}>
-            <SectionTitle>Multi-Currency Payroll Summary ΓÇö Current Period</SectionTitle>
+            <SectionTitle>Multi-Currency Payroll Summary — Current Period</SectionTitle>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
                 <thead><tr style={{ background: B.bgHover }}>
@@ -2475,7 +2475,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
                         <td style={{ padding: "8px 10px" }}><Badge color={B.blue} bg={`${B.blue}12`}>{c.currency}</Badge></td>
                         <td style={{ padding: "8px 10px" }}>{totalHours}h</td>
                         <td style={{ padding: "8px 10px" }}>{fmt(regPay, c.currency, c.locale)}</td>
-                        <td style={{ padding: "8px 10px" }}>{otPay > 0 ? fmt(otPay, c.currency, c.locale) : "ΓÇö"}</td>
+                        <td style={{ padding: "8px 10px" }}>{otPay > 0 ? fmt(otPay, c.currency, c.locale) : "—"}</td>
                         <td style={{ padding: "8px 10px", fontWeight: 700 }}>{fmt(regPay + otPay, c.currency, c.locale)}</td>
                         <td style={{ padding: "8px 10px", color: B.teal, fontWeight: 700 }}>${usdEquiv.toLocaleString()}</td>
                       </tr>
@@ -2497,8 +2497,8 @@ const TimeModule = ({ employee: empProp } = {}) => {
               <div style={{ fontSize: 10, color: B.textMuted, marginTop: 8 }}>Rates updated: Apr 23, 2026 ┬╖ Source: Treasury rate feed</div>
             </Card>
             <Card>
-              <SectionTitle>Payroll by Currency ΓÇö Consolidated (USD)</SectionTitle>
-              {[{ curr: "CAD ≡ƒç¿≡ƒçª", usd: 42300, pct: 28 }, { curr: "KES ≡ƒç░≡ƒç¬", usd: 18900, pct: 12 }, { curr: "GBP ≡ƒç¼≡ƒçº", usd: 31200, pct: 20 }, { curr: "INR ≡ƒç«≡ƒç│", usd: 12400, pct: 8 }, { curr: "NGN ≡ƒç│≡ƒç¼", usd: 8700, pct: 6 }, { curr: "Others", usd: 39500, pct: 26 }].map((item, i) => (
+              <SectionTitle>Payroll by Currency — Consolidated (USD)</SectionTitle>
+              {[{ curr: "CAD =���=���", usd: 42300, pct: 28 }, { curr: "KES =���=���", usd: 18900, pct: 12 }, { curr: "GBP =���=���", usd: 31200, pct: 20 }, { curr: "INR =���=���", usd: 12400, pct: 8 }, { curr: "NGN =���=���", usd: 8700, pct: 6 }, { curr: "Others", usd: 39500, pct: 26 }].map((item, i) => (
                 <div key={i} style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, fontSize: 12 }}>
                     <span style={{ fontWeight: 600 }}>{item.curr}</span>
@@ -2515,7 +2515,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ WORKFLOW BUILDER ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── WORKFLOW BUILDER ────────────────────────────────────────────────────────
 const WorkflowModule = () => {
   const [selectedWF, setSelectedWF] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
@@ -2576,16 +2576,16 @@ const WorkflowModule = () => {
               {wf.steps.map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <div style={{ padding: "3px 8px", borderRadius: 4, background: B.bgHover, fontSize: 11, color: B.textSecondary, fontWeight: 600 }}>{s.role}: {s.action}</div>
-                  {i < wf.steps.length - 1 && <span style={{ color: B.textMuted, fontSize: 10 }}>ΓåÆ</span>}
+                  {i < wf.steps.length - 1 && <span style={{ color: B.textMuted, fontSize: 10 }}>→</span>}
                 </div>
               ))}
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 11, color: B.textMuted }}>SLA: {wf.sla} ┬╖ Countries: {wf.countries}</div>
               <div style={{ display: "flex", gap: 4 }}>
-                <Btn variant="secondary" size="sm" onClick={() => openEdit(wf)}>Γ£Å∩╕Å Edit</Btn>
-                <Btn variant="ghost" size="sm" onClick={() => setSelectedWF(wf)}>≡ƒæü View</Btn>
-                <Btn variant="ghost" size="sm" style={{ color: wf.status === "Active" ? B.warning : B.success }} onClick={() => setWorkflows(prev => prev.map(w => w.id === wf.id ? { ...w, status: w.status === "Active" ? "Inactive" : "Active" } : w))}>{wf.status === "Active" ? "ΓÅ╕" : "Γû╢"}</Btn>
+                <Btn variant="secondary" size="sm" onClick={() => openEdit(wf)}>✏∩╕Å Edit</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => setSelectedWF(wf)}>=��� View</Btn>
+                <Btn variant="ghost" size="sm" style={{ color: wf.status === "Active" ? B.warning : B.success }} onClick={() => setWorkflows(prev => prev.map(w => w.id === wf.id ? { ...w, status: w.status === "Active" ? "Inactive" : "Active" } : w))}>{wf.status === "Active" ? "⏸" : "▶"}</Btn>
               </div>
             </div>
           </Card>
@@ -2607,7 +2607,7 @@ const WorkflowModule = () => {
                   <div style={{ width: 28, height: 28, borderRadius: 14, background: B.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
                   <div style={{ flex: 1, padding: "10px 14px", borderRadius: 6, background: B.bgHover, border: `1px solid ${B.border}` }}>
                     <span style={{ fontWeight: 700, color: B.textPrimary }}>{s.role}</span>
-                    <span style={{ color: B.textMuted }}> ΓÇö {s.action}</span>
+                    <span style={{ color: B.textMuted }}> — {s.action}</span>
                   </div>
                 </div>
               ))}
@@ -2618,7 +2618,7 @@ const WorkflowModule = () => {
               <div><span style={{ fontWeight: 700, color: B.textSecondary }}>Status:</span> {selectedWF.status}</div>
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 16, justifyContent: "flex-end" }}>
-              <Btn variant="secondary" onClick={() => { setSelectedWF(null); openEdit(selectedWF); }}>Γ£Å∩╕Å Edit This Workflow</Btn>
+              <Btn variant="secondary" onClick={() => { setSelectedWF(null); openEdit(selectedWF); }}>✏∩╕Å Edit This Workflow</Btn>
               <Btn variant="secondary" onClick={() => setSelectedWF(null)}>Close</Btn>
             </div>
           </div>
@@ -2655,8 +2655,8 @@ const WorkflowModule = () => {
                 <div style={{ width: 26, height: 26, borderRadius: 13, background: B.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
                 {/* Reorder buttons */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 0, flexShrink: 0 }}>
-                  <button onClick={() => moveStep(i, -1)} disabled={i === 0} style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", fontSize: 10, color: i === 0 ? B.borderLight : B.textMuted, padding: "0 2px", lineHeight: 1 }}>Γû▓</button>
-                  <button onClick={() => moveStep(i, 1)} disabled={i === editForm.steps.length - 1} style={{ background: "none", border: "none", cursor: i === editForm.steps.length - 1 ? "default" : "pointer", fontSize: 10, color: i === editForm.steps.length - 1 ? B.borderLight : B.textMuted, padding: "0 2px", lineHeight: 1 }}>Γû╝</button>
+                  <button onClick={() => moveStep(i, -1)} disabled={i === 0} style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", fontSize: 10, color: i === 0 ? B.borderLight : B.textMuted, padding: "0 2px", lineHeight: 1 }}>▲</button>
+                  <button onClick={() => moveStep(i, 1)} disabled={i === editForm.steps.length - 1} style={{ background: "none", border: "none", cursor: i === editForm.steps.length - 1 ? "default" : "pointer", fontSize: 10, color: i === editForm.steps.length - 1 ? B.borderLight : B.textMuted, padding: "0 2px", lineHeight: 1 }}>▼</button>
                 </div>
                 {/* Role */}
                 <Select value={s.role} onChange={v => updateStep(i, "role", v)} style={{ width: 140 }} options={[
@@ -2665,7 +2665,7 @@ const WorkflowModule = () => {
                   { value: "Grants Finance", label: "Grants Finance" }, { value: "IT", label: "IT" }, { value: "L&D Team", label: "L&D Team" },
                   { value: "Country Director", label: "Country Director" }, { value: "VP", label: "VP / Executive" }, { value: "System", label: "System (Auto)" },
                 ]} />
-                <span style={{ color: B.textMuted, fontSize: 12 }}>ΓåÆ</span>
+                <span style={{ color: B.textMuted, fontSize: 12 }}>→</span>
                 {/* Action */}
                 <Select value={s.action} onChange={v => updateStep(i, "action", v)} style={{ flex: 1 }} options={[
                   { value: "", label: "Select action..." }, { value: "Approve/Reject", label: "Approve / Reject" }, { value: "Review", label: "Review" },
@@ -2678,7 +2678,7 @@ const WorkflowModule = () => {
                   { value: "Parse receipt (OCR)", label: "Parse Receipt (OCR)" }, { value: "Custom", label: "Custom Action" },
                 ]} />
                 {/* Delete */}
-                <button onClick={() => removeStep(i)} disabled={editForm.steps.length <= 1} style={{ background: "none", border: "none", color: editForm.steps.length <= 1 ? B.borderLight : B.danger, cursor: editForm.steps.length <= 1 ? "default" : "pointer", fontSize: 16, padding: "0 4px" }}>Γ£ò</button>
+                <button onClick={() => removeStep(i)} disabled={editForm.steps.length <= 1} style={{ background: "none", border: "none", color: editForm.steps.length <= 1 ? B.borderLight : B.danger, cursor: editForm.steps.length <= 1 ? "default" : "pointer", fontSize: 16, padding: "0 4px" }}>✕</button>
               </div>
             ))}
           </div>
@@ -2687,7 +2687,7 @@ const WorkflowModule = () => {
           <div style={{ padding: 10, borderRadius: 6, background: `${B.charcoal}06`, border: `1px solid ${B.charcoal}12`, fontSize: 11, color: B.textMuted }}>
             {editingWF === "new"
               ? "Creating a new workflow will make it available for use immediately. All workflow changes are recorded in the audit log."
-              : `Editing workflow "${editForm.name}" ΓÇö changes take effect immediately for all future triggers. In-flight instances continue under the previous configuration. This change will be recorded in the audit trail.`}
+              : `Editing workflow "${editForm.name}" — changes take effect immediately for all future triggers. In-flight instances continue under the previous configuration. This change will be recorded in the audit trail.`}
           </div>
 
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", paddingTop: 10, borderTop: `1px solid ${B.border}` }}>
@@ -2698,10 +2698,10 @@ const WorkflowModule = () => {
                   setEditingWF(null);
                   alert(`Workflow "${editForm.name}" deleted. Audit log entry created.`);
                 }
-              }}>≡ƒùæ Delete Workflow</Btn>
+              }}>=��� Delete Workflow</Btn>
             )}
             <Btn variant="secondary" onClick={() => setEditingWF(null)}>Cancel</Btn>
-            <Btn variant="primary" onClick={saveWorkflow}>≡ƒÆ╛ {editingWF === "new" ? "Create Workflow" : "Save Changes"}</Btn>
+            <Btn variant="primary" onClick={saveWorkflow}>=��� {editingWF === "new" ? "Create Workflow" : "Save Changes"}</Btn>
           </div>
         </div>
       </Modal>
@@ -2709,7 +2709,7 @@ const WorkflowModule = () => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ H&W / L&D ALLOWANCE MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── H&W / L&D ALLOWANCE MODULE ─────────────────────────────────────────────
 const AllowanceModule = ({ employee: empProp } = {}) => {
   const emp = empProp || ME;
   const [tab, setTab] = useState("hw");
@@ -2743,16 +2743,16 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
         <SectionTitle>Submit New {tab === "hw" ? "Health & Wellness" : "Learning & Development"} Claim</SectionTitle>
         <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleDrop}
           style={{ border: `2px dashed ${dragOver ? B.accent : B.border}`, borderRadius: 8, padding: 30, textAlign: "center", background: dragOver ? B.accentBg : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>≡ƒôä</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>=���</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Drag & drop receipts here</div>
-          <div style={{ fontSize: 12, color: B.textMuted }}>PDF, JPG, PNG ΓÇö receipts will be automatically parsed via OCR</div>
+          <div style={{ fontSize: 12, color: B.textMuted }}>PDF, JPG, PNG — receipts will be automatically parsed via OCR</div>
         </div>
         {uploads.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", marginBottom: 8 }}>Parsed Receipts</div>
             {uploads.map((u, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, marginBottom: 6 }}>
-                <span style={{ fontSize: 18 }}>Γ£ô</span>
+                <span style={{ fontSize: 18 }}>✓</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{u.name}</div>
                   <div style={{ fontSize: 12, color: B.textMuted }}>Vendor: {u.parsed.vendor} ┬╖ Amount: {u.parsed.amount} ┬╖ Date: {u.parsed.date} ┬╖ Category: {u.parsed.category}</div>
@@ -2761,12 +2761,12 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
               </div>
             ))}
             <Btn variant="primary" style={{ marginTop: 8 }} onClick={() => { setShowSubmit(true); setTimeout(() => setShowSubmit(false), 2000); setUploads([]); }}>Submit for Approval</Btn>
-            {showSubmit && <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: B.successBg, color: B.success, fontWeight: 700, fontSize: 13 }}>Γ£ô Claim submitted successfully ΓÇö routed to manager for approval</div>}
+            {showSubmit && <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: B.successBg, color: B.success, fontWeight: 700, fontSize: 13 }}>✓ Claim submitted successfully — routed to manager for approval</div>}
           </div>
         )}
       </Card>
       <Card>
-        <SectionTitle action={<Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Type (H&W/L&D), Description, Amount, Currency, Date columns")}>≡ƒôñ Batch Import Claims</Btn>}>Recent Claims</SectionTitle>
+        <SectionTitle action={<Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Type (H&W/L&D), Description, Amount, Currency, Date columns")}>=��� Batch Import Claims</Btn>}>Recent Claims</SectionTitle>
         <Table columns={[
           { label: "ID", render: r => <span style={{ fontWeight: 600, color: B.accent }}>{r.id}</span> },
           { label: "Employee", key: "employee" },
@@ -2780,25 +2780,25 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ APPROVALS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── APPROVALS ──────────────────────────────────────────────────────────────
 const ApprovalsModule = () => {
   const [approvals, setApprovals] = useState(PENDING_APPROVALS);
   return (
     <div>
       <SectionTitle>Pending Approvals ({approvals.length})</SectionTitle>
       {approvals.length === 0 ? (
-        <Card style={{ textAlign: "center", padding: 40 }}><div style={{ fontSize: 32, marginBottom: 8 }}>Γ£à</div><div style={{ fontSize: 15, fontWeight: 700, color: B.textPrimary }}>All caught up!</div></Card>
+        <Card style={{ textAlign: "center", padding: 40 }}><div style={{ fontSize: 32, marginBottom: 8 }}>✅</div><div style={{ fontSize: 15, fontWeight: 700, color: B.textPrimary }}>All caught up!</div></Card>
       ) : approvals.map(a => (
         <Card key={a.id} style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
           <Avatar name={a.employee} size={42} />
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}><span style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{a.type}</span><StatusBadge status={a.urgency} /></div>
-            <div style={{ fontSize: 13, color: B.textSecondary }}>{a.employee} ΓÇö {a.detail}</div>
+            <div style={{ fontSize: 13, color: B.textSecondary }}>{a.employee} — {a.detail}</div>
             <div style={{ fontSize: 11, color: B.textMuted }}>Submitted {fmtDate(a.submitted)}</div>
           </div>
           <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-            <Btn variant="success" size="sm" onClick={() => setApprovals(p => p.filter(x => x.id !== a.id))}>Γ£ô Approve</Btn>
-            <Btn variant="danger" size="sm" onClick={() => setApprovals(p => p.filter(x => x.id !== a.id))}>Γ£ò Reject</Btn>
+            <Btn variant="success" size="sm" onClick={() => setApprovals(p => p.filter(x => x.id !== a.id))}>✓ Approve</Btn>
+            <Btn variant="danger" size="sm" onClick={() => setApprovals(p => p.filter(x => x.id !== a.id))}>✕ Reject</Btn>
           </div>
         </Card>
       ))}
@@ -2806,7 +2806,7 @@ const ApprovalsModule = () => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ ANALYTICS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── ANALYTICS ──────────────────────────────────────────────────────────────
 const AnalyticsModule = () => {
   const genderData = { F: EMPLOYEES.filter(e => e.gender === "F").length, M: EMPLOYEES.filter(e => e.gender === "M").length };
   return (
@@ -2846,7 +2846,7 @@ const AnalyticsModule = () => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ SETTINGS / ADMIN (ENHANCED with Reporting Center) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── SETTINGS / ADMIN (ENHANCED with Reporting Center) ──────────────────────
 const SettingsModule = () => {
   const [tab, setTab] = useState("reports");
   const [reportType, setReportType] = useState("");
@@ -2858,24 +2858,24 @@ const SettingsModule = () => {
   const [reportGenerated, setReportGenerated] = useState(false);
   const [savedReports, setSavedReports] = useState([
     { id: "RPT-001", name: "Q1 2026 Headcount by Region", type: "Headcount", created: "2026-04-01", createdBy: "Admin User", format: "XLSX", rows: 248 },
-    { id: "RPT-002", name: "Overtime Compliance ΓÇö March 2026", type: "Compliance", created: "2026-04-05", createdBy: "Admin User", format: "PDF", rows: 42 },
-    { id: "RPT-003", name: "Grant Allocation ΓÇö BMGF Fortification", type: "Grant", created: "2026-03-28", createdBy: "Finance Lead", format: "CSV", rows: 156 },
-    { id: "RPT-004", name: "Leave Balance Snapshot ΓÇö All Countries", type: "Leave", created: "2026-04-10", createdBy: "Admin User", format: "XLSX", rows: 28 },
+    { id: "RPT-002", name: "Overtime Compliance — March 2026", type: "Compliance", created: "2026-04-05", createdBy: "Admin User", format: "PDF", rows: 42 },
+    { id: "RPT-003", name: "Grant Allocation — BMGF Fortification", type: "Grant", created: "2026-03-28", createdBy: "Finance Lead", format: "CSV", rows: 156 },
+    { id: "RPT-004", name: "Leave Balance Snapshot — All Countries", type: "Leave", created: "2026-04-10", createdBy: "Admin User", format: "XLSX", rows: 28 },
     { id: "RPT-005", name: "Turnover Analysis 2025", type: "Turnover", created: "2026-01-15", createdBy: "Admin User", format: "PDF", rows: 14 },
   ]);
 
   const REPORT_TEMPLATES = [
-    { value: "headcount", label: "Headcount Report", desc: "Workforce count by country, department, level, gender, status", fields: ["country", "department", "date_range", "group_by"], icon: "≡ƒæÑ" },
-    { value: "compensation", label: "Compensation Report", desc: "Salary, bonus, total comp by entity with currency conversion", fields: ["country", "department", "currency", "date_range"], icon: "≡ƒÆ░" },
-    { value: "leave", label: "Leave & Absence Report", desc: "Leave balances, usage, accruals, carryover by employee", fields: ["country", "department", "leave_type", "date_range"], icon: "≡ƒôà" },
-    { value: "compliance", label: "Compliance & Overtime Report", desc: "Labor law violations, overtime hours, rest break gaps", fields: ["country", "date_range", "severity"], icon: "ΓÜû∩╕Å" },
-    { value: "grant", label: "Grant / Donor Allocation Report", desc: "Hours, costs, and FTE allocation by grant/project code", fields: ["grant", "country", "date_range", "currency"], icon: "≡ƒôè" },
-    { value: "turnover", label: "Turnover & Retention Report", desc: "Attrition rate, voluntary/involuntary, tenure analysis", fields: ["country", "department", "date_range"], icon: "≡ƒôë" },
-    { value: "diversity", label: "Diversity & Inclusion Report", desc: "Gender balance, nationality mix, level distribution", fields: ["country", "department", "date_range"], icon: "≡ƒîì" },
-    { value: "benefits", label: "Benefits Enrollment Report", desc: "Enrollment status, plan uptake, cost per employee", fields: ["country", "plan_type", "date_range"], icon: "≡ƒÅÑ" },
-    { value: "performance", label: "Performance Review Report", desc: "Ratings distribution, calibration, goal completion", fields: ["country", "department", "review_cycle"], icon: "Γ¡É" },
-    { value: "payroll", label: "Payroll Summary Report", desc: "Gross/net pay, deductions, taxes, multi-currency summary", fields: ["country", "pay_period", "currency"], icon: "≡ƒÆ╡" },
-    { value: "custom", label: "Custom Report Builder", desc: "Select fields, filters, grouping, and calculations from scratch", fields: ["all"], icon: "≡ƒöº" },
+    { value: "headcount", label: "Headcount Report", desc: "Workforce count by country, department, level, gender, status", fields: ["country", "department", "date_range", "group_by"], icon: "\u{1F465}" },
+    { value: "compensation", label: "Compensation Report", desc: "Salary, bonus, total comp by entity with currency conversion", fields: ["country", "department", "currency", "date_range"], icon: "=���" },
+    { value: "leave", label: "Leave & Absence Report", desc: "Leave balances, usage, accruals, carryover by employee", fields: ["country", "department", "leave_type", "date_range"], icon: "=���" },
+    { value: "compliance", label: "Compliance & Overtime Report", desc: "Labor law violations, overtime hours, rest break gaps", fields: ["country", "date_range", "severity"], icon: "⚖∩╕Å" },
+    { value: "grant", label: "Grant / Donor Allocation Report", desc: "Hours, costs, and FTE allocation by grant/project code", fields: ["grant", "country", "date_range", "currency"], icon: "=���" },
+    { value: "turnover", label: "Turnover & Retention Report", desc: "Attrition rate, voluntary/involuntary, tenure analysis", fields: ["country", "department", "date_range"], icon: "=���" },
+    { value: "diversity", label: "Diversity & Inclusion Report", desc: "Gender balance, nationality mix, level distribution", fields: ["country", "department", "date_range"], icon: "=���" },
+    { value: "benefits", label: "Benefits Enrollment Report", desc: "Enrollment status, plan uptake, cost per employee", fields: ["country", "plan_type", "date_range"], icon: "=���" },
+    { value: "performance", label: "Performance Review Report", desc: "Ratings distribution, calibration, goal completion", fields: ["country", "department", "review_cycle"], icon: "⭐" },
+    { value: "payroll", label: "Payroll Summary Report", desc: "Gross/net pay, deductions, taxes, multi-currency summary", fields: ["country", "pay_period", "currency"], icon: "=���" },
+    { value: "custom", label: "Custom Report Builder", desc: "Select fields, filters, grouping, and calculations from scratch", fields: ["all"], icon: "=���" },
   ];
 
   const CUSTOM_FIELDS = [
@@ -2899,16 +2899,16 @@ const SettingsModule = () => {
   const [dragIdx, setDragIdx] = useState(null);
   // Job Evaluation Grades
   const [jobGrades, setJobGrades] = useState([
-    { id: "JG-01", grade: "P1", title: "Associate / Entry", category: "Professional", minExp: 0, maxExp: 2, benchmarks: "Market P25ΓÇôP40", factor: "Individual contributor, learning role", points: 100 },
-    { id: "JG-02", grade: "P2", title: "Officer", category: "Professional", minExp: 1, maxExp: 4, benchmarks: "Market P40ΓÇôP50", factor: "Independent contributor, applied expertise", points: 200 },
-    { id: "JG-03", grade: "P3", title: "Senior Officer", category: "Professional", minExp: 3, maxExp: 7, benchmarks: "Market P50ΓÇôP60", factor: "Specialist, project leadership", points: 300 },
-    { id: "JG-04", grade: "P4", title: "Lead / Specialist", category: "Professional", minExp: 5, maxExp: 10, benchmarks: "Market P55ΓÇôP65", factor: "Technical authority, cross-functional", points: 400 },
-    { id: "JG-05", grade: "P5", title: "Principal / Expert", category: "Professional", minExp: 8, maxExp: 15, benchmarks: "Market P60ΓÇôP75", factor: "Org-wide expertise, strategy input", points: 500 },
-    { id: "JG-06", grade: "M1", title: "Manager", category: "Management", minExp: 5, maxExp: 10, benchmarks: "Market P55ΓÇôP65", factor: "Team leadership, budget accountability", points: 450 },
-    { id: "JG-07", grade: "M2", title: "Senior Manager", category: "Management", minExp: 8, maxExp: 15, benchmarks: "Market P60ΓÇôP75", factor: "Department leadership, strategic delivery", points: 550 },
-    { id: "JG-08", grade: "M3", title: "Director", category: "Management", minExp: 10, maxExp: 20, benchmarks: "Market P65ΓÇôP80", factor: "Multi-team or country leadership", points: 650 },
-    { id: "JG-09", grade: "D1", title: "Senior Director", category: "Executive", minExp: 12, maxExp: 25, benchmarks: "Market P75ΓÇôP90", factor: "Function or regional leadership", points: 800 },
-    { id: "JG-10", grade: "VP", title: "Vice President", category: "Executive", minExp: 15, maxExp: 30, benchmarks: "Market P80ΓÇôP95", factor: "Organizational strategy, board-level", points: 950 },
+    { id: "JG-01", grade: "P1", title: "Associate / Entry", category: "Professional", minExp: 0, maxExp: 2, benchmarks: "Market P25–P40", factor: "Individual contributor, learning role", points: 100 },
+    { id: "JG-02", grade: "P2", title: "Officer", category: "Professional", minExp: 1, maxExp: 4, benchmarks: "Market P40–P50", factor: "Independent contributor, applied expertise", points: 200 },
+    { id: "JG-03", grade: "P3", title: "Senior Officer", category: "Professional", minExp: 3, maxExp: 7, benchmarks: "Market P50–P60", factor: "Specialist, project leadership", points: 300 },
+    { id: "JG-04", grade: "P4", title: "Lead / Specialist", category: "Professional", minExp: 5, maxExp: 10, benchmarks: "Market P55–P65", factor: "Technical authority, cross-functional", points: 400 },
+    { id: "JG-05", grade: "P5", title: "Principal / Expert", category: "Professional", minExp: 8, maxExp: 15, benchmarks: "Market P60–P75", factor: "Org-wide expertise, strategy input", points: 500 },
+    { id: "JG-06", grade: "M1", title: "Manager", category: "Management", minExp: 5, maxExp: 10, benchmarks: "Market P55–P65", factor: "Team leadership, budget accountability", points: 450 },
+    { id: "JG-07", grade: "M2", title: "Senior Manager", category: "Management", minExp: 8, maxExp: 15, benchmarks: "Market P60–P75", factor: "Department leadership, strategic delivery", points: 550 },
+    { id: "JG-08", grade: "M3", title: "Director", category: "Management", minExp: 10, maxExp: 20, benchmarks: "Market P65–P80", factor: "Multi-team or country leadership", points: 650 },
+    { id: "JG-09", grade: "D1", title: "Senior Director", category: "Executive", minExp: 12, maxExp: 25, benchmarks: "Market P75–P90", factor: "Function or regional leadership", points: 800 },
+    { id: "JG-10", grade: "VP", title: "Vice President", category: "Executive", minExp: 15, maxExp: 30, benchmarks: "Market P80–P95", factor: "Organizational strategy, board-level", points: 950 },
   ]);
   const [showGradeEdit, setShowGradeEdit] = useState(null);
   const [gradeForm, setGradeForm] = useState({ grade: "", title: "", category: "Professional", minExp: 0, maxExp: 0, benchmarks: "", factor: "", points: 0 });
@@ -2937,7 +2937,7 @@ const SettingsModule = () => {
         { key: "localization", label: "Localization" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉ REPORTING CENTER ΓòÉΓòÉΓòÉ */}
+      {/* ═══ REPORTING CENTER ═══ */}
       {tab === "reports" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
@@ -2953,7 +2953,7 @@ const SettingsModule = () => {
                       <div style={{ fontSize: 13, fontWeight: 700, color: reportType === r.value ? B.accent : B.textPrimary }}>{r.label}</div>
                       <div style={{ fontSize: 11, color: B.textMuted }}>{r.desc}</div>
                     </div>
-                    {reportType === r.value && <span style={{ color: B.accent, fontSize: 16 }}>Γ£ô</span>}
+                    {reportType === r.value && <span style={{ color: B.accent, fontSize: 16 }}>✓</span>}
                   </div>
                 ))}
               </div>
@@ -3006,14 +3006,14 @@ const SettingsModule = () => {
               {reportType === "custom" && (
                 <Card>
                   <SectionTitle>Select Data Columns</SectionTitle>
-                  <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 10 }}>{selectedFields.length} fields selected ΓÇö drag to reorder</div>
+                  <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 10 }}>{selectedFields.length} fields selected — drag to reorder</div>
                   {CUSTOM_FIELDS.map(group => (
                     <div key={group.group} style={{ marginBottom: 10 }}>
                       <div style={{ fontSize: 10, fontWeight: 700, color: B.accent, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>{group.group}</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {group.fields.map(f => (
                           <button key={f} onClick={() => toggleField(f)} style={{ padding: "4px 10px", borderRadius: 4, border: `1px solid ${selectedFields.includes(f) ? B.accent : B.border}`, background: selectedFields.includes(f) ? B.accentBg : B.white, color: selectedFields.includes(f) ? B.accent : B.textMuted, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "Arial, sans-serif" }}>
-                            {selectedFields.includes(f) ? "Γ£ô " : ""}{f}
+                            {selectedFields.includes(f) ? "✓ " : ""}{f}
                           </button>
                         ))}
                       </div>
@@ -3025,13 +3025,13 @@ const SettingsModule = () => {
               {/* Generate */}
               <div style={{ display: "flex", gap: 8 }}>
                 <Btn variant="primary" style={{ flex: 1 }} onClick={handleGenerate} disabled={!reportType}>
-                  {reportGenerated ? "Γ£ô Report Generated!" : "≡ƒôè Generate Report"}
+                  {reportGenerated ? "✓ Report Generated!" : "=��� Generate Report"}
                 </Btn>
-                <Btn variant="secondary" onClick={() => { if (reportType) setSavedReports(prev => [{ id: `RPT-${Date.now().toString(36)}`, name: `${REPORT_TEMPLATES.find(t => t.value === reportType)?.label || "Custom"} ΓÇö ${new Date().toLocaleDateString()}`, type: reportType, created: new Date().toISOString().split("T")[0], createdBy: "Admin User", format: reportFormat.toUpperCase(), rows: Math.floor(Math.random() * 200 + 20) }, ...prev]); }}>≡ƒÆ╛ Save</Btn>
+                <Btn variant="secondary" onClick={() => { if (reportType) setSavedReports(prev => [{ id: `RPT-${Date.now().toString(36)}`, name: `${REPORT_TEMPLATES.find(t => t.value === reportType)?.label || "Custom"} — ${new Date().toLocaleDateString()}`, type: reportType, created: new Date().toISOString().split("T")[0], createdBy: "Admin User", format: reportFormat.toUpperCase(), rows: Math.floor(Math.random() * 200 + 20) }, ...prev]); }}>=��� Save</Btn>
               </div>
               {reportGenerated && (
                 <div style={{ padding: "10px 14px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, fontSize: 12, color: B.success, fontWeight: 700 }}>
-                  Γ£ô Report generated successfully ΓÇö {reportFormat.toUpperCase()} file ready for download ({Math.floor(Math.random() * 200 + 20)} rows, {reportCountry === "ALL" ? "14 countries" : COUNTRIES.find(c => c.code === reportCountry)?.name})
+                  ✓ Report generated successfully — {reportFormat.toUpperCase()} file ready for download ({Math.floor(Math.random() * 200 + 20)} rows, {reportCountry === "ALL" ? "14 countries" : COUNTRIES.find(c => c.code === reportCountry)?.name})
                 </div>
               )}
             </div>
@@ -3039,7 +3039,7 @@ const SettingsModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ SAVED REPORTS ΓòÉΓòÉΓòÉ */}
+      {/* ═══ SAVED REPORTS ═══ */}
       {tab === "saved" && (
         <Card>
           <SectionTitle>Saved & Scheduled Reports</SectionTitle>
@@ -3052,16 +3052,16 @@ const SettingsModule = () => {
             { label: "Rows", key: "rows" },
             { label: "Actions", render: r => (
               <div style={{ display: "flex", gap: 4 }}>
-                <Btn variant="ghost" size="sm" onClick={() => alert(`Downloading ${r.name}`)}>Γ¼ç</Btn>
-                <Btn variant="ghost" size="sm" onClick={() => alert(`Re-running ${r.name}`)}>Γå╗</Btn>
-                <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSavedReports(prev => prev.filter(x => x.id !== r.id))}>≡ƒùæ</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => alert(`Downloading ${r.name}`)}>⬇</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => alert(`Re-running ${r.name}`)}>↻</Btn>
+                <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSavedReports(prev => prev.filter(x => x.id !== r.id))}>=���</Btn>
               </div>
             )},
           ]} data={savedReports} />
         </Card>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ SALARY STRUCTURES (Drag & Drop Reorder) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ SALARY STRUCTURES (Drag & Drop Reorder) ═══ */}
       {tab === "salary" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -3085,7 +3085,7 @@ const SettingsModule = () => {
                         style={{ background: dragIdx === i ? B.accentBg : "transparent", cursor: "grab", transition: "background 0.12s" }}
                         onMouseEnter={ev => { if (dragIdx === null) ev.currentTarget.style.background = B.bgHover; }}
                         onMouseLeave={ev => { if (dragIdx === null) ev.currentTarget.style.background = "transparent"; }}>
-                        <td style={{ padding: "8px 6px", borderBottom: `1px solid ${B.borderLight}`, color: B.textMuted, cursor: "grab", fontSize: 14 }}>Γï«Γï«</td>
+                        <td style={{ padding: "8px 6px", borderBottom: `1px solid ${B.borderLight}`, color: B.textMuted, cursor: "grab", fontSize: 14 }}>⋮⋮</td>
                         <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{ss.level}</td>
                         <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={B.blue} bg={`${B.blue}12`}>{ss.band}</Badge></td>
                         <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.min, ss.currency)}</td>
@@ -3096,8 +3096,8 @@ const SettingsModule = () => {
                         <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{empCount}</td>
                         <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
                           <div style={{ display: "flex", gap: 4 }}>
-                            <Btn variant="ghost" size="sm" onClick={() => { setSalaryForm({ ...ss }); setShowSalaryEdit(ss.id); }}>Γ£Å∩╕Å</Btn>
-                            {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => prev.filter(s => s.id !== ss.id))}>≡ƒùæ</Btn>}
+                            <Btn variant="ghost" size="sm" onClick={() => { setSalaryForm({ ...ss }); setShowSalaryEdit(ss.id); }}>✏∩╕Å</Btn>
+                            {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => prev.filter(s => s.id !== ss.id))}>=���</Btn>}
                           </div>
                         </td>
                       </tr>
@@ -3122,20 +3122,20 @@ const SettingsModule = () => {
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Currency</label>
                 <Select value={salaryForm.currency} onChange={v => setSalaryForm(p => ({ ...p, currency: v }))} style={{ width: "100%" }} options={[...new Set(COUNTRIES.map(c => c.currency))].map(c => ({ value: c, label: c }))} /></div>
             </div>
-            {salaryForm.min > 0 && salaryForm.max > 0 && <div style={{ marginTop: 10, padding: 8, borderRadius: 6, background: B.accentBg, fontSize: 12, color: B.textSecondary }}>Spread: {Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100)}% ┬╖ Midpoint penetration range: {fmt(salaryForm.min, salaryForm.currency)} ΓÇö {fmt(salaryForm.max, salaryForm.currency)}</div>}
+            {salaryForm.min > 0 && salaryForm.max > 0 && <div style={{ marginTop: 10, padding: 8, borderRadius: 6, background: B.accentBg, fontSize: 12, color: B.textSecondary }}>Spread: {Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100)}% ┬╖ Midpoint penetration range: {fmt(salaryForm.min, salaryForm.currency)} — {fmt(salaryForm.max, salaryForm.currency)}</div>}
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 }}>
               <Btn variant="secondary" onClick={() => setShowSalaryEdit(null)}>Cancel</Btn>
               <Btn variant="primary" onClick={() => {
                 if (showSalaryEdit === "new") { setSalaryStructures(prev => [...prev, { ...salaryForm, id: `SS-${Date.now()}`, spread: salaryForm.min > 0 ? Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100) : 0 }]); }
                 else { setSalaryStructures(prev => prev.map(s => s.id === showSalaryEdit ? { ...s, ...salaryForm, spread: salaryForm.min > 0 ? Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100) : 0 } : s)); }
                 setShowSalaryEdit(null); alert(`Salary band ${showSalaryEdit === "new" ? "created" : "updated"}. Audit log entry created.`);
-              }}>≡ƒÆ╛ {showSalaryEdit === "new" ? "Create" : "Save"}</Btn>
+              }}>=��� {showSalaryEdit === "new" ? "Create" : "Save"}</Btn>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ JOB EVALUATION GRADING ΓòÉΓòÉΓòÉ */}
+      {/* ═══ JOB EVALUATION GRADING ═══ */}
       {tab === "grades" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -3158,15 +3158,15 @@ const SettingsModule = () => {
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{jg.grade}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.title}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={catColors[jg.category] || B.textMuted} bg={`${catColors[jg.category] || B.textMuted}14`}>{jg.category}</Badge></td>
-                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.minExp}ΓÇô{jg.maxExp} yrs</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.minExp}–{jg.maxExp} yrs</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{jg.benchmarks}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11, color: B.textSecondary }}>{jg.factor}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{jg.points}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{empCount}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
                         <div style={{ display: "flex", gap: 4 }}>
-                          <Btn variant="ghost" size="sm" onClick={() => { setGradeForm({ ...jg }); setShowGradeEdit(jg.id); }}>Γ£Å∩╕Å</Btn>
-                          {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}>≡ƒùæ</Btn>}
+                          <Btn variant="ghost" size="sm" onClick={() => { setGradeForm({ ...jg }); setShowGradeEdit(jg.id); }}>✏∩╕Å</Btn>
+                          {empCount === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}>=���</Btn>}
                         </div>
                       </td>
                     </tr>);
@@ -3189,7 +3189,7 @@ const SettingsModule = () => {
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Max Experience (yrs)</label>
                 <input type="number" value={gradeForm.maxExp} onChange={ev => setGradeForm(p => ({ ...p, maxExp: parseInt(ev.target.value) || 0 }))} style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
               <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Market Benchmark</label>
-                <input value={gradeForm.benchmarks} onChange={ev => setGradeForm(p => ({ ...p, benchmarks: ev.target.value }))} placeholder="e.g. Market P50ΓÇôP65" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
+                <input value={gradeForm.benchmarks} onChange={ev => setGradeForm(p => ({ ...p, benchmarks: ev.target.value }))} placeholder="e.g. Market P50–P65" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
               <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Evaluation Factor / Scope</label>
                 <input value={gradeForm.factor} onChange={ev => setGradeForm(p => ({ ...p, factor: ev.target.value }))} placeholder="e.g. Team leadership, budget accountability" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
             </div>
@@ -3199,17 +3199,17 @@ const SettingsModule = () => {
                 if (showGradeEdit === "new") { setJobGrades(prev => [...prev, { ...gradeForm, id: `JG-${Date.now()}` }]); }
                 else { setJobGrades(prev => prev.map(g => g.id === showGradeEdit ? { ...g, ...gradeForm } : g)); }
                 setShowGradeEdit(null); alert(`Job grade "${gradeForm.grade}" ${showGradeEdit === "new" ? "created" : "updated"}. Audit log entry created.`);
-              }}>≡ƒÆ╛ {showGradeEdit === "new" ? "Create" : "Save"}</Btn>
+              }}>=��� {showGradeEdit === "new" ? "Create" : "Save"}</Btn>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ EDIT HISTORICAL RECORDS ΓòÉΓòÉΓòÉ */}
+      {/* ═══ EDIT HISTORICAL RECORDS ═══ */}
       {tab === "history" && (
         <div>
           <div style={{ padding: "10px 14px", borderRadius: 8, background: B.warningBg, border: `1px solid ${B.warning}20`, marginBottom: 14, fontSize: 12, color: B.textSecondary }}>
-            <strong>Historical Record Editing</strong> ΓÇö Search for any employee and modify their effective-dated records (compensation, title, level, department, status). All edits create an audit trail entry with the original value, new value, reason, and administrator identity.
+            <strong>Historical Record Editing</strong> — Search for any employee and modify their effective-dated records (compensation, title, level, department, status). All edits create an audit trail entry with the original value, new value, reason, and administrator identity.
           </div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
             <div style={{ flex: 1 }}><SearchBar value={historySearch} onChange={setHistorySearch} placeholder="Search employee by name or ID..." /></div>
@@ -3228,10 +3228,10 @@ const SettingsModule = () => {
                     <Badge color={fieldColors[h.field] || B.textMuted} bg={`${fieldColors[h.field] || B.textMuted}14`} style={{ fontSize: 8, width: 70, justifyContent: "center" }}>{h.field}</Badge>
                     <span style={{ color: B.textMuted, width: 80 }}>{fmtDate(h.effectiveDate)}</span>
                     <span style={{ color: B.textMuted, textDecoration: "line-through" }}>{h.oldValue}</span>
-                    <span style={{ color: B.textMuted }}>ΓåÆ</span>
+                    <span style={{ color: B.textMuted }}>→</span>
                     <span style={{ fontWeight: 700, flex: 1 }}>{h.newValue}</span>
                     <span style={{ color: B.textMuted, fontSize: 10 }}>{h.reason}</span>
-                    <Btn variant="ghost" size="sm" onClick={() => { setHistoryForm({ field: h.field, oldValue: h.oldValue, newValue: h.newValue, effectiveDate: h.effectiveDate, reason: h.reason, empId: emp.id, empName: `${emp.first} ${emp.last}`, idx: i }); setShowHistoryEdit(true); }}>Γ£Å∩╕Å</Btn>
+                    <Btn variant="ghost" size="sm" onClick={() => { setHistoryForm({ field: h.field, oldValue: h.oldValue, newValue: h.newValue, effectiveDate: h.effectiveDate, reason: h.reason, empId: emp.id, empName: `${emp.first} ${emp.last}`, idx: i }); setShowHistoryEdit(true); }}>✏∩╕Å</Btn>
                   </div>
                 );
               })}
@@ -3239,7 +3239,7 @@ const SettingsModule = () => {
             </Card>
           ))}
           {historySearch.length < 2 && <div style={{ textAlign: "center", padding: 30, color: B.textMuted, fontSize: 13 }}>Type at least 2 characters to search for an employee and view their editable history.</div>}
-          <Modal open={!!showHistoryEdit} onClose={() => setShowHistoryEdit(null)} title={historyForm.idx === "new" ? `Add Record ΓÇö ${historyForm.empName}` : `Edit Record ΓÇö ${historyForm.empName}`} width={520}>
+          <Modal open={!!showHistoryEdit} onClose={() => setShowHistoryEdit(null)} title={historyForm.idx === "new" ? `Add Record — ${historyForm.empName}` : `Edit Record — ${historyForm.empName}`} width={520}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Field</label>
                 <Select value={historyForm.field} onChange={v => setHistoryForm(p => ({ ...p, field: v }))} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...["Status", "Title", "Level", "Department", "Entity", "Compensation"].map(f => ({ value: f, label: f }))]} /></div>
@@ -3250,24 +3250,24 @@ const SettingsModule = () => {
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>New Value</label>
                 <input value={historyForm.newValue} onChange={ev => setHistoryForm(p => ({ ...p, newValue: ev.target.value }))} style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
               <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Reason / Justification</label>
-                <input value={historyForm.reason} onChange={ev => setHistoryForm(p => ({ ...p, reason: ev.target.value }))} placeholder="e.g. Correction ΓÇö original entry error" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
+                <input value={historyForm.reason} onChange={ev => setHistoryForm(p => ({ ...p, reason: ev.target.value }))} placeholder="e.g. Correction — original entry error" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
             </div>
             <div style={{ marginTop: 10, padding: 10, borderRadius: 6, background: `${B.charcoal}06`, border: `1px solid ${B.charcoal}12`, fontSize: 11, color: B.textMuted, fontFamily: "monospace" }}>
               <div><strong>Audit:</strong> {historyForm.idx === "new" ? "Insert" : "Modify"} historical record</div>
               <div><strong>Employee:</strong> {historyForm.empName} ({historyForm.empId})</div>
-              <div><strong>Field:</strong> {historyForm.field || "ΓÇö"} ┬╖ <strong>Effective:</strong> {historyForm.effectiveDate || "ΓÇö"}</div>
-              <div><strong>Value:</strong> {historyForm.oldValue || "ΓÇö"} ΓåÆ {historyForm.newValue || "ΓÇö"}</div>
+              <div><strong>Field:</strong> {historyForm.field || "—"} ┬╖ <strong>Effective:</strong> {historyForm.effectiveDate || "—"}</div>
+              <div><strong>Value:</strong> {historyForm.oldValue || "—"} → {historyForm.newValue || "—"}</div>
               <div><strong>Modified by:</strong> Admin ┬╖ <strong>Timestamp:</strong> {new Date().toISOString()}</div>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 }}>
               <Btn variant="secondary" onClick={() => setShowHistoryEdit(null)}>Cancel</Btn>
-              <Btn variant="primary" onClick={() => { setShowHistoryEdit(null); alert(`Historical record ${historyForm.idx === "new" ? "added" : "updated"} for ${historyForm.empName}. Audit entry created with full before/after values.`); }}>≡ƒÆ╛ {historyForm.idx === "new" ? "Add Record" : "Save Edit"}</Btn>
+              <Btn variant="primary" onClick={() => { setShowHistoryEdit(null); alert(`Historical record ${historyForm.idx === "new" ? "added" : "updated"} for ${historyForm.empName}. Audit entry created with full before/after values.`); }}>=��� {historyForm.idx === "new" ? "Add Record" : "Save Edit"}</Btn>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ ENTITIES ΓòÉΓòÉΓòÉ */}
+      {/* ═══ ENTITIES ═══ */}
       {tab === "entities" && (
         <Table columns={[
           { label: "Entity", render: r => <span style={{ fontWeight: 700 }}>{r.entity}</span> },
@@ -3279,7 +3279,7 @@ const SettingsModule = () => {
         ]} data={COUNTRIES} />
       )}
 
-      {/* ΓòÉΓòÉΓòÉ SECURITY ΓòÉΓòÉΓòÉ */}
+      {/* ═══ SECURITY ═══ */}
       {tab === "security" && (
         <Card>
           <SectionTitle>Security Roles</SectionTitle>
@@ -3298,7 +3298,7 @@ const SettingsModule = () => {
         </Card>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ LOCALIZATION ΓòÉΓòÉΓòÉ */}
+      {/* ═══ LOCALIZATION ═══ */}
       {tab === "localization" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {COUNTRIES.map(c => (
@@ -3314,7 +3314,7 @@ const SettingsModule = () => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ COMPENSATION PLANNING MODULE (ACR: COLA + Merit + Bonus ┬╖ Access Control) ΓöÇ
+// ─── COMPENSATION PLANNING MODULE (ACR: COLA + Merit + Bonus ┬╖ Access Control) ─
 const CompPlanningModule = ({ role }) => {
   const [tab, setTab] = useState("hub");
   const [meritPool, setMeritPool] = useState(3.5);
@@ -3372,9 +3372,9 @@ const CompPlanningModule = ({ role }) => {
   return (
     <div>
       {isHR && (<div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 14px",borderRadius:6,background:`${B.charcoal}08`,border:`1px solid ${B.charcoal}15`,marginBottom:14}}>
-        <span style={{fontSize:14}}>≡ƒöÆ</span>
-        <span style={{flex:1,fontSize:12,color:B.textSecondary}}><strong>Restricted Module</strong> ΓÇö HR Admin + Superuser have full access. Managers see only their team worksheet when permissioned.</span>
-        <Btn variant="secondary" size="sm" onClick={()=>setShowPermModal(true)}>≡ƒæÑ Manage Access ({permUsers.length})</Btn>
+        <span style={{fontSize:14}}>=���</span>
+        <span style={{flex:1,fontSize:12,color:B.textSecondary}}><strong>Restricted Module</strong> — HR Admin + Superuser have full access. Managers see only their team worksheet when permissioned.</span>
+        <Btn variant="secondary" size="sm" onClick={()=>setShowPermModal(true)}>=��� Manage Access ({permUsers.length})</Btn>
       </div>)}
       <Tabs tabs={[
         {key:"hub",label:"Compensation Hub"},{key:"acr",label:"ACR Configuration"},{key:"bands",label:"Pay Bands"},
@@ -3397,7 +3397,7 @@ const CompPlanningModule = ({ role }) => {
             <SectionTitle>2026 ACR Cycle Progress</SectionTitle>
             {[{step:"Budget Approval (COLA+Merit+Bonus)",status:"Complete",date:"Mar 15"},{step:"COLA rates finalized by country",status:"Complete",date:"Mar 25"},{step:"Manager Worksheets Open",status:"Complete",date:"Apr 1"},{step:"Manager Submissions Due",status:"In Progress",date:"Apr 30"},{step:"HR Equity Review & Calibration",status:"Upcoming",date:"May 15"},{step:"Finance & Donor Alignment",status:"Upcoming",date:"May 25"},{step:"Final Approvals",status:"Upcoming",date:"Jun 1"},{step:"Employee Letters",status:"Upcoming",date:"Jun 15"}].map((s,i)=>(
               <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"6px 10px",borderRadius:6,background:B.bgHover,marginBottom:3,fontSize:12}}>
-                <div style={{width:18,height:18,borderRadius:9,background:s.status==="Complete"?B.success:s.status==="In Progress"?B.accent:B.bgCard,border:`2px solid ${s.status==="Complete"?B.success:s.status==="In Progress"?B.accent:B.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff",flexShrink:0}}>{s.status==="Complete"?"Γ£ô":""}</div>
+                <div style={{width:18,height:18,borderRadius:9,background:s.status==="Complete"?B.success:s.status==="In Progress"?B.accent:B.bgCard,border:`2px solid ${s.status==="Complete"?B.success:s.status==="In Progress"?B.accent:B.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff",flexShrink:0}}>{s.status==="Complete"?"✓":""}</div>
                 <span style={{flex:1,fontWeight:600}}>{s.step}</span><span style={{color:B.textMuted,fontSize:11}}>{s.date}</span>
               </div>))}
           </Card>
@@ -3416,7 +3416,7 @@ const CompPlanningModule = ({ role }) => {
       {/* ACR CONFIGURATION */}
       {tab==="acr"&&(<div>
         <Card style={{marginBottom:14,borderTop:`4px solid ${B.accent}`}}>
-          <SectionTitle>ACR Pool Configuration ΓÇö COLA ┬╖ Merit ┬╖ Bonus</SectionTitle>
+          <SectionTitle>ACR Pool Configuration — COLA ┬╖ Merit ┬╖ Bonus</SectionTitle>
           <div style={{fontSize:12,color:B.textMuted,marginBottom:14}}>COLA adjusts for country-level inflation. Merit rewards individual performance (added to base). Bonus is a one-time performance payment (not added to base).</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14}}>
             {[{label:"COLA Pool %",value:colaPool,set:setColaPool,color:B.orange,desc:"Country CPI-linked"},{label:"Merit Pool %",value:meritPool,set:setMeritPool,color:B.teal,desc:"Performance-based salary increase"},{label:"Bonus Pool %",value:bonusPool,set:setBonusPool,color:B.blue,desc:"One-time, not added to base"}].map((p,i)=>(
@@ -3446,11 +3446,11 @@ const CompPlanningModule = ({ role }) => {
           <SectionTitle>Merit Matrix (Performance ├ù Compa-Ratio)</SectionTitle>
           <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:12,fontFamily:"Arial, sans-serif",textAlign:"center"}}>
             <thead><tr><th style={{padding:8,background:B.bgHover,borderBottom:`2px solid ${B.teal}`,fontSize:9,letterSpacing:0.6,textTransform:"uppercase",color:B.textSecondary}}>Rating \ CR</th>
-              {["< 0.85","0.85ΓÇô0.95","0.95ΓÇô1.05","1.05ΓÇô1.15","> 1.15"].map(h=><th key={h} style={{padding:8,background:B.bgHover,borderBottom:`2px solid ${B.teal}`,fontSize:9,color:B.textSecondary}}>{h}</th>)}
+              {["< 0.85","0.85–0.95","0.95–1.05","1.05–1.15","> 1.15"].map(h=><th key={h} style={{padding:8,background:B.bgHover,borderBottom:`2px solid ${B.teal}`,fontSize:9,color:B.textSecondary}}>{h}</th>)}
             </tr></thead>
-            <tbody>{[{r:"ΓëÑ 4.5 Exceptional",v:[6,5,4.5,4,3]},{r:"4.0ΓÇô4.4 Exceeds",v:[5,4,3.5,3,2]},{r:"3.5ΓÇô3.9 Meets+",v:[4,3.5,3,2.5,1.5]},{r:"3.0ΓÇô3.4 Meets",v:[3,2.5,2,1.5,0]},{r:"< 3.0 Developing",v:[0,0,0,0,0]}].map((row,ri)=>(
+            <tbody>{[{r:"≥ 4.5 Exceptional",v:[6,5,4.5,4,3]},{r:"4.0–4.4 Exceeds",v:[5,4,3.5,3,2]},{r:"3.5–3.9 Meets+",v:[4,3.5,3,2.5,1.5]},{r:"3.0–3.4 Meets",v:[3,2.5,2,1.5,0]},{r:"< 3.0 Developing",v:[0,0,0,0,0]}].map((row,ri)=>(
               <tr key={ri}><td style={{padding:8,fontWeight:700,textAlign:"left",borderBottom:`1px solid ${B.borderLight}`,fontSize:11}}>{row.r}</td>
-                {row.v.map((val,vi)=><td key={vi} style={{padding:8,borderBottom:`1px solid ${B.borderLight}`}}><div style={{display:"inline-flex",padding:"4px 10px",borderRadius:4,background:val>=4?B.successBg:val>=2?`${B.teal}12`:val>0?B.warningBg:B.bgHover,color:val>=4?B.success:val>=2?B.teal:val>0?B.orange:B.textMuted,fontWeight:700}}>{val>0?`${val}%`:"ΓÇö"}</div></td>)}
+                {row.v.map((val,vi)=><td key={vi} style={{padding:8,borderBottom:`1px solid ${B.borderLight}`}}><div style={{display:"inline-flex",padding:"4px 10px",borderRadius:4,background:val>=4?B.successBg:val>=2?`${B.teal}12`:val>0?B.warningBg:B.bgHover,color:val>=4?B.success:val>=2?B.teal:val>0?B.orange:B.textMuted,fontWeight:700}}>{val>0?`${val}%`:"—"}</div></td>)}
               </tr>))}</tbody>
           </table></div>
         </Card>
@@ -3464,7 +3464,7 @@ const CompPlanningModule = ({ role }) => {
           {label:"Min",render:r=>fmt(r.min,"CAD")},{label:"Mid",render:r=><span style={{fontWeight:700}}>{fmt(r.mid,"CAD")}</span>},
           {label:"Max",render:r=>fmt(r.max,"CAD")},{label:"Spread",render:r=>`${Math.round((r.max-r.min)/r.min*100)}%`},
           {label:"Emps",render:r=><span style={{fontWeight:700}}>{EMPLOYEES.filter(e=>e.level===r.level).length}</span>},
-          {label:"Avg CR",render:r=>{const emps=EMPLOYEES.filter(e=>e.level===r.level);const cr=emps.length?(emps.reduce((s,e)=>s+e.salary,0)/emps.length/r.mid).toFixed(2):"ΓÇö";return cr!=="ΓÇö"?<Badge color={cr>=0.95&&cr<=1.05?B.success:B.warning} bg={cr>=0.95?B.successBg:B.warningBg}>{cr}</Badge>:"ΓÇö";}},
+          {label:"Avg CR",render:r=>{const emps=EMPLOYEES.filter(e=>e.level===r.level);const cr=emps.length?(emps.reduce((s,e)=>s+e.salary,0)/emps.length/r.mid).toFixed(2):"—";return cr!=="—"?<Badge color={cr>=0.95&&cr<=1.05?B.success:B.warning} bg={cr>=0.95?B.successBg:B.warningBg}>{cr}</Badge>:"—";}},
         ]} data={BANDS}/>
       </Card>)}
 
@@ -3473,13 +3473,13 @@ const CompPlanningModule = ({ role }) => {
         <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap",fontSize:12,alignItems:"center"}}>
           {[{l:"COLA",a:totals.colaCost,b:totals.colaBudget,c:B.orange},{l:"Merit",a:totals.meritCost,b:totals.meritBudget,c:B.teal},{l:"Bonus",a:totals.bonusCost,b:totals.bonusBudget,c:B.blue}].map((p,i)=>(
             <div key={i} style={{padding:"6px 12px",borderRadius:6,background:`${p.c}10`,border:`1px solid ${p.c}25`,fontWeight:700,color:p.c}}>{p.l}: {fmt(p.a,"CAD")} / {fmt(p.b,"CAD")} ({Math.round(p.a/p.b*100)}%)</div>))}
-          <Badge color={totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?B.success:B.danger} bg={totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?B.successBg:B.dangerBg}>Total: {fmt(totals.totalACRCost,"CAD")} {totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?"Γ£ô Within Budget":"ΓÜá Over"}</Badge>
-          <Btn variant="secondary" size="sm" style={{marginLeft:"auto"}} onClick={()=>alert("Batch upload: drag an Excel file with Employee ID, COLA%, Merit%, Bonus% columns to bulk-update the worksheet.")}>≡ƒôñ Batch Upload Comp Data</Btn>
+          <Badge color={totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?B.success:B.danger} bg={totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?B.successBg:B.dangerBg}>Total: {fmt(totals.totalACRCost,"CAD")} {totals.totalACRCost<=(totals.colaBudget+totals.meritBudget+totals.bonusBudget)?"✓ Within Budget":"⚠ Over"}</Badge>
+          <Btn variant="secondary" size="sm" style={{marginLeft:"auto"}} onClick={()=>alert("Batch upload: drag an Excel file with Employee ID, COLA%, Merit%, Bonus% columns to bulk-update the worksheet.")}>=��� Batch Upload Comp Data</Btn>
         </div>
         <div style={{overflowX:"auto",borderRadius:6,border:`1px solid ${B.border}`}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:10,fontFamily:"Arial, sans-serif"}}>
             <thead><tr style={{background:B.bgHover}}>
-              {["Employee","≡ƒîì","Lvl","Current","CR","Perf","COLA%","COLA$","Merit%","Merit$","Bonus%","Bonus$","Γåæ%","New Base","Flags","Status"].map(h=>(
+              {["Employee","=���","Lvl","Current","CR","Perf","COLA%","COLA$","Merit%","Merit$","Bonus%","Bonus$","↑%","New Base","Flags","Status"].map(h=>(
                 <th key={h} style={{padding:"6px 5px",textAlign:"left",borderBottom:`2px solid ${B.accent}`,fontWeight:700,fontSize:8,letterSpacing:0.4,textTransform:"uppercase",color:B.textSecondary,whiteSpace:"nowrap"}}>{h}</th>))}
             </tr></thead>
             <tbody>{worksheetData.map((r,i)=>(
@@ -3498,7 +3498,7 @@ const CompPlanningModule = ({ role }) => {
                 <td style={{padding:"5px 5px",borderBottom:`1px solid ${B.borderLight}`}}>{fmt(r.bonusAmt,r.currency,r.locale)}</td>
                 <td style={{padding:"5px 3px",borderBottom:`1px solid ${B.borderLight}`,fontWeight:700,color:B.accent}}>{r.totalIncreasePct}%</td>
                 <td style={{padding:"5px 5px",borderBottom:`1px solid ${B.borderLight}`,fontWeight:700}}>{fmt(r.newSalary,r.currency,r.locale)}</td>
-                <td style={{padding:"5px 3px",borderBottom:`1px solid ${B.borderLight}`}}>{r.flags.length>0?r.flags.map((f,fi)=><Badge key={fi} color={B.danger} bg={B.dangerBg} style={{marginRight:2,fontSize:7}}>{f}</Badge>):<span style={{color:B.success,fontSize:9}}>Γ£ô</span>}</td>
+                <td style={{padding:"5px 3px",borderBottom:`1px solid ${B.borderLight}`}}>{r.flags.length>0?r.flags.map((f,fi)=><Badge key={fi} color={B.danger} bg={B.dangerBg} style={{marginRight:2,fontSize:7}}>{f}</Badge>):<span style={{color:B.success,fontSize:9}}>✓</span>}</td>
                 <td style={{padding:"5px 3px",borderBottom:`1px solid ${B.borderLight}`}}><StatusBadge status={r.approved?"Approved":"Pending"}/></td>
               </tr>))}</tbody>
           </table>
@@ -3513,7 +3513,7 @@ const CompPlanningModule = ({ role }) => {
           {equityData.genderGap.byLevel.map((l,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}><span style={{fontSize:12,width:60,fontWeight:700}}>{l.level}</span><div style={{flex:1}}><ProgressBar value={l.gap} max={10} color={l.gap>5?B.danger:B.warning}/></div><Badge color={l.gap>5?B.danger:B.warning} bg={l.gap>5?B.dangerBg:B.warningBg}>{l.gap}%</Badge></div>))}
         </Card>
         <Card><SectionTitle>Remediation What-If</SectionTitle>
-          {[{label:"Close to 3%",cost:42000,g:"3.0%"},{label:"Close to 2%",cost:78000,g:"2.0%"},{label:"Full parity",cost:135000,g:"0.0%"}].map((s,i)=>(<div key={i} style={{padding:12,borderRadius:8,background:B.bgHover,border:`1px solid ${B.border}`,textAlign:"center",marginBottom:8}}><div style={{fontSize:13,fontWeight:700}}>{s.label}</div><div style={{fontSize:20,fontWeight:700,fontFamily:"Georgia, serif",color:B.accent}}>{fmt(s.cost,"CAD")}</div><div style={{fontSize:11,color:B.textMuted}}>Gap ΓåÆ {s.g}</div></div>))}
+          {[{label:"Close to 3%",cost:42000,g:"3.0%"},{label:"Close to 2%",cost:78000,g:"2.0%"},{label:"Full parity",cost:135000,g:"0.0%"}].map((s,i)=>(<div key={i} style={{padding:12,borderRadius:8,background:B.bgHover,border:`1px solid ${B.border}`,textAlign:"center",marginBottom:8}}><div style={{fontSize:13,fontWeight:700}}>{s.label}</div><div style={{fontSize:20,fontWeight:700,fontFamily:"Georgia, serif",color:B.accent}}>{fmt(s.cost,"CAD")}</div><div style={{fontSize:11,color:B.textMuted}}>Gap → {s.g}</div></div>))}
         </Card>
       </div>)}
 
@@ -3535,7 +3535,7 @@ const CompPlanningModule = ({ role }) => {
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><Avatar name={`${e.first} ${e.last}`} size={28}/><div><div style={{fontWeight:700,fontSize:12}}>{e.first} {e.last}</div><div style={{fontSize:10,color:B.textMuted}}>{e.title} ┬╖ {e.flag}</div></div></div>
           {[{l:"Base",v:e.salary,c:B.accent},{l:"Bonus",v:e.bonus,c:B.teal},{l:"Benefits",v:bv,c:B.blue},{l:"Allowances",v:al,c:B.purple}].map((x,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,fontSize:11}}><div style={{width:6,height:6,borderRadius:3,background:x.c}}/><span style={{flex:1}}>{x.l}</span><span style={{fontWeight:700}}>{fmt(x.v,e.currency,e.locale)}</span></div>))}
           <div style={{display:"flex",justifyContent:"space-between",marginTop:6,paddingTop:6,borderTop:`2px solid ${B.accent}`,fontSize:12,fontWeight:700}}><span>Total</span><span style={{color:B.accent}}>{fmt(t,e.currency,e.locale)}</span></div>
-          <Btn variant="secondary" size="sm" style={{width:"100%",marginTop:6}}onClick={() => alert(`Total Rewards Statement PDF generated for ${e.first} ${e.last}`)}>≡ƒôä PDF</Btn>
+          <Btn variant="secondary" size="sm" style={{width:"100%",marginTop:6}}onClick={() => alert(`Total Rewards Statement PDF generated for ${e.first} ${e.last}`)}>=��� PDF</Btn>
         </Card>);})}
       </div>)}
 
@@ -3546,13 +3546,13 @@ const CompPlanningModule = ({ role }) => {
           {["Program Mgmt","Finance & Grants","Technical","Comms","IT & Digital","People & Culture"].map((jf,i)=>{const p=[52,48,55,45,42,50][i];return(<div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><span style={{fontSize:12,width:110,flexShrink:0}}>{jf}</span><div style={{flex:1,position:"relative",height:8,borderRadius:4,background:B.bgHover}}><div style={{width:`${p}%`,height:"100%",borderRadius:4,background:p>=48?B.success:B.danger}}/><div style={{position:"absolute",left:"50%",top:-3,width:2,height:14,background:B.textMuted}}/></div><span style={{fontSize:11,fontWeight:700,width:30}}>P{p}</span></div>);})}
         </Card>
         <Card><SectionTitle>Benchmark Sources</SectionTitle>
-          {[{n:"Birches Group ΓÇö INGO Global",u:"Jan 2026",s:"Active"},{n:"Mercer ICS (COLA)",u:"Mar 2026",s:"Active"},{n:"PayScale Tech",u:"Feb 2026",s:"Active"},{n:"WTW",u:"Nov 2025",s:"Renewal Due"}].map((s,i)=>(
+          {[{n:"Birches Group — INGO Global",u:"Jan 2026",s:"Active"},{n:"Mercer ICS (COLA)",u:"Mar 2026",s:"Active"},{n:"PayScale Tech",u:"Feb 2026",s:"Active"},{n:"WTW",u:"Nov 2025",s:"Renewal Due"}].map((s,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:6,background:B.bgHover,marginBottom:6}}><div style={{flex:1}}><div style={{fontWeight:700,fontSize:12}}>{s.n}</div><div style={{fontSize:11,color:B.textMuted}}>Updated: {s.u}</div></div><StatusBadge status={s.s==="Active"?"Active":"Pending"}/></div>))}
         </Card>
       </div>)}
 
       {/* ACCESS MODAL */}
-      <Modal open={showPermModal} onClose={()=>setShowPermModal(false)} title="Comp Planning ΓÇö Access Management" width={650}>
+      <Modal open={showPermModal} onClose={()=>setShowPermModal(false)} title="Comp Planning — Access Management" width={650}>
         <div style={{fontSize:12,color:B.textMuted,marginBottom:14}}>HR Admins and Superusers have full access. Grant worksheet or read-only access to managers below.</div>
         <Table columns={[
           {label:"User",render:r=><div style={{display:"flex",alignItems:"center",gap:6}}><Avatar name={r.name} size={24}/><span style={{fontWeight:700,fontSize:12}}>{r.name}</span></div>},
@@ -3574,7 +3574,7 @@ const CompPlanningModule = ({ role }) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ SURVEY & ENGAGEMENT MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── SURVEY & ENGAGEMENT MODULE ──────────────────────────────────────────────
 const SurveyModule = ({ employee: empProp } = {}) => {
   const emp = empProp || ME;
   const [tab, setTab] = useState("dashboard");
@@ -3628,7 +3628,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
     }
   };
 
-  // ΓöÇΓöÇ Survey Data ΓöÇΓöÇ
+  // ── Survey Data ──
   const SURVEYS = [
     { id: "SRV-2026-Q1", name: "Q1 2026 Engagement Pulse", type: "Pulse", status: "Closed", responses: 24, total: 28, startDate: "2026-01-15", endDate: "2026-02-01", anonymous: true, threshold: 5, engagement: 78, nps: 42 },
     { id: "SRV-2026-Q2", name: "Q2 2026 Engagement Survey", type: "Annual", status: "Active", responses: 18, total: 28, startDate: "2026-04-14", endDate: "2026-05-02", anonymous: true, threshold: 5, engagement: 74, nps: 38 },
@@ -3675,7 +3675,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
     lead: { L: 73, E: 68, A: 85, D: 70 },
     byDept: { "Programs": 80, "External Relations": 76, "Finance": 72, "People & Culture": 84, "Technical": 77, "Research & Evidence": 79, "Policy & Advocacy": 75, "IT & Digital": 66, "Operations": 71, "Executive Office": 88 },
     byCountry: { CA: 79, GB: 77, KE: 82, NG: 74, IN: 70, BD: 68, PH: 75, TZ: 80, SN: 72, IT: 76, CH: 81, MW: 73, PK: 69, ID: 71 },
-    byTenure: { "< 1 yr": 82, "1ΓÇô3 yr": 76, "3ΓÇô5 yr": 72, "5+ yr": 78 },
+    byTenure: { "< 1 yr": 82, "1–3 yr": 76, "3–5 yr": 72, "5+ yr": 78 },
     benchmarks: { global: 72, nonprofit: 75, canada: 74, "int'l dev": 71 },
     turnoverRisk: [
       { team: "IT & Digital", score: 38, risk: "High", drivers: "Enablement gap, below-benchmark comp" },
@@ -3703,7 +3703,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         <span style={{ fontSize: 12, fontWeight: 600, color: B.textPrimary }}>{label}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color }}>{score}%</span>
-          {benchmark && <span style={{ fontSize: 10, color: score >= benchmark ? B.success : B.danger }}>{score >= benchmark ? "Γû▓" : "Γû╝"} vs {benchmark}% benchmark</span>}
+          {benchmark && <span style={{ fontSize: 10, color: score >= benchmark ? B.success : B.danger }}>{score >= benchmark ? "▲" : "▼"} vs {benchmark}% benchmark</span>}
         </div>
       </div>
       <div style={{ position: "relative", height: 8, borderRadius: 4, background: B.bgHover }}>
@@ -3726,7 +3726,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         { key: "create", label: "Survey Builder" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ENGAGEMENT DASHBOARD ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ ENGAGEMENT DASHBOARD ════════ */}
       {tab === "dashboard" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px,1fr))", gap: 10, marginBottom: 16 }}>
@@ -3756,7 +3756,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 </div>
               ))}
               <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: B.accentBg, border: `1px solid ${B.accent}20`, fontSize: 12, color: B.textSecondary }}>
-                <strong>NI Score: {ENGAGEMENT_DATA.overall}%</strong> ΓÇö Above the international development benchmark by {ENGAGEMENT_DATA.overall - ENGAGEMENT_DATA.benchmarks["int'l dev"]} points.
+                <strong>NI Score: {ENGAGEMENT_DATA.overall}%</strong> — Above the international development benchmark by {ENGAGEMENT_DATA.overall - ENGAGEMENT_DATA.benchmarks["int'l dev"]} points.
               </div>
             </Card>
             <Card>
@@ -3783,7 +3783,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               ].map((f, i) => (
                 <div key={i} style={{ padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{f.area} ΓÇö {f.score}%</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{f.area} — {f.score}%</span>
                     <Badge color={f.impact === "High" ? B.danger : B.orange} bg={f.impact === "High" ? B.dangerBg : B.warningBg}>{f.impact} Impact</Badge>
                   </div>
                   <div style={{ fontSize: 12, color: B.textSecondary }}>{f.suggestion}</div>
@@ -3799,14 +3799,14 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               <div onDragOver={ev => { ev.preventDefault(); setPyDragOver(true); }} onDragLeave={() => setPyDragOver(false)} onDrop={handlePYDrop}
                 style={{ border: `2px dashed ${pyDragOver ? B.accent : B.border}`, borderRadius: 8, padding: 24, textAlign: "center", background: pyDragOver ? B.accentBg : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
                 {priorYearData ? (
-                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>Γ£à</div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>2025 Results Loaded</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>Engagement: {priorYearData.engagement}% ┬╖ {priorYearData.totalResponses} responses ┬╖ {priorYearData.responseRate}% rate</div></div>
+                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>✅</div><div style={{ fontSize: 13, fontWeight: 700, color: B.success }}>2025 Results Loaded</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>Engagement: {priorYearData.engagement}% ┬╖ {priorYearData.totalResponses} responses ┬╖ {priorYearData.responseRate}% rate</div></div>
                 ) : (
-                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>≡ƒôè</div><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>Drag & drop prior year results</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>.xlsx, .csv, or .pdf ΓÇö columns auto-mapped</div></div>
+                  <div><div style={{ fontSize: 28, marginBottom: 6 }}>=���</div><div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>Drag & drop prior year results</div><div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>.xlsx, .csv, or .pdf — columns auto-mapped</div></div>
                 )}
               </div>
             </Card>
             <Card style={{ opacity: priorYearData ? 1 : 0.4, pointerEvents: priorYearData ? "auto" : "none" }}>
-              <SectionTitle>{priorYearData ? `Year-over-Year (${priorYearData.year} ΓåÆ 2026)` : "YoY Comparison (import to unlock)"}</SectionTitle>
+              <SectionTitle>{priorYearData ? `Year-over-Year (${priorYearData.year} → 2026)` : "YoY Comparison (import to unlock)"}</SectionTitle>
               {priorYearData ? (
                 <div>
                   {[{ label: "Engagement", prev: priorYearData.engagement, curr: ENGAGEMENT_DATA.overall },
@@ -3820,7 +3820,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                     return (<div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 0", borderBottom: `1px solid ${B.borderLight}`, fontSize: 12 }}>
                       <span style={{ flex: 1, fontWeight: 600 }}>{m.label}</span>
                       <span style={{ color: B.textMuted, width: 30, textAlign: "right" }}>{m.prev}</span>
-                      <span style={{ color: B.textMuted }}>ΓåÆ</span>
+                      <span style={{ color: B.textMuted }}>→</span>
                       <span style={{ fontWeight: 700, width: 30, textAlign: "right" }}>{m.curr}</span>
                       <Badge color={d > 0 ? B.success : d < 0 ? B.danger : B.textMuted} bg={d > 0 ? B.successBg : d < 0 ? B.dangerBg : B.bgHover} style={{ width: 44, justifyContent: "center" }}>{d > 0 ? "+" : ""}{d}</Badge>
                     </div>);
@@ -3833,11 +3833,11 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ SURVEYS LIST ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ SURVEYS LIST ════════ */}
       {tab === "surveys" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14, gap: 6 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Survey ID, Employee ID, Question ID, Response, Score columns for bulk survey result import")}>≡ƒôñ Batch Import Results</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Survey ID, Employee ID, Question ID, Response, Score columns for bulk survey result import")}>=��� Batch Import Results</Btn>
             <Btn variant="primary" onClick={() => setTab("create")}>+ Create Survey</Btn>
           </div>
           {SURVEYS.map(s => (
@@ -3848,13 +3848,13 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                     <span style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{s.name}</span>
                     <StatusBadge status={s.status} />
                     <Badge color={B.textMuted} bg={B.bgHover}>{s.type}</Badge>
-                    {s.anonymous && <Badge color={B.purple} bg={`${B.purple}12`}>Anonymous (ΓëÑ{s.threshold})</Badge>}
+                    {s.anonymous && <Badge color={B.purple} bg={`${B.purple}12`}>Anonymous (≥{s.threshold})</Badge>}
                   </div>
-                  <div style={{ fontSize: 12, color: B.textMuted }}>{fmtDate(s.startDate)} ΓÇô {fmtDate(s.endDate)} ┬╖ {s.responses}/{s.total} responses ({Math.round(s.responses / s.total * 100)}%)</div>
+                  <div style={{ fontSize: 12, color: B.textMuted }}>{fmtDate(s.startDate)} – {fmtDate(s.endDate)} ┬╖ {s.responses}/{s.total} responses ({Math.round(s.responses / s.total * 100)}%)</div>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
-                  {s.status === "Active" && <Btn variant="secondary" size="sm" onClick={() => alert('Reminder emails sent to non-respondents')}>≡ƒôº Send Reminder</Btn>}
-                  <Btn variant="secondary" size="sm" onClick={() => setTab("dashboard")}>≡ƒôè Results</Btn>
+                  {s.status === "Active" && <Btn variant="secondary" size="sm" onClick={() => alert('Reminder emails sent to non-respondents')}>=��� Send Reminder</Btn>}
+                  <Btn variant="secondary" size="sm" onClick={() => setTab("dashboard")}>=��� Results</Btn>
                 </div>
               </div>
             </Card>
@@ -3862,7 +3862,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ HEATMAPS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ HEATMAPS ════════ */}
       {tab === "heatmaps" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
@@ -3872,7 +3872,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
             ]} />
           </div>
           <Card>
-            <SectionTitle>Engagement Heatmap ΓÇö {heatmapDim === "department" ? "Department" : heatmapDim === "country" ? "Country" : "Tenure Band"}</SectionTitle>
+            <SectionTitle>Engagement Heatmap — {heatmapDim === "department" ? "Department" : heatmapDim === "country" ? "Country" : "Tenure Band"}</SectionTitle>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
                 <thead><tr style={{ background: B.bgHover }}>
@@ -3904,7 +3904,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 12, fontSize: 11, color: B.textMuted, alignItems: "center" }}>
               <span>Legend:</span>
-              {[{ label: "ΓëÑ80 Strong", color: B.success }, { label: "70ΓÇô79 Good", color: B.blue }, { label: "60ΓÇô69 Caution", color: B.warning }, { label: "<60 Critical", color: B.danger }].map(l => (
+              {[{ label: "≥80 Strong", color: B.success }, { label: "70–79 Good", color: B.blue }, { label: "60–69 Caution", color: B.warning }, { label: "<60 Critical", color: B.danger }].map(l => (
                 <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 12, height: 12, borderRadius: 3, background: `${l.color}25` }} />{l.label}</span>
               ))}
             </div>
@@ -3912,7 +3912,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LEAD DRIVERS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ LEAD DRIVERS ════════ */}
       {tab === "drivers" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.accent}` }}>
@@ -3928,7 +3928,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
                   <div style={{ width: 36, height: 36, borderRadius: 18, background: `${d.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: d.color, fontFamily: "Georgia, serif" }}>{d.key}</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{d.label} ΓÇö {d.score}%</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{d.label} — {d.score}%</div>
                     <div style={{ fontSize: 11, color: B.textMuted }}>{d.desc}</div>
                   </div>
                   <Badge color={d.score >= 75 ? B.success : d.score >= 65 ? B.warning : B.danger} bg={d.score >= 75 ? B.successBg : d.score >= 65 ? B.warningBg : B.dangerBg}>
@@ -3963,7 +3963,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ COMMENT ANALYTICS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ COMMENT ANALYTICS ════════ */}
       {tab === "comments" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
@@ -4003,7 +4003,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ PREDICTIVE / TURNOVER RISK ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ PREDICTIVE / TURNOVER RISK ════════ */}
       {tab === "predictive" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.danger}` }}>
@@ -4013,7 +4013,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               <div key={i} style={{ padding: "12px 14px", borderRadius: 8, background: t.risk === "High" ? B.dangerBg : B.warningBg, border: `1px solid ${t.risk === "High" ? B.danger : B.warning}20`, marginBottom: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>{t.team}</span>
-                  <Badge color={t.risk === "High" ? B.danger : B.orange} bg={t.risk === "High" ? B.dangerBg : B.warningBg}>{t.risk} Risk ΓÇö {t.score}%</Badge>
+                  <Badge color={t.risk === "High" ? B.danger : B.orange} bg={t.risk === "High" ? B.dangerBg : B.warningBg}>{t.risk} Risk — {t.score}%</Badge>
                 </div>
                 <div style={{ fontSize: 12, color: B.textSecondary }}>Key drivers: {t.drivers}</div>
                 <ProgressBar value={100 - t.score} max={100} color={t.risk === "High" ? B.danger : B.orange} height={4} />
@@ -4021,7 +4021,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
             ))}
           </Card>
           <Card>
-            <SectionTitle>Engagement ΓåÆ Business Outcome Correlation</SectionTitle>
+            <SectionTitle>Engagement → Business Outcome Correlation</SectionTitle>
             {[
               { metric: "Voluntary Turnover", correlation: -0.74, insight: "Higher engagement = lower attrition" },
               { metric: "Sick Days Taken", correlation: -0.58, insight: "Engaged employees take fewer sick days" },
@@ -4041,7 +4041,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ SURVEY BUILDER (Enhanced with Drag-Drop) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ SURVEY BUILDER (Enhanced with Drag-Drop) ════════ */}
       {tab === "create" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -4078,7 +4078,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="checkbox" defaultChecked id="anon2" /><label htmlFor="anon2" style={{ fontSize: 12 }}>Anonymous responses</label>
-                  <span style={{ marginLeft: "auto", fontSize: 11, color: B.textMuted }}>Threshold: ΓëÑ5 per group</span>
+                  <span style={{ marginLeft: "auto", fontSize: 11, color: B.textMuted }}>Threshold: ≥5 per group</span>
                 </div>
               </div>
             </Card>
@@ -4089,9 +4089,9 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Drag and drop an Excel, Word, or PDF file containing your survey questions. The system will automatically parse and format them into survey items with detected question types.</div>
               <div onDragOver={ev => { ev.preventDefault(); setQDragOver(true); }} onDragLeave={() => setQDragOver(false)} onDrop={handleQDrop}
                 style={{ border: `2px dashed ${qDragOver ? B.blue : B.border}`, borderRadius: 8, padding: 28, textAlign: "center", background: qDragOver ? `${B.blue}08` : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>≡ƒôï</div>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>=���</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary }}>Drag & drop question file here</div>
-                <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Supports .xlsx, .csv, .docx, .pdf ΓÇö one question per row/line</div>
+                <div style={{ fontSize: 12, color: B.textMuted, marginTop: 4 }}>Supports .xlsx, .csv, .docx, .pdf — one question per row/line</div>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
                   {[".xlsx", ".csv", ".docx", ".pdf"].map(ext => (
                     <span key={ext} style={{ padding: "2px 8px", borderRadius: 4, background: B.bgCard, border: `1px solid ${B.border}`, fontSize: 10, color: B.textMuted, fontWeight: 600 }}>{ext}</span>
@@ -4101,7 +4101,7 @@ const SurveyModule = ({ employee: empProp } = {}) => {
               {uploadedQuestions.length > 0 && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <Badge color={B.success} bg={B.successBg}>Γ£ô {uploadedQuestions.length} QUESTIONS PARSED</Badge>
+                    <Badge color={B.success} bg={B.successBg}>✓ {uploadedQuestions.length} QUESTIONS PARSED</Badge>
                     <span style={{ fontSize: 11, color: B.textMuted }}>from {uploadedQuestions[0].source}</span>
                   </div>
                   {uploadedQuestions.map(q => (
@@ -4162,9 +4162,9 @@ const SurveyModule = ({ employee: empProp } = {}) => {
                 <div style={{ display: "flex", justifyContent: "space-between", color: B.textSecondary, borderTop: `1px solid ${B.border}`, paddingTop: 6 }}><span style={{ fontWeight: 700 }}>Total questions</span><span style={{ fontWeight: 700, color: B.accent }}>{QUESTION_TEMPLATES.reduce((s, c) => s + c.questions.length, 0) + uploadedQuestions.length}</span></div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <Btn variant="primary" style={{ flex: 1 }} onClick={() => alert('Survey launched! Invitations sent to selected participants.')}>≡ƒÜÇ Launch Survey</Btn>
-                <Btn variant="secondary" onClick={() => alert('Survey draft saved')}>≡ƒÆ╛ Save Draft</Btn>
-                <Btn variant="secondary" onClick={() => alert('Opening survey preview...')}>≡ƒæü Preview</Btn>
+                <Btn variant="primary" style={{ flex: 1 }} onClick={() => alert('Survey launched! Invitations sent to selected participants.')}>=��� Launch Survey</Btn>
+                <Btn variant="secondary" onClick={() => alert('Survey draft saved')}>=��� Save Draft</Btn>
+                <Btn variant="secondary" onClick={() => alert('Opening survey preview...')}>=��� Preview</Btn>
               </div>
             </Card>
           </div>
@@ -4174,23 +4174,23 @@ const SurveyModule = ({ employee: empProp } = {}) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ AUDIT LOG DATA ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── AUDIT LOG DATA ─────────────────────────────────────────────────────────
 const AUDIT_LOG = [
   { id: "AUD-0001", timestamp: "2026-04-23T14:32:18Z", user: "Grant Carioni", role: "Superuser", action: "Modified", target: "Workflow: Health & Wellness Allowance", detail: "Changed approval step 2 from 'HR Director' to 'Finance'", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
-  { id: "AUD-0002", timestamp: "2026-04-23T13:15:44Z", user: "Admin User", role: "HR Admin", action: "Created", target: "Employee: NI-01028", detail: "New hire onboarding ΓÇö Maria Santos, Philippines office", ip: "203.0.113.88", location: "Manila, PH", session: "SES-4b7c1e" },
-  { id: "AUD-0003", timestamp: "2026-04-23T11:05:22Z", user: "Sarah Chen", role: "Manager", action: "Approved", target: "Leave Request: LR-002", detail: "Lars M├╝ller ΓÇö Sick Leave 2 days approved", ip: "192.0.2.17", location: "Ottawa, CA", session: "SES-9d2e5f" },
+  { id: "AUD-0002", timestamp: "2026-04-23T13:15:44Z", user: "Admin User", role: "HR Admin", action: "Created", target: "Employee: NI-01028", detail: "New hire onboarding — Maria Santos, Philippines office", ip: "203.0.113.88", location: "Manila, PH", session: "SES-4b7c1e" },
+  { id: "AUD-0003", timestamp: "2026-04-23T11:05:22Z", user: "Sarah Chen", role: "Manager", action: "Approved", target: "Leave Request: LR-002", detail: "Lars M├╝ller — Sick Leave 2 days approved", ip: "192.0.2.17", location: "Ottawa, CA", session: "SES-9d2e5f" },
   { id: "AUD-0004", timestamp: "2026-04-23T09:48:31Z", user: "Grant Carioni", role: "Superuser", action: "Deleted", target: "Report: RPT-ARCHIVE-019", detail: "Removed archived 2023 headcount report", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
-  { id: "AUD-0005", timestamp: "2026-04-22T17:22:15Z", user: "Admin User", role: "HR Admin", action: "Modified", target: "Employee: NI-01005 Compensation", detail: "Oliver Wright salary change GBP 62,000 ΓåÆ 68,000", ip: "198.51.100.55", location: "London, GB", session: "SES-1c8d4a" },
+  { id: "AUD-0005", timestamp: "2026-04-22T17:22:15Z", user: "Admin User", role: "HR Admin", action: "Modified", target: "Employee: NI-01005 Compensation", detail: "Oliver Wright salary change GBP 62,000 → 68,000", ip: "198.51.100.55", location: "London, GB", session: "SES-1c8d4a" },
   { id: "AUD-0006", timestamp: "2026-04-22T15:10:08Z", user: "Grant Carioni", role: "Superuser", action: "Config Change", target: "System: Labor Compliance Rules", detail: "Updated Indonesia OT multiplier from 1.5 to match Cipta Kerja amendment", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
-  { id: "AUD-0007", timestamp: "2026-04-22T14:05:33Z", user: "Priya Patel", role: "Manager", action: "Submitted", target: "Leave Request: LR-001", detail: "Annual Leave Apr 28 ΓÇô May 2 submitted for approval", ip: "93.184.216.34", location: "Rome, IT", session: "SES-7f3a9b" },
+  { id: "AUD-0007", timestamp: "2026-04-22T14:05:33Z", user: "Priya Patel", role: "Manager", action: "Submitted", target: "Leave Request: LR-001", detail: "Annual Leave Apr 28 – May 2 submitted for approval", ip: "93.184.216.34", location: "Rome, IT", session: "SES-7f3a9b" },
   { id: "AUD-0008", timestamp: "2026-04-22T10:30:00Z", user: "Grant Carioni", role: "Superuser", action: "Feature Toggle", target: "Module: Multi-Currency Payroll", detail: "Enabled multi-currency payroll tab for all admin users", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
-  { id: "AUD-0009", timestamp: "2026-04-21T16:44:12Z", user: "Admin User", role: "HR Admin", action: "Generated", target: "Verification Letter: NI-01010", detail: "Employment letter for Elena Volkov ΓÇö immigration purpose", ip: "198.51.100.55", location: "Ottawa, CA", session: "SES-1c8d4a" },
+  { id: "AUD-0009", timestamp: "2026-04-21T16:44:12Z", user: "Admin User", role: "HR Admin", action: "Generated", target: "Verification Letter: NI-01010", detail: "Employment letter for Elena Volkov — immigration purpose", ip: "198.51.100.55", location: "Ottawa, CA", session: "SES-1c8d4a" },
   { id: "AUD-0010", timestamp: "2026-04-21T11:18:55Z", user: "Grant Carioni", role: "Superuser", action: "Role Change", target: "User: Marcus Johnson", detail: "Elevated from Manager to Country HR Admin (Nigeria)", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
-  { id: "AUD-0011", timestamp: "2026-04-20T09:05:40Z", user: "Grant Carioni", role: "Superuser", action: "Formatting", target: "System: Dashboard Layout", detail: "Modified dashboard grid ΓÇö added Grant Allocation widget to default view", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
-  { id: "AUD-0012", timestamp: "2026-04-19T14:28:19Z", user: "System", role: "System", action: "Sync", target: "Integration: Workable ATS", detail: "Auto-sync completed ΓÇö 7 requisitions, 169 candidates updated", ip: "10.0.0.1", location: "Cloud (AWS ca-central-1)", session: "SES-SYSTEM" },
+  { id: "AUD-0011", timestamp: "2026-04-20T09:05:40Z", user: "Grant Carioni", role: "Superuser", action: "Formatting", target: "System: Dashboard Layout", detail: "Modified dashboard grid — added Grant Allocation widget to default view", ip: "198.51.100.42", location: "Ottawa, CA", session: "SES-8a3f2d" },
+  { id: "AUD-0012", timestamp: "2026-04-19T14:28:19Z", user: "System", role: "System", action: "Sync", target: "Integration: Workable ATS", detail: "Auto-sync completed — 7 requisitions, 169 candidates updated", ip: "10.0.0.1", location: "Cloud (AWS ca-central-1)", session: "SES-SYSTEM" },
 ];
 
-// ΓöÇΓöÇΓöÇ SUPERUSER MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── SUPERUSER MODULE ───────────────────────────────────────────────────────
 const SuperuserModule = () => {
   const [tab, setTab] = useState("audit");
   const [auditFilter, setAuditFilter] = useState("ALL");
@@ -4207,16 +4207,16 @@ const SuperuserModule = () => {
   const [showConfirm, setShowConfirm] = useState(null);
   const [showAddOnAssign, setShowAddOnAssign] = useState(null);
   const [addOnModules, setAddOnModules] = useState([
-    { id: "ADDON-001", name: "Expense Management", desc: "Travel and expense claims with receipt scanning, per-diem rules, and multi-currency reimbursement", icon: "≡ƒº╛", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-02-15" },
-    { id: "ADDON-002", name: "Asset & Equipment Tracker", desc: "Assign, track, and recover organizational assets (laptops, phones, vehicles) per employee", icon: "≡ƒÆ╗", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["IT & Digital", "Operations"], created: "2026-03-01" },
-    { id: "ADDON-003", name: "Volunteer Management", desc: "Onboard, schedule, track hours, and manage credentials for volunteers and short-term consultants", icon: "≡ƒñ¥", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Programs"], created: "2026-01-20" },
-    { id: "ADDON-004", name: "Travel & Security Clearance", desc: "Travel request approvals, security briefings, field travel risk assessments, and emergency contact sync", icon: "Γ£ê∩╕Å", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-03-10" },
-    { id: "ADDON-005", name: "Document Vault (e-Signature)", desc: "Secure document storage with e-signature workflows, version control, and retention policy enforcement", icon: "≡ƒöÉ", status: "active", assignedTo: "individuals", assignedUsers: ["Sarah Chen", "Marcus Johnson", "Priya Patel", "Grant Carioni"], assignedGroups: [], created: "2026-04-01" },
-    { id: "ADDON-006", name: "Mentorship & Coaching Platform", desc: "Match mentors with mentees, schedule sessions, track goals, and collect feedback", icon: "≡ƒÄô", status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: "2026-04-18" },
-    { id: "ADDON-007", name: "Workplace Safety & Incident Reporting", desc: "Report workplace incidents, near-misses, and safety concerns with investigation workflows", icon: "ΓÜá∩╕Å", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Operations", "Programs", "Technical"], created: "2026-02-01" },
-    { id: "ADDON-008", name: "Internal Job Board & Mobility", desc: "Post internal opportunities, allow employees to express interest, and track internal transfers", icon: "≡ƒöä", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-01-15" },
+    { id: "ADDON-001", name: "Expense Management", desc: "Travel and expense claims with receipt scanning, per-diem rules, and multi-currency reimbursement", icon: "=���", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-02-15" },
+    { id: "ADDON-002", name: "Asset & Equipment Tracker", desc: "Assign, track, and recover organizational assets (laptops, phones, vehicles) per employee", icon: "=���", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["IT & Digital", "Operations"], created: "2026-03-01" },
+    { id: "ADDON-003", name: "Volunteer Management", desc: "Onboard, schedule, track hours, and manage credentials for volunteers and short-term consultants", icon: "=���", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Programs"], created: "2026-01-20" },
+    { id: "ADDON-004", name: "Travel & Security Clearance", desc: "Travel request approvals, security briefings, field travel risk assessments, and emergency contact sync", icon: "✈∩╕Å", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-03-10" },
+    { id: "ADDON-005", name: "Document Vault (e-Signature)", desc: "Secure document storage with e-signature workflows, version control, and retention policy enforcement", icon: "\u{1F510}", status: "active", assignedTo: "individuals", assignedUsers: ["Sarah Chen", "Marcus Johnson", "Priya Patel", "Grant Carioni"], assignedGroups: [], created: "2026-04-01" },
+    { id: "ADDON-006", name: "Mentorship & Coaching Platform", desc: "Match mentors with mentees, schedule sessions, track goals, and collect feedback", icon: "=���", status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: "2026-04-18" },
+    { id: "ADDON-007", name: "Workplace Safety & Incident Reporting", desc: "Report workplace incidents, near-misses, and safety concerns with investigation workflows", icon: "⚠∩╕Å", status: "active", assignedTo: "groups", assignedUsers: [], assignedGroups: ["Operations", "Programs", "Technical"], created: "2026-02-01" },
+    { id: "ADDON-008", name: "Internal Job Board & Mobility", desc: "Post internal opportunities, allow employees to express interest, and track internal transfers", icon: "=���", status: "active", assignedTo: "all", assignedUsers: [], assignedGroups: [], created: "2026-01-15" },
   ]);
-  const [newAddOn, setNewAddOn] = useState({ name: "", desc: "", icon: "≡ƒôª" });
+  const [newAddOn, setNewAddOn] = useState({ name: "", desc: "", icon: "=���" });
   const [assignTarget, setAssignTarget] = useState("all");
   const [assignDepts, setAssignDepts] = useState([]);
   const [assignIndividuals, setAssignIndividuals] = useState([]);
@@ -4236,13 +4236,13 @@ const SuperuserModule = () => {
 
   // Security Roles Management
   const [securityRoles, setSecurityRoles] = useState([
-    { id: "ROLE-001", name: "Superuser", desc: "Full system access ΓÇö all modules, all data, all configuration", level: "System", users: 1, permissions: { people: "Full", comp: "Full", surveys: "Full", performance: "Full", lms: "Full", time: "Full", admin: "Full", reports: "Full" }, locked: true },
-    { id: "ROLE-002", name: "HR Admin", desc: "Full HR access ΓÇö employee records, compensation, onboarding, reporting", level: "Global", users: 1, permissions: { people: "Full", comp: "Full", surveys: "Full", performance: "Full", lms: "Admin", time: "Full", admin: "Limited", reports: "Full" }, locked: false },
-    { id: "ROLE-003", name: "Country HR Admin", desc: "HR access scoped to a specific country/entity ΓÇö manages local staff", level: "Country", users: 1, permissions: { people: "Country", comp: "Country", surveys: "Country", performance: "Country", lms: "Country", time: "Country", admin: "None", reports: "Country" }, locked: false },
-    { id: "ROLE-004", name: "Manager", desc: "Access to direct reports ΓÇö reviews, leave approvals, team analytics", level: "Team", users: 2, permissions: { people: "Team", comp: "View Own", surveys: "Participate", performance: "Team", lms: "View", time: "Team", admin: "None", reports: "Team" }, locked: false },
-    { id: "ROLE-005", name: "Employee", desc: "Self-service ΓÇö own profile, leave requests, learning, feedback", level: "Self", users: 20, permissions: { people: "Self", comp: "View Own", surveys: "Participate", performance: "Self", lms: "Learner", time: "Self", admin: "None", reports: "None" }, locked: false },
-    { id: "ROLE-006", name: "Grants Finance", desc: "Financial oversight ΓÇö grant allocations, compensation cost views, budget reports", level: "Functional", users: 1, permissions: { people: "View", comp: "View", surveys: "None", performance: "None", lms: "None", time: "View", admin: "None", reports: "Finance" }, locked: false },
-    { id: "ROLE-007", name: "L&D Administrator", desc: "Learning management ΓÇö course admin, content uploads, learning analytics", level: "Functional", users: 0, permissions: { people: "View", comp: "None", surveys: "None", performance: "View", lms: "Full", time: "None", admin: "None", reports: "LMS" }, locked: false },
+    { id: "ROLE-001", name: "Superuser", desc: "Full system access — all modules, all data, all configuration", level: "System", users: 1, permissions: { people: "Full", comp: "Full", surveys: "Full", performance: "Full", lms: "Full", time: "Full", admin: "Full", reports: "Full" }, locked: true },
+    { id: "ROLE-002", name: "HR Admin", desc: "Full HR access — employee records, compensation, onboarding, reporting", level: "Global", users: 1, permissions: { people: "Full", comp: "Full", surveys: "Full", performance: "Full", lms: "Admin", time: "Full", admin: "Limited", reports: "Full" }, locked: false },
+    { id: "ROLE-003", name: "Country HR Admin", desc: "HR access scoped to a specific country/entity — manages local staff", level: "Country", users: 1, permissions: { people: "Country", comp: "Country", surveys: "Country", performance: "Country", lms: "Country", time: "Country", admin: "None", reports: "Country" }, locked: false },
+    { id: "ROLE-004", name: "Manager", desc: "Access to direct reports — reviews, leave approvals, team analytics", level: "Team", users: 2, permissions: { people: "Team", comp: "View Own", surveys: "Participate", performance: "Team", lms: "View", time: "Team", admin: "None", reports: "Team" }, locked: false },
+    { id: "ROLE-005", name: "Employee", desc: "Self-service — own profile, leave requests, learning, feedback", level: "Self", users: 20, permissions: { people: "Self", comp: "View Own", surveys: "Participate", performance: "Self", lms: "Learner", time: "Self", admin: "None", reports: "None" }, locked: false },
+    { id: "ROLE-006", name: "Grants Finance", desc: "Financial oversight — grant allocations, compensation cost views, budget reports", level: "Functional", users: 1, permissions: { people: "View", comp: "View", surveys: "None", performance: "None", lms: "None", time: "View", admin: "None", reports: "Finance" }, locked: false },
+    { id: "ROLE-007", name: "L&D Administrator", desc: "Learning management — course admin, content uploads, learning analytics", level: "Functional", users: 0, permissions: { people: "View", comp: "None", surveys: "None", performance: "View", lms: "Full", time: "None", admin: "None", reports: "LMS" }, locked: false },
     { id: "ROLE-008", name: "External Auditor", desc: "Read-only access to compliance reports, audit logs, and financial summaries", level: "Audit", users: 0, permissions: { people: "None", comp: "View", surveys: "None", performance: "None", lms: "None", time: "View", admin: "Audit Log", reports: "Audit" }, locked: false },
   ]);
   const [showRoleModal, setShowRoleModal] = useState(null); // null = closed, "new" = create, role id = edit
@@ -4294,10 +4294,10 @@ const SuperuserModule = () => {
     <div>
       {/* Superuser banner */}
       <div style={{ padding: "10px 16px", borderRadius: 6, background: `linear-gradient(135deg, ${B.charcoal}, ${B.grey})`, color: "#fff", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={{ fontSize: 22 }}>≡ƒöÉ</span>
+        <span style={{ fontSize: 22 }}>=���</span>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>Superuser Control Panel</div>
-          <div style={{ fontSize: 11, opacity: 0.8 }}>Full system access ΓÇö feature management, formatting, audit logs, user administration. All actions are logged.</div>
+          <div style={{ fontSize: 11, opacity: 0.8 }}>Full system access — feature management, formatting, audit logs, user administration. All actions are logged.</div>
         </div>
         <Badge color="#FFB81C" bg="rgba(255,184,28,0.2)" style={{ fontSize: 11 }}>SUPERUSER</Badge>
       </div>
@@ -4314,7 +4314,7 @@ const SuperuserModule = () => {
         { key: "sessions", label: "Active Sessions" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉ AUDIT LOG ΓòÉΓòÉΓòÉ */}
+      {/* ═══ AUDIT LOG ═══ */}
       {tab === "audit" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
@@ -4341,10 +4341,10 @@ const SuperuserModule = () => {
                       </div>
                       <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 4 }}>{a.detail}</div>
                       <div style={{ display: "flex", gap: 12, fontSize: 11, color: B.textMuted, flexWrap: "wrap" }}>
-                        <span>≡ƒæñ {a.user} <Badge color={a.role === "Superuser" ? B.yellow : a.role === "HR Admin" ? B.accent : a.role === "System" ? B.textMuted : B.blue} bg={`${a.role === "Superuser" ? B.yellow : B.textMuted}14`} style={{ fontSize: 9, marginLeft: 4 }}>{a.role}</Badge></span>
-                        <span>≡ƒîÉ {a.ip}</span>
-                        <span>≡ƒôì {a.location}</span>
-                        <span>≡ƒöæ {a.session}</span>
+                        <span>=��� {a.user} <Badge color={a.role === "Superuser" ? B.yellow : a.role === "HR Admin" ? B.accent : a.role === "System" ? B.textMuted : B.blue} bg={`${a.role === "Superuser" ? B.yellow : B.textMuted}14`} style={{ fontSize: 9, marginLeft: 4 }}>{a.role}</Badge></span>
+                        <span>=��� {a.ip}</span>
+                        <span>=��� {a.location}</span>
+                        <span>=��� {a.session}</span>
                       </div>
                     </div>
                   </div>
@@ -4355,7 +4355,7 @@ const SuperuserModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ FEATURE MANAGEMENT ΓòÉΓòÉΓòÉ */}
+      {/* ═══ FEATURE MANAGEMENT ═══ */}
       {tab === "features" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card>
@@ -4392,7 +4392,7 @@ const SuperuserModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ ADD-ON MODULES (Assign to individuals, groups, or all) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ ADD-ON MODULES (Assign to individuals, groups, or all) ═══ */}
       {tab === "addons" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -4405,7 +4405,7 @@ const SuperuserModule = () => {
             <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
               <div style={{ flex: "0 0 50px" }}>
                 <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Icon</label>
-                <Select value={newAddOn.icon} onChange={v => setNewAddOn(p => ({ ...p, icon: v }))} options={["≡ƒôª","≡ƒº╛","≡ƒÆ╗","≡ƒñ¥","Γ£ê∩╕Å","≡ƒöÉ","≡ƒÄô","ΓÜá∩╕Å","≡ƒöä","≡ƒôï","≡ƒÅÑ","≡ƒÄ»","≡ƒô₧","≡ƒùé∩╕Å","≡ƒîì"].map(i => ({ value: i, label: i }))} />
+                <Select value={newAddOn.icon} onChange={v => setNewAddOn(p => ({ ...p, icon: v }))} options={["=���","=���","=���","=���","✈∩╕Å","=���","=���","⚠∩╕Å","=���","=���","=���","=���","=��P","=���∩╕Å","=���"].map(i => ({ value: i, label: i }))} />
               </div>
               <div style={{ flex: 1, minWidth: 180 }}>
                 <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Module Name</label>
@@ -4415,7 +4415,7 @@ const SuperuserModule = () => {
                 <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Description</label>
                 <input value={newAddOn.desc} onChange={ev => setNewAddOn(p => ({ ...p, desc: ev.target.value }))} placeholder="Brief description of the module's purpose" style={{ width: "100%", padding: 8, borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} />
               </div>
-              <Btn variant="primary" onClick={() => { if (newAddOn.name) { setAddOnModules(prev => [...prev, { id: `ADDON-${Date.now().toString(36)}`, ...newAddOn, status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: new Date().toISOString().split("T")[0] }]); setNewAddOn({ name: "", desc: "", icon: "≡ƒôª" }); } }}>+ Create Module</Btn>
+              <Btn variant="primary" onClick={() => { if (newAddOn.name) { setAddOnModules(prev => [...prev, { id: `ADDON-${Date.now().toString(36)}`, ...newAddOn, status: "draft", assignedTo: "none", assignedUsers: [], assignedGroups: [], created: new Date().toISOString().split("T")[0] }]); setNewAddOn({ name: "", desc: "", icon: "=���" }); } }}>+ Create Module</Btn>
             </div>
           </Card>
 
@@ -4458,19 +4458,19 @@ const SuperuserModule = () => {
                     </div>
                   )}
                   {mod.assignedTo === "none" && (
-                    <span style={{ fontSize: 11, color: B.textMuted }}>Not yet assigned ΓÇö module is in draft</span>
+                    <span style={{ fontSize: 11, color: B.textMuted }}>Not yet assigned — module is in draft</span>
                   )}
                 </div>
 
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 6 }}>
-                  <Btn variant="primary" size="sm" onClick={() => setShowAddOnAssign(mod.id)}>≡ƒæÑ Assign / Reassign</Btn>
+                  <Btn variant="primary" size="sm" onClick={() => setShowAddOnAssign(mod.id)}>=��� Assign / Reassign</Btn>
                   {mod.status === "draft" ? (
-                    <Btn variant="success" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "active" } : m))}>Γ£ô Activate</Btn>
+                    <Btn variant="success" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "active" } : m))}>✓ Activate</Btn>
                   ) : (
-                    <Btn variant="secondary" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "draft" } : m))}>ΓÅ╕ Deactivate</Btn>
+                    <Btn variant="secondary" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "draft" } : m))}>⏸ Deactivate</Btn>
                   )}
-                  <Btn variant="ghost" size="sm" style={{ color: B.danger, marginLeft: "auto" }} onClick={() => setAddOnModules(prev => prev.filter(m => m.id !== mod.id))}>≡ƒùæ</Btn>
+                  <Btn variant="ghost" size="sm" style={{ color: B.danger, marginLeft: "auto" }} onClick={() => setAddOnModules(prev => prev.filter(m => m.id !== mod.id))}>=���</Btn>
                 </div>
               </Card>
             ))}
@@ -4484,7 +4484,7 @@ const SuperuserModule = () => {
             <div style={{ marginBottom: 14 }}>
               <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 6, fontFamily: "Arial, sans-serif" }}>Assignment Scope</label>
               <div style={{ display: "flex", gap: 6 }}>
-                {[{ v: "all", l: "≡ƒîÉ All Staff", d: `All ${EMPLOYEES.length} employees` }, { v: "groups", l: "≡ƒÅó Departments / Groups", d: "Select specific departments" }, { v: "individuals", l: "≡ƒæñ Individual Employees", d: "Pick specific people" }].map(opt => (
+                {[{ v: "all", l: "=��� All Staff", d: `All ${EMPLOYEES.length} employees` }, { v: "groups", l: "=��� Departments / Groups", d: "Select specific departments" }, { v: "individuals", l: "=��� Individual Employees", d: "Pick specific people" }].map(opt => (
                   <div key={opt.v} onClick={() => setAssignTarget(opt.v)} style={{ flex: 1, padding: "10px 12px", borderRadius: 8, border: `2px solid ${assignTarget === opt.v ? B.accent : B.border}`, background: assignTarget === opt.v ? B.accentBg : B.white, cursor: "pointer", transition: "all 0.15s" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: assignTarget === opt.v ? B.accent : B.textPrimary }}>{opt.l}</div>
                     <div style={{ fontSize: 11, color: B.textMuted }}>{opt.d}</div>
@@ -4503,7 +4503,7 @@ const SuperuserModule = () => {
                     const count = EMPLOYEES.filter(e => e.department === d).length;
                     return (
                       <button key={d} onClick={() => setAssignDepts(prev => sel ? prev.filter(x => x !== d) : [...prev, d])} style={{ padding: "6px 12px", borderRadius: 6, border: `1px solid ${sel ? B.accent : B.border}`, background: sel ? B.accentBg : B.white, color: sel ? B.accent : B.textSecondary, fontSize: 12, fontWeight: sel ? 700 : 500, cursor: "pointer", fontFamily: "Arial, sans-serif" }}>
-                        {sel ? "Γ£ô " : ""}{d} ({count})
+                        {sel ? "✓ " : ""}{d} ({count})
                       </button>
                     );
                   })}
@@ -4548,22 +4548,22 @@ const SuperuserModule = () => {
                   status: "active",
                 } : m));
                 setShowAddOnAssign(null); setAssignDepts([]); setAssignIndividuals([]);
-              }}>Γ£ô Apply Assignment</Btn>
+              }}>✓ Apply Assignment</Btn>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ MASS DATA UPLOAD (Superuser ΓÇö Initial Population & Batch Uploads) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ MASS DATA UPLOAD (Superuser — Initial Population & Batch Uploads) ═══ */}
       {tab === "massupload" && (
         <div>
           <div style={{ padding: "10px 14px", borderRadius: 6, background: `${B.charcoal}08`, border: `1px solid ${B.charcoal}15`, marginBottom: 14, fontSize: 12, color: B.textSecondary }}>
-            <strong>Mass Data Upload</strong> ΓÇö Use this panel to initially populate the HRIS with employee data, or batch-upload records into any module. Files are validated, auto-mapped, and previewed before import. All uploads are logged in the audit trail.
+            <strong>Mass Data Upload</strong> — Use this panel to initially populate the HRIS with employee data, or batch-upload records into any module. Files are validated, auto-mapped, and previewed before import. All uploads are logged in the audit trail.
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             {/* Employee Master Data */}
             <Card style={{ borderTop: `4px solid ${B.accent}` }}>
-              <SectionTitle>≡ƒæÑ Employee Master Data</SectionTitle>
+              <SectionTitle>=��� Employee Master Data</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Initial population or bulk update of employee records: personal info, employment details, compensation, and reporting structure.</div>
               <BatchUpload module="employee data" color={B.accent}
                 fields={["Employee ID", "First Name", "Last Name", "Email", "Country", "Entity", "Department", "Title", "Level", "Manager ID", "Hire Date", "Salary", "Currency", "Bonus", "Status"]}
@@ -4572,7 +4572,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Compensation / Payroll */}
             <Card style={{ borderTop: `4px solid ${B.teal}` }}>
-              <SectionTitle>≡ƒÆ░ Compensation & Payroll</SectionTitle>
+              <SectionTitle>=��� Compensation & Payroll</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Batch upload salary changes, bonus payments, COLA adjustments, or full compensation history.</div>
               <BatchUpload module="compensation data" color={B.teal}
                 fields={["Employee ID", "Effective Date", "Change Type", "Old Salary", "New Salary", "Currency", "Reason", "Approved By"]}
@@ -4581,7 +4581,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Leave / Time */}
             <Card style={{ borderTop: `4px solid ${B.blue}` }}>
-              <SectionTitle>≡ƒôà Leave & Time Records</SectionTitle>
+              <SectionTitle>=��� Leave & Time Records</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import historical leave records, time entries, or leave balance adjustments.</div>
               <BatchUpload module="leave records" color={B.blue}
                 fields={["Employee ID", "Leave Type", "Start Date", "End Date", "Days", "Status", "Approved By"]}
@@ -4590,7 +4590,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Performance */}
             <Card style={{ borderTop: `4px solid ${B.purple}` }}>
-              <SectionTitle>Γ¡É Performance Reviews</SectionTitle>
+              <SectionTitle>⭐ Performance Reviews</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import performance ratings, review cycles, goals, and development plans.</div>
               <BatchUpload module="performance data" color={B.purple}
                 fields={["Employee ID", "Review Cycle", "Rating", "Reviewer", "Goals Met", "Status"]}
@@ -4599,7 +4599,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Onboarding */}
             <Card style={{ borderTop: `4px solid ${B.orange}` }}>
-              <SectionTitle>≡ƒÜÇ Onboarding Journeys</SectionTitle>
+              <SectionTitle>=��� Onboarding Journeys</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Batch-create onboarding journeys for multiple new hires at once.</div>
               <BatchUpload module="onboarding data" color={B.orange}
                 fields={["Name", "Role", "Country", "Department", "Start Date", "Manager", "Template", "Buddy"]}
@@ -4608,7 +4608,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Survey Responses */}
             <Card style={{ borderTop: `4px solid ${B.pink}` }}>
-              <SectionTitle>≡ƒô¥ Survey Results / History</SectionTitle>
+              <SectionTitle>=��� Survey Results / History</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import historical survey responses, engagement scores, or prior-year results for YoY comparison.</div>
               <BatchUpload module="survey data" color={B.pink}
                 fields={["Survey ID", "Employee ID", "Question ID", "Response", "Score", "Timestamp", "Anonymous"]}
@@ -4617,7 +4617,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Grant Allocations */}
             <Card style={{ borderTop: `4px solid ${B.dkTeal}` }}>
-              <SectionTitle>≡ƒôè Grant / Project Allocations</SectionTitle>
+              <SectionTitle>=��� Grant / Project Allocations</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Import grant allocation percentages, timesheet data, or project assignments.</div>
               <BatchUpload module="grant allocation data" color={B.dkTeal}
                 fields={["Employee ID", "Grant Code", "Grant Name", "Allocation %", "Period", "Hours", "Status"]}
@@ -4626,7 +4626,7 @@ const SuperuserModule = () => {
             </Card>
             {/* Allowance Claims */}
             <Card style={{ borderTop: `4px solid ${B.ltPurple}` }}>
-              <SectionTitle>≡ƒÆ│ Allowance Claims (H&W / L&D)</SectionTitle>
+              <SectionTitle>=��� Allowance Claims (H&W / L&D)</SectionTitle>
               <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Batch import historical allowance claims and reimbursement records.</div>
               <BatchUpload module="allowance claims" color={B.ltPurple}
                 fields={["Employee ID", "Type", "Description", "Amount", "Currency", "Date", "Status"]}
@@ -4637,7 +4637,7 @@ const SuperuserModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ SECURITY ROLES ΓòÉΓòÉΓòÉ */}
+      {/* ═══ SECURITY ROLES ═══ */}
       {tab === "roles" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -4659,8 +4659,8 @@ const SuperuserModule = () => {
                     <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{role.id} ┬╖ {role.users} user(s) assigned</div>
                   </div>
                   <div style={{ display: "flex", gap: 4 }}>
-                    <Btn variant="secondary" size="sm" onClick={() => { setEditRole({ ...role }); setShowRoleModal(role.id); }}>Γ£Å∩╕Å Edit</Btn>
-                    {!role.locked && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { if (role.users === 0) { setSecurityRoles(prev => prev.filter(r => r.id !== role.id)); } else { alert(`Cannot delete "${role.name}" ΓÇö ${role.users} user(s) are still assigned. Reassign them first.`); } }}>≡ƒùæ</Btn>}
+                    <Btn variant="secondary" size="sm" onClick={() => { setEditRole({ ...role }); setShowRoleModal(role.id); }}>✏∩╕Å Edit</Btn>
+                    {!role.locked && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { if (role.users === 0) { setSecurityRoles(prev => prev.filter(r => r.id !== role.id)); } else { alert(`Cannot delete "${role.name}" — ${role.users} user(s) are still assigned. Reassign them first.`); } }}>=���</Btn>}
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -4709,14 +4709,14 @@ const SuperuserModule = () => {
                   }
                   setShowRoleModal(null);
                   alert(showRoleModal === "new" ? `Security role "${editRole.name}" created` : `Security role "${editRole.name}" updated`);
-                }}>≡ƒÆ╛ {showRoleModal === "new" ? "Create Role" : "Save Changes"}</Btn>
+                }}>=��� {showRoleModal === "new" ? "Create Role" : "Save Changes"}</Btn>
               </div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ LEGAL ENTITIES ΓòÉΓòÉΓòÉ */}
+      {/* ═══ LEGAL ENTITIES ═══ */}
       {tab === "entities" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -4749,15 +4749,15 @@ const SuperuserModule = () => {
                     <div style={{ gridColumn: "1 / -1" }}><span style={{ color: B.textMuted }}>Reg No: </span><strong>{ent.registrationNo}</strong></div>
                   </div>
                   <div style={{ display: "flex", gap: 4 }}>
-                    <Btn variant="secondary" size="sm" onClick={() => { setEditEntity({ ...ent }); setShowEntityModal(ent.id); }}>Γ£Å∩╕Å Edit</Btn>
+                    <Btn variant="secondary" size="sm" onClick={() => { setEditEntity({ ...ent }); setShowEntityModal(ent.id); }}>✏∩╕Å Edit</Btn>
                     {ent.headcount === 0 && ent.type !== "HQ" && (
-                      <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { setEntities(prev => prev.filter(e => e.id !== ent.id)); alert(`Entity "${ent.name}" removed`); }}>≡ƒùæ Remove</Btn>
+                      <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => { setEntities(prev => prev.filter(e => e.id !== ent.id)); alert(`Entity "${ent.name}" removed`); }}>=��� Remove</Btn>
                     )}
                     {ent.status === "Active" && ent.type !== "HQ" && (
-                      <Btn variant="ghost" size="sm" style={{ color: B.warning }} onClick={() => { setEntities(prev => prev.map(e => e.id === ent.id ? { ...e, status: "Inactive" } : e)); alert(`Entity "${ent.name}" deactivated`); }}>ΓÅ╕ Deactivate</Btn>
+                      <Btn variant="ghost" size="sm" style={{ color: B.warning }} onClick={() => { setEntities(prev => prev.map(e => e.id === ent.id ? { ...e, status: "Inactive" } : e)); alert(`Entity "${ent.name}" deactivated`); }}>⏸ Deactivate</Btn>
                     )}
                     {ent.status === "Inactive" && (
-                      <Btn variant="ghost" size="sm" style={{ color: B.success }} onClick={() => { setEntities(prev => prev.map(e => e.id === ent.id ? { ...e, status: "Active" } : e)); }}>Γû╢ Reactivate</Btn>
+                      <Btn variant="ghost" size="sm" style={{ color: B.success }} onClick={() => { setEntities(prev => prev.map(e => e.id === ent.id ? { ...e, status: "Active" } : e)); }}>▶ Reactivate</Btn>
                     )}
                   </div>
                 </Card>
@@ -4790,20 +4790,20 @@ const SuperuserModule = () => {
                 <Btn variant="secondary" onClick={() => setShowEntityModal(null)}>Cancel</Btn>
                 <Btn variant="primary" onClick={() => {
                   if (showEntityModal === "new") {
-                    setEntities(prev => [...prev, { ...editEntity, id: `ENT-${editEntity.code || Date.now().toString(36)}`, flag: "≡ƒÅó", status: "Active", headcount: 0, registrationNo: `NI-${editEntity.code}-${Math.floor(1000 + Math.random() * 9000)}`, established: new Date().toISOString().split("T")[0] }]);
+                    setEntities(prev => [...prev, { ...editEntity, id: `ENT-${editEntity.code || Date.now().toString(36)}`, flag: "=���", status: "Active", headcount: 0, registrationNo: `NI-${editEntity.code}-${Math.floor(1000 + Math.random() * 9000)}`, established: new Date().toISOString().split("T")[0] }]);
                   } else {
                     setEntities(prev => prev.map(e => e.id === showEntityModal ? { ...e, ...editEntity } : e));
                   }
                   setShowEntityModal(null);
                   alert(showEntityModal === "new" ? `Entity "${editEntity.name}" created and available for assignment` : `Entity "${editEntity.name}" updated`);
-                }}>≡ƒÆ╛ {showEntityModal === "new" ? "Create Entity" : "Save Changes"}</Btn>
+                }}>=��� {showEntityModal === "new" ? "Create Entity" : "Save Changes"}</Btn>
               </div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ FORMATTING & DISPLAY ΓòÉΓòÉΓòÉ */}
+      {/* ═══ FORMATTING & DISPLAY ═══ */}
       {tab === "formatting" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card>
@@ -4836,15 +4836,15 @@ const SuperuserModule = () => {
                 <Select value={formatSettings[s.key]} onChange={v => setFormatSettings(prev => ({ ...prev, [s.key]: v }))} style={{ width: "100%" }} options={s.options} />
               </div>
             ))}
-            <Btn variant="primary" style={{ width: "100%", marginTop: 8 }} onClick={() => alert("Formatting saved and applied globally")}>≡ƒÆ╛ Save Formatting Changes</Btn>
+            <Btn variant="primary" style={{ width: "100%", marginTop: 8 }} onClick={() => alert("Formatting saved and applied globally")}>=��� Save Formatting Changes</Btn>
           </Card>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ USER ADMINISTRATION ΓòÉΓòÉΓòÉ */}
+      {/* ═══ USER ADMINISTRATION ═══ */}
       {tab === "users" && (
         <Card>
-          <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => alert('Add User form ΓÇö enter name, email, role, country, and MFA settings')}>+ Add User</Btn>}>System Users & Access</SectionTitle>
+          <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => alert('Add User form — enter name, email, role, country, and MFA settings')}>+ Add User</Btn>}>System Users & Access</SectionTitle>
           <Table columns={[
             { label: "User", render: r => <div style={{ display: "flex", alignItems: "center", gap: 8 }}><Avatar name={r.name} size={28} /><div><div style={{ fontWeight: 700, fontSize: 12 }}>{r.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{r.email}</div></div></div> },
             { label: "Role", render: r => <Badge color={r.role === "Superuser" ? B.yellow : r.role === "HR Admin" ? B.accent : r.role === "Country HR Admin" ? B.orange : r.role === "Grants Finance" ? B.purple : B.blue} bg={`${r.role === "Superuser" ? B.yellow : B.textMuted}14`}>{r.role}</Badge> },
@@ -4855,15 +4855,15 @@ const SuperuserModule = () => {
             { label: "Status", render: r => <StatusBadge status={r.status} /> },
             { label: "Actions", render: r => (
               <div style={{ display: "flex", gap: 4 }}>
-                <Btn variant="ghost" size="sm" onClick={() => alert('Edit user: modify role, permissions, MFA, and country assignment')}>Γ£Å∩╕Å</Btn>
-                {r.role !== "Superuser" && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => alert(`Account locked for ${r.name}. They will be logged out immediately.`)}>≡ƒöÆ</Btn>}
+                <Btn variant="ghost" size="sm" onClick={() => alert('Edit user: modify role, permissions, MFA, and country assignment')}>✏∩╕Å</Btn>
+                {r.role !== "Superuser" && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => alert(`Account locked for ${r.name}. They will be logged out immediately.`)}>=���</Btn>}
               </div>
             )},
           ]} data={users} />
         </Card>
       )}
 
-      {/* ΓòÉΓòÉΓòÉ ACTIVE SESSIONS ΓòÉΓòÉΓòÉ */}
+      {/* ═══ ACTIVE SESSIONS ═══ */}
       {tab === "sessions" && (
         <Card>
           <SectionTitle>Active Sessions</SectionTitle>
@@ -4894,12 +4894,12 @@ const SuperuserModule = () => {
           Are you sure you want to <strong>{featureToggles[showConfirm] ? "DISABLE" : "ENABLE"}</strong> the <strong>{showConfirm}</strong> feature? This change will take effect immediately for all users and will be recorded in the audit log.
         </div>
         <div style={{ padding: 12, borderRadius: 6, background: B.warningBg, border: `1px solid ${B.warning}30`, fontSize: 12, color: B.textPrimary, marginBottom: 16 }}>
-          ΓÜá∩╕Å Feature toggles affect all users globally. Disabling a module will hide it from navigation and prevent access until re-enabled.
+          ⚠∩╕Å Feature toggles affect all users globally. Disabling a module will hide it from navigation and prevent access until re-enabled.
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <Btn variant="secondary" onClick={() => setShowConfirm(null)}>Cancel</Btn>
           <Btn variant={featureToggles[showConfirm] ? "danger" : "success"} onClick={confirmToggle}>
-            {featureToggles[showConfirm] ? "≡ƒöÆ Disable Feature" : "Γ£ô Enable Feature"}
+            {featureToggles[showConfirm] ? "=��� Disable Feature" : "✓ Enable Feature"}
           </Btn>
         </div>
       </Modal>
@@ -4907,7 +4907,7 @@ const SuperuserModule = () => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ PERFORMANCE MANAGEMENT MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── PERFORMANCE MANAGEMENT MODULE ───────────────────────────────────────────
 const PerformanceModule = ({ employee: empProp } = {}) => {
   const emp = empProp || ME;
   const [tab, setTab] = useState("dashboard");
@@ -4919,9 +4919,9 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
   const [nineBoxView, setNineBoxView] = useState(false);
 
   const CYCLES = [
-    { id: "2026-H1", name: "H1 2026 Review Cycle", period: "JanΓÇôJun 2026", status: "Active", due: "2026-06-30", completion: 42, selfDone: 14, mgrDone: 8, total: 28 },
-    { id: "2025-Annual", name: "2025 Annual Review", period: "JanΓÇôDec 2025", status: "Closed", due: "2026-01-31", completion: 96, selfDone: 27, mgrDone: 26, total: 28 },
-    { id: "2025-H1", name: "H1 2025 Mid-Year Check-In", period: "JanΓÇôJun 2025", status: "Closed", due: "2025-07-15", completion: 89, selfDone: 25, mgrDone: 24, total: 28 },
+    { id: "2026-H1", name: "H1 2026 Review Cycle", period: "Jan–Jun 2026", status: "Active", due: "2026-06-30", completion: 42, selfDone: 14, mgrDone: 8, total: 28 },
+    { id: "2025-Annual", name: "2025 Annual Review", period: "Jan–Dec 2025", status: "Closed", due: "2026-01-31", completion: 96, selfDone: 27, mgrDone: 26, total: 28 },
+    { id: "2025-H1", name: "H1 2025 Mid-Year Check-In", period: "Jan–Jun 2025", status: "Closed", due: "2025-07-15", completion: 89, selfDone: 25, mgrDone: 24, total: 28 },
   ];
   const activeCycle = CYCLES.find(c => c.id === selectedCycle) || CYCLES[0];
 
@@ -4945,11 +4945,11 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
 
   // Feedback wall
   const FEEDBACK = [
-    { from: "Sarah Chen", to: "Marcus Johnson", type: "Praise", text: "Outstanding job leading the Nigeria country review ΓÇö your preparation and facilitation were exceptional.", competency: "Leadership", date: "2026-04-20" },
-    { from: "Oliver Wright", to: "Sophie Dubois", type: "Coaching", text: "Consider structuring your donor reports with the executive summary first ΓÇö it helps busy readers.", competency: "Communication", date: "2026-04-18" },
+    { from: "Sarah Chen", to: "Marcus Johnson", type: "Praise", text: "Outstanding job leading the Nigeria country review — your preparation and facilitation were exceptional.", competency: "Leadership", date: "2026-04-20" },
+    { from: "Oliver Wright", to: "Sophie Dubois", type: "Coaching", text: "Consider structuring your donor reports with the executive summary first — it helps busy readers.", competency: "Communication", date: "2026-04-18" },
     { from: "Priya Patel", to: "Ana Silva", type: "Praise", text: "Your policy brief on fortification standards was cited by the WHO regional office. Incredible impact!", competency: "Technical Excellence", date: "2026-04-15" },
     { from: "Raj Krishnamurthy", to: "Mei Wong", type: "Praise", text: "Thank you for staying late to fix the data pipeline before the donor deadline. True team player.", competency: "Collaboration", date: "2026-04-12" },
-    { from: "Lars M├╝ller", to: "David Kim", type: "Coaching", text: "Try breaking the sprint into smaller deliverables ΓÇö it will help the team see progress more clearly.", competency: "Project Management", date: "2026-04-10" },
+    { from: "Lars M├╝ller", to: "David Kim", type: "Coaching", text: "Try breaking the sprint into smaller deliverables — it will help the team see progress more clearly.", competency: "Project Management", date: "2026-04-10" },
   ];
 
   const NI_COMPETENCIES = ["Leadership", "Technical Excellence", "Collaboration", "Communication", "Innovation", "Mission Commitment", "Project Management", "Stakeholder Engagement"];
@@ -4974,7 +4974,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
         { key: "analytics", label: "Analytics" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ DASHBOARD ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ DASHBOARD ════════ */}
       {tab === "dashboard" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px,1fr))", gap: 10, marginBottom: 16 }}>
@@ -5004,7 +5004,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
               {FEEDBACK.slice(0, 4).map((f, i) => (
                 <div key={i} style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 6, borderLeft: `3px solid ${feedbackColors[f.type] || B.textMuted}` }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, fontSize: 12 }}>
-                    <Avatar name={f.from} size={20} /><strong>{f.from}</strong><span style={{ color: B.textMuted }}>ΓåÆ</span><strong>{f.to}</strong>
+                    <Avatar name={f.from} size={20} /><strong>{f.from}</strong><span style={{ color: B.textMuted }}>→</span><strong>{f.to}</strong>
                     <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`} style={{ marginLeft: "auto", fontSize: 8 }}>{f.type}</Badge>
                   </div>
                   <div style={{ fontSize: 11, color: B.textSecondary, lineHeight: 1.5 }}>"{f.text}"</div>
@@ -5025,10 +5025,10 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
             </Card>
             <Card>
               <SectionTitle>Action Items</SectionTitle>
-              {[{ action: "Complete self-assessment", count: activeCycle.total - activeCycle.selfDone, urgency: "High", icon: "≡ƒô¥" },
-                { action: "Manager reviews pending", count: activeCycle.total - activeCycle.mgrDone, urgency: "Medium", icon: "≡ƒæÑ" },
-                { action: "Goals at risk (< 50% progress)", count: EMPLOYEE_GOALS.reduce((s, eg) => s + eg.goals.filter(g => g.progress < 50).length, 0), urgency: "High", icon: "≡ƒÄ»" },
-                { action: "Development plans needing update", count: 6, urgency: "Low", icon: "≡ƒôÜ" },
+              {[{ action: "Complete self-assessment", count: activeCycle.total - activeCycle.selfDone, urgency: "High", icon: "=���" },
+                { action: "Manager reviews pending", count: activeCycle.total - activeCycle.mgrDone, urgency: "Medium", icon: "\u{1F465}" },
+                { action: "Goals at risk (< 50% progress)", count: EMPLOYEE_GOALS.reduce((s, eg) => s + eg.goals.filter(g => g.progress < 50).length, 0), urgency: "High", icon: "=���" },
+                { action: "Development plans needing update", count: 6, urgency: "Low", icon: "=���" },
               ].map((a, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: a.urgency === "High" ? B.dangerBg : a.urgency === "Medium" ? B.warningBg : B.bgHover, marginBottom: 4, border: `1px solid ${a.urgency === "High" ? B.danger : a.urgency === "Medium" ? B.warning : B.border}15` }}>
                   <span style={{ fontSize: 16 }}>{a.icon}</span>
@@ -5041,16 +5041,16 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ GOALS & OKRs ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ GOALS & OKRs ════════ */}
       {tab === "goals" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 14 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Goal Title, Type, Aligned To, Target Date")}>≡ƒôñ Batch Upload Goals</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Goal Title, Type, Aligned To, Target Date")}>=��� Batch Upload Goals</Btn>
             <Btn variant="primary" size="sm" onClick={() => setShowGoalModal(true)}>+ Create Goal</Btn>
           </div>
           {/* Org goals cascade */}
           <Card style={{ marginBottom: 14, borderTop: `4px solid ${B.accent}` }}>
-            <SectionTitle>Goal Alignment Cascade (Organization ΓåÆ Team ΓåÆ Individual)</SectionTitle>
+            <SectionTitle>Goal Alignment Cascade (Organization → Team → Individual)</SectionTitle>
             {ORG_GOALS.map(og => (
               <div key={og.id} style={{ marginBottom: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 6, background: B.accentBg, border: `1px solid ${B.accent}20` }}>
@@ -5091,14 +5091,14 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
               </div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>
                 <Btn variant="secondary" onClick={() => setShowGoalModal(false)}>Cancel</Btn>
-                <Btn variant="primary" onClick={() => { alert("Goal created and linked to alignment cascade"); setShowGoalModal(false); }}>Γ£ô Create Goal</Btn>
+                <Btn variant="primary" onClick={() => { alert("Goal created and linked to alignment cascade"); setShowGoalModal(false); }}>✓ Create Goal</Btn>
               </div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ REVIEW CYCLES ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ REVIEW CYCLES ════════ */}
       {tab === "reviews" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
@@ -5106,7 +5106,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
             <Badge color={activeCycle.status === "Active" ? B.success : B.textMuted} bg={activeCycle.status === "Active" ? B.successBg : B.bgHover}>{activeCycle.status}</Badge>
           </div>
           <Card style={{ marginBottom: 14 }}>
-            <SectionTitle>Review Status ΓÇö {activeCycle.name}</SectionTitle>
+            <SectionTitle>Review Status — {activeCycle.name}</SectionTitle>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, fontFamily: "Arial, sans-serif" }}>
                 <thead><tr style={{ background: B.bg }}>
@@ -5134,12 +5134,12 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ FEEDBACK & RECOGNITION ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ FEEDBACK & RECOGNITION ════════ */}
       {tab === "feedback" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 14 }}>
             <Btn variant="primary" size="sm" onClick={() => setShowFeedback(true)}>+ Give Feedback</Btn>
-            <Btn variant="secondary" size="sm" onClick={() => setShow360(true)}>≡ƒöä Request 360┬░</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => setShow360(true)}>=��� Request 360┬░</Btn>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card style={{ borderTop: `4px solid ${B.success}` }}>
@@ -5149,7 +5149,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                     <Avatar name={f.from} size={24} />
                     <span style={{ fontSize: 12, fontWeight: 700 }}>{f.from}</span>
-                    <span style={{ color: B.textMuted, fontSize: 11 }}>ΓåÆ</span>
+                    <span style={{ color: B.textMuted, fontSize: 11 }}>→</span>
                     <Avatar name={f.to} size={24} />
                     <span style={{ fontSize: 12, fontWeight: 700 }}>{f.to}</span>
                     <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`} style={{ marginLeft: "auto", fontSize: 8 }}>{f.type}</Badge>
@@ -5212,13 +5212,13 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                   <Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...EMPLOYEES.slice(0, 14).map(emp => ({ value: emp.id, label: `${emp.first} ${emp.last}` }))]} />
                 </div>
               ))}
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setShow360(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("360┬░ feedback requests sent!"); setShow360(false); }}>≡ƒÜÇ Launch 360┬░</Btn></div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setShow360(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("360┬░ feedback requests sent!"); setShow360(false); }}>=��� Launch 360┬░</Btn></div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ CHECK-INS & 1:1s ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ CHECK-INS & 1:1s ════════ */}
       {tab === "checkins" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.blue}` }}>
@@ -5230,7 +5230,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
             ].map((c, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
                 <Avatar name={c.mgr} size={28} />
-                <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.mgr} Γåö {c.emp}</div><div style={{ fontSize: 11, color: B.textMuted }}>{c.topics}</div></div>
+                <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.mgr} ↔ {c.emp}</div><div style={{ fontSize: 11, color: B.textMuted }}>{c.topics}</div></div>
                 <div style={{ textAlign: "right" }}><Badge color={B.blue} bg={`${B.blue}12`}>{c.type}</Badge><div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{fmtDate(c.date)}</div></div>
               </div>
             ))}
@@ -5258,13 +5258,13 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                 <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Type</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "weekly", label: "Weekly 1:1" }, { value: "monthly", label: "Monthly" }, { value: "quarterly", label: "Quarterly Review" }, { value: "probation", label: "Probation" }]} /></div>
               </div>
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Topics / Agenda</label><textarea rows={3} placeholder="Key topics to discuss..." style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", resize: "vertical", boxSizing: "border-box" }} /></div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}><Btn variant="secondary" onClick={() => setShowCheckin(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("Check-in scheduled! Calendar invite sent."); setShowCheckin(false); }}>≡ƒôà Schedule</Btn></div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}><Btn variant="secondary" onClick={() => setShowCheckin(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("Check-in scheduled! Calendar invite sent."); setShowCheckin(false); }}>=��� Schedule</Btn></div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ TALENT & 9-BOX ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ TALENT & 9-BOX ════════ */}
       {tab === "talent" && (
         <div>
           <Card style={{ marginBottom: 14 }}>
@@ -5292,10 +5292,10 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card>
               <SectionTitle>Rating Distribution</SectionTitle>
-              {[{ range: "4.5ΓÇô5.0 (Exceptional)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 4.5).length, color: B.success },
-                { range: "4.0ΓÇô4.4 (Exceeds)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 4.0 && eg.rating < 4.5).length, color: B.teal },
-                { range: "3.5ΓÇô3.9 (Meets+)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 3.5 && eg.rating < 4.0).length, color: B.blue },
-                { range: "3.0ΓÇô3.4 (Meets)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 3.0 && eg.rating < 3.5).length, color: B.warning },
+              {[{ range: "4.5–5.0 (Exceptional)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 4.5).length, color: B.success },
+                { range: "4.0–4.4 (Exceeds)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 4.0 && eg.rating < 4.5).length, color: B.teal },
+                { range: "3.5–3.9 (Meets+)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 3.5 && eg.rating < 4.0).length, color: B.blue },
+                { range: "3.0–3.4 (Meets)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 3.0 && eg.rating < 3.5).length, color: B.warning },
                 { range: "< 3.0 (Developing)", count: EMPLOYEE_GOALS.filter(eg => eg.rating < 3.0).length, color: B.danger },
               ].map((r, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -5307,7 +5307,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
             </Card>
             <Card>
               <SectionTitle>Succession Pipeline</SectionTitle>
-              {[{ role: "Country Director ΓÇö Kenya", ready: "Joseph Mwangi", developing: "Grace Okafor" },
+              {[{ role: "Country Director — Kenya", ready: "Joseph Mwangi", developing: "Grace Okafor" },
                 { role: "VP Programs", ready: "Sarah Chen", developing: "Priya Patel" },
                 { role: "Finance Director", ready: "Marcus Johnson", developing: "Fatou Diop" },
               ].map((s, i) => (
@@ -5324,17 +5324,17 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ANALYTICS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ ANALYTICS ════════ */}
       {tab === "analytics" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.accent}` }}>
             <SectionTitle>Performance by Department</SectionTitle>
             {DEPARTMENTS.slice(0, 7).map(d => {
               const emps = EMPLOYEE_GOALS.filter(eg => eg.emp.department === d);
-              const avg = emps.length ? (emps.reduce((s, eg) => s + eg.rating, 0) / emps.length).toFixed(1) : "ΓÇö";
+              const avg = emps.length ? (emps.reduce((s, eg) => s + eg.rating, 0) / emps.length).toFixed(1) : "—";
               return (<div key={d} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                 <span style={{ fontSize: 11, width: 110, fontWeight: 600 }}>{d}</span>
-                <div style={{ flex: 1 }}><ProgressBar value={avg !== "ΓÇö" ? parseFloat(avg) : 0} max={5} color={avg >= 4 ? B.success : avg >= 3.5 ? B.blue : B.warning} /></div>
+                <div style={{ flex: 1 }}><ProgressBar value={avg !== "—" ? parseFloat(avg) : 0} max={5} color={avg >= 4 ? B.success : avg >= 3.5 ? B.blue : B.warning} /></div>
                 <span style={{ fontSize: 12, fontWeight: 700, width: 28, textAlign: "right" }}>{avg}</span>
               </div>);
             })}
@@ -5383,7 +5383,7 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ LEARNING MANAGEMENT SYSTEM (LMS) MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── LEARNING MANAGEMENT SYSTEM (LMS) MODULE ────────────────────────────────
 const LMSModule = ({ employee: empProp } = {}) => {
   const emp = empProp || ME;
   const [tab, setTab] = useState("dashboard");
@@ -5444,7 +5444,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
         { key: "admin", label: "LMS Admin" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LMS DASHBOARD ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ LMS DASHBOARD ════════ */}
       {tab === "dashboard" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px,1fr))", gap: 10, marginBottom: 16 }}>
@@ -5477,7 +5477,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 </div>
               ))}
               <div style={{ marginTop: 10, padding: 10, borderRadius: 6, background: B.dangerBg, border: `1px solid ${B.danger}20`, fontSize: 12 }}>
-                <strong style={{ color: B.danger }}>4 employees</strong> have overdue mandatory training. <Btn variant="ghost" size="sm" style={{ color: B.danger }}onClick={() => alert('Reminder emails sent to 4 employees with overdue mandatory training')}>Send Reminders ΓåÆ</Btn>
+                <strong style={{ color: B.danger }}>4 employees</strong> have overdue mandatory training. <Btn variant="ghost" size="sm" style={{ color: B.danger }}onClick={() => alert('Reminder emails sent to 4 employees with overdue mandatory training')}>Send Reminders →</Btn>
               </div>
             </Card>
             <Card>
@@ -5486,7 +5486,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: `1px solid ${B.borderLight}`, fontSize: 12 }}>
                   <span style={{ fontWeight: 700, color: B.textPrimary, width: 20 }}>#{i + 1}</span>
                   <span style={{ flex: 1 }}>{c.title}</span>
-                  <span style={{ fontWeight: 700, color: B.orange }}>Γÿà {c.rating}</span>
+                  <span style={{ fontWeight: 700, color: B.orange }}>★ {c.rating}</span>
                 </div>
               ))}
             </Card>
@@ -5510,14 +5510,14 @@ const LMSModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ COURSE CATALOG ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ COURSE CATALOG ════════ */}
       {tab === "catalog" && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 200 }}><SearchBar value={searchQ} onChange={setSearchQ} placeholder="Search courses, competencies, providers..." /></div>
             <Select value={catalogFilter} onChange={setCatalogFilter} options={[{ value: "ALL", label: "All Categories" }, ...categories.map(c => ({ value: c, label: c }))]} />
             <Select value={audienceFilter} onChange={setAudienceFilter} options={[{ value: "ALL", label: "All Audiences" }, ...audiences.map(a => ({ value: a, label: a }))]} />
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag SCORM package or Excel course list")}>≡ƒôñ Import Courses</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag SCORM package or Excel course list")}>=��� Import Courses</Btn>
           </div>
           <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>{filtered.length} courses</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -5529,7 +5529,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                     <Badge color={fmtColors[c.format] || B.textMuted} bg={B.bgHover}>{c.format}</Badge>
                     <Badge color={B.textMuted} bg={B.bgHover}>{c.level}</Badge>
                   </div>
-                  <span style={{ fontSize: 11, color: B.orange, fontWeight: 700 }}>Γÿà {c.rating}</span>
+                  <span style={{ fontSize: 11, color: B.orange, fontWeight: 700 }}>★ {c.rating}</span>
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary, marginBottom: 2 }}>{c.title}</div>
                 <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>{c.provider} ┬╖ {c.duration} ┬╖ {c.language.join(", ")} ┬╖ {c.competency}</div>
@@ -5560,15 +5560,15 @@ const LMSModule = ({ employee: empProp } = {}) => {
               <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
                 <div style={{ flex: 1, textAlign: "center", padding: 12, borderRadius: 8, background: B.bgHover }}><div style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: B.blue }}>{c.enrolled}</div><div style={{ fontSize: 10, color: B.textMuted }}>Enrolled</div></div>
                 <div style={{ flex: 1, textAlign: "center", padding: 12, borderRadius: 8, background: B.bgHover }}><div style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: B.success }}>{c.completed}</div><div style={{ fontSize: 10, color: B.textMuted }}>Completed</div></div>
-                <div style={{ flex: 1, textAlign: "center", padding: 12, borderRadius: 8, background: B.bgHover }}><div style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: B.orange }}>Γÿà {c.rating}</div><div style={{ fontSize: 10, color: B.textMuted }}>Rating</div></div>
+                <div style={{ flex: 1, textAlign: "center", padding: 12, borderRadius: 8, background: B.bgHover }}><div style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: B.orange }}>★ {c.rating}</div><div style={{ fontSize: 10, color: B.textMuted }}>Rating</div></div>
               </div>
-              <div style={{ display: "flex", gap: 8 }}><Btn variant="primary" style={{ flex: 1 }}onClick={() => alert('Launching course: ' + c.title)}>Γû╢ Launch Course</Btn><Btn variant="secondary" onClick={() => alert('Assign course to staff ΓÇö select employees, departments, or all staff')}>≡ƒôï Assign to Staff</Btn><Btn variant="secondary" onClick={() => alert('Course analytics: enrollment, completion rates, avg score, and feedback')}>≡ƒôè View Report</Btn></div>
+              <div style={{ display: "flex", gap: 8 }}><Btn variant="primary" style={{ flex: 1 }}onClick={() => alert('Launching course: ' + c.title)}>▶ Launch Course</Btn><Btn variant="secondary" onClick={() => alert('Assign course to staff — select employees, departments, or all staff')}>=��� Assign to Staff</Btn><Btn variant="secondary" onClick={() => alert('Course analytics: enrollment, completion rates, avg score, and feedback')}>=��� View Report</Btn></div>
             </div>); })()}
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LEARNING PATHS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ LEARNING PATHS ════════ */}
       {tab === "paths" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {LEARNING_PATHS.map((p, i) => (
@@ -5584,7 +5584,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
               </div>
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                 {COURSES.filter(c => c.path === p.name).map(c => (
-                  <Badge key={c.id} color={catColors[c.cat] || B.textMuted} bg={`${catColors[c.cat] || B.textMuted}08`} style={{ fontSize: 9, textTransform: "none" }}>{c.title.length > 30 ? c.title.slice(0, 30) + "ΓÇª" : c.title}</Badge>
+                  <Badge key={c.id} color={catColors[c.cat] || B.textMuted} bg={`${catColors[c.cat] || B.textMuted}08`} style={{ fontSize: 9, textTransform: "none" }}>{c.title.length > 30 ? c.title.slice(0, 30) + "…" : c.title}</Badge>
                 ))}
               </div>
             </Card>
@@ -5592,7 +5592,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ COMPLIANCE TRACKER ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ COMPLIANCE TRACKER ════════ */}
       {tab === "compliance" && (
         <Card>
           <SectionTitle>Mandatory Training Compliance by Employee</SectionTitle>
@@ -5616,7 +5616,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
                     <td style={{ padding: "6px 10px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={`${e.first} ${e.last}`} size={22} /><span style={{ fontWeight: 700 }}>{e.first} {e.last}</span></div></td>
                     {statuses.map((s, si) => (
                       <td key={si} style={{ padding: "6px 6px", textAlign: "center", borderBottom: `1px solid ${B.borderLight}` }}>
-                        <div style={{ width: 20, height: 20, borderRadius: 10, background: s === "done" ? B.success : s === "progress" ? B.warning : B.danger, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff" }}>{s === "done" ? "Γ£ô" : s === "progress" ? "ΓùÅ" : "!"}</div>
+                        <div style={{ width: 20, height: 20, borderRadius: 10, background: s === "done" ? B.success : s === "progress" ? B.warning : B.danger, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff" }}>{s === "done" ? "✓" : s === "progress" ? "●" : "!"}</div>
                       </td>
                     ))}
                     <td style={{ padding: "6px 10px", textAlign: "center", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={allDone ? B.success : hasOverdue ? B.danger : B.warning} bg={allDone ? B.successBg : hasOverdue ? B.dangerBg : B.warningBg}>{allDone ? "Compliant" : hasOverdue ? "Overdue" : "In Progress"}</Badge></td>
@@ -5628,15 +5628,15 @@ const LMSModule = ({ employee: empProp } = {}) => {
         </Card>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ EVENTS & WEBINARS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ EVENTS & WEBINARS ════════ */}
       {tab === "events" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[{ title: "Quarterly L&D Town Hall", date: "2026-05-08", time: "14:00 UTC", type: "Webinar", speaker: "VP People & Culture", registered: 24, capacity: 50, status: "Upcoming" },
             { title: "Field Security Refresher (East Africa)", date: "2026-05-15", time: "10:00 EAT", type: "Live Virtual", speaker: "Security Advisor", registered: 8, capacity: 15, status: "Upcoming" },
             { title: "Nutrition Data Analytics Workshop", date: "2026-05-22", time: "09:00 EST", type: "Workshop", speaker: "Research & Evidence", registered: 12, capacity: 20, status: "Upcoming" },
-            { title: "Leadership Coaching Circle ΓÇö Cohort 3", date: "2026-06-01", time: "16:00 UTC", type: "Community", speaker: "External Coach", registered: 6, capacity: 8, status: "Upcoming" },
+            { title: "Leadership Coaching Circle — Cohort 3", date: "2026-06-01", time: "16:00 UTC", type: "Community", speaker: "External Coach", registered: 6, capacity: 8, status: "Upcoming" },
             { title: "Partner Academy: Micronutrient Supplements", date: "2026-04-10", time: "11:00 UTC", type: "MOOC Launch", speaker: "Technical Team", registered: 35, capacity: 100, status: "Completed" },
-            { title: "New Hire Orientation ΓÇö April Cohort", date: "2026-04-07", time: "09:00 EST", type: "Orientation", speaker: "People & Culture", registered: 3, capacity: 10, status: "Completed" },
+            { title: "New Hire Orientation — April Cohort", date: "2026-04-07", time: "09:00 EST", type: "Orientation", speaker: "People & Culture", registered: 3, capacity: 10, status: "Completed" },
           ].map((ev, i) => (
             <Card key={i} style={{ borderLeft: `4px solid ${ev.status === "Upcoming" ? B.blue : B.textMuted}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -5649,13 +5649,13 @@ const LMSModule = ({ employee: empProp } = {}) => {
                 <span>{ev.registered}/{ev.capacity} registered</span>
                 <ProgressBar value={ev.registered} max={ev.capacity} color={ev.registered >= ev.capacity * 0.8 ? B.warning : B.blue} />
               </div>
-              {ev.status === "Upcoming" && <Btn variant="primary" size="sm" style={{ width: "100%", marginTop: 8 }}onClick={() => alert('Registered! Calendar invite sent to your email.')}>≡ƒôà Register / Add to Calendar</Btn>}
+              {ev.status === "Upcoming" && <Btn variant="primary" size="sm" style={{ width: "100%", marginTop: 8 }}onClick={() => alert('Registered! Calendar invite sent to your email.')}>=��� Register / Add to Calendar</Btn>}
             </Card>
           ))}
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ANALYTICS & IMPACT ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ ANALYTICS & IMPACT ════════ */}
       {tab === "analytics" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.accent}` }}>
@@ -5712,13 +5712,13 @@ const LMSModule = ({ employee: empProp } = {}) => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ LMS ADMIN ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ LMS ADMIN ════════ */}
       {tab === "admin" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card>
             <SectionTitle>System Configuration</SectionTitle>
             {[{ l: "SSO Provider", v: "Azure AD (SAML 2.0)", s: "Connected" },
-              { l: "HRIS Integration", v: "NI-HRIS Γåö LMS auto-sync", s: "Active" },
+              { l: "HRIS Integration", v: "NI-HRIS ↔ LMS auto-sync", s: "Active" },
               { l: "SCORM/xAPI Support", v: "SCORM 1.2, 2004; xAPI (TinCan)", s: "Enabled" },
               { l: "Content Storage", v: "256 GB / 500 GB used", s: "Healthy" },
               { l: "Default Language", v: "English (+ FR, ES)", s: "Active" },
@@ -5770,7 +5770,7 @@ const LMSModule = ({ employee: empProp } = {}) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ PREBOARDING & ONBOARDING MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── PREBOARDING & ONBOARDING MODULE ─────────────────────────────────────────
 const OnboardingModule = () => {
   const [tab, setTab] = useState("dashboard");
   const [selectedJourney, setSelectedJourney] = useState(null);
@@ -5780,7 +5780,7 @@ const OnboardingModule = () => {
 
   const JOURNEYS = [
     { id: "ONB-2026-012", name: "Maria Santos", role: "Communications Coordinator", country: "PH", dept: "External Relations", manager: "Oliver Wright", startDate: "2026-05-05", phase: "Pre-boarding", status: "In Progress", progress: 65, template: "Standard HQ", buddy: "Sophie Dubois", offer: "2026-04-10", tasks: { total: 22, done: 14, overdue: 1 } },
-    { id: "ONB-2026-011", name: "Daniel Osei", role: "Program Officer ΓÇö Fortification", country: "KE", dept: "Programs", manager: "Sarah Chen", startDate: "2026-04-28", phase: "Week 1", status: "In Progress", progress: 40, template: "Field Staff", buddy: "Joseph Mwangi", offer: "2026-03-25", tasks: { total: 28, done: 11, overdue: 0 } },
+    { id: "ONB-2026-011", name: "Daniel Osei", role: "Program Officer — Fortification", country: "KE", dept: "Programs", manager: "Sarah Chen", startDate: "2026-04-28", phase: "Week 1", status: "In Progress", progress: 40, template: "Field Staff", buddy: "Joseph Mwangi", offer: "2026-03-25", tasks: { total: 28, done: 11, overdue: 0 } },
     { id: "ONB-2026-010", name: "Fatou Diop", role: "Finance Analyst", country: "SN", dept: "Finance", manager: "Marcus Johnson", startDate: "2026-04-14", phase: "30-Day", status: "In Progress", progress: 55, template: "Standard HQ", buddy: "Amina Diallo", offer: "2026-03-10", tasks: { total: 25, done: 14, overdue: 2 } },
     { id: "ONB-2026-009", name: "Arun Mehta", role: "Sr. M&E Specialist", country: "IN", dept: "Research & Evidence", manager: "Priya Patel", startDate: "2026-03-17", phase: "60-Day", status: "In Progress", progress: 78, template: "Technical Leader", buddy: "Raj Krishnamurthy", offer: "2026-02-15", tasks: { total: 30, done: 23, overdue: 0 } },
     { id: "ONB-2026-008", name: "Claire Dupont", role: "Policy Advisor", country: "CH", dept: "Policy & Advocacy", manager: "Ana Silva", startDate: "2026-02-03", phase: "90-Day", status: "In Progress", progress: 88, template: "Standard HQ", buddy: "Lina Berg", offer: "2025-12-20", tasks: { total: 26, done: 23, overdue: 0 } },
@@ -5788,7 +5788,7 @@ const OnboardingModule = () => {
   ];
 
   const PREBOARD_TASKS = [
-    { cat: "Documents & Compliance", icon: "≡ƒôï", tasks: [
+    { cat: "Documents & Compliance", icon: "=���", tasks: [
       { name: "Signed offer letter (e-signature)", owner: "New Hire", due: "T-21", status: "done" },
       { name: "Employment contract execution", owner: "HR", due: "T-18", status: "done" },
       { name: "ID & work authorization copies", owner: "New Hire", due: "T-14", status: "done" },
@@ -5798,7 +5798,7 @@ const OnboardingModule = () => {
       { name: "Code of conduct acknowledgment", owner: "New Hire", due: "T-7", status: "pending" },
       { name: "Country-specific compliance forms", owner: "HR", due: "T-7", status: "pending" },
     ]},
-    { cat: "IT & Access Provisioning", icon: "≡ƒÆ╗", tasks: [
+    { cat: "IT & Access Provisioning", icon: "=���", tasks: [
       { name: "Laptop / hardware request submitted", owner: "IT", due: "T-14", status: "done" },
       { name: "Email & SSO account created", owner: "IT", due: "T-7", status: "done" },
       { name: "HRIS profile created", owner: "HR", due: "T-7", status: "done" },
@@ -5806,7 +5806,7 @@ const OnboardingModule = () => {
       { name: "Role-based system permissions set", owner: "IT", due: "T-3", status: "pending" },
       { name: "VPN & security credentials", owner: "IT", due: "T-3", status: "pending" },
     ]},
-    { cat: "Communication & Engagement", icon: "≡ƒÆ¼", tasks: [
+    { cat: "Communication & Engagement", icon: "=���", tasks: [
       { name: "Welcome email from HR (T-21)", owner: "HR", due: "T-21", status: "done" },
       { name: "Manager intro email (T-14)", owner: "Manager", due: "T-14", status: "done" },
       { name: "Team welcome message (T-7)", owner: "Buddy", due: "T-7", status: "progress" },
@@ -5814,7 +5814,7 @@ const OnboardingModule = () => {
       { name: "Calendar: Week 1 manager meetings", owner: "Manager", due: "T-3", status: "pending" },
       { name: "Pre-boarding portal access sent", owner: "System", due: "T-21", status: "done" },
     ]},
-    { cat: "Culture & Content", icon: "≡ƒîì", tasks: [
+    { cat: "Culture & Content", icon: "=���", tasks: [
       { name: "Watch: NI mission & values video", owner: "New Hire", due: "T-7", status: "progress" },
       { name: "Read: Employee handbook", owner: "New Hire", due: "T-3", status: "pending" },
       { name: "Complete: 'Get to know you' questionnaire", owner: "New Hire", due: "T-5", status: "pending" },
@@ -5828,12 +5828,12 @@ const OnboardingModule = () => {
     { phase: "First 30 Days", color: B.teal, tasks: ["30-day goals set with manager", "Complete role-specific learning path", "Join new hire cohort community", "Attend department orientation", "Submit 30-day pulse survey", "Buddy check-in #2", "Manager check-in #2"] },
     { phase: "First 60 Days", color: B.purple, tasks: ["60-day goal progress review", "Begin first project / deliverable", "Cross-functional introductions complete", "Manager check-in #3", "Submit 60-day pulse survey"] },
     { phase: "First 90 Days", color: B.orange, tasks: ["90-day performance review & goal assessment", "Buddy relationship wrap-up / transition to mentor", "Complete all onboarding learning modules", "Manager check-in #4 (formal 90-day review)", "Submit 90-day NPS survey", "Probation review (where applicable)"] },
-    { phase: "6ΓÇô12 Months", color: B.grey, tasks: ["6-month check-in with manager", "Career development plan initiated", "Join relevant communities of practice", "Submit 6-month engagement survey", "12-month anniversary recognition", "Full onboarding journey marked complete"] },
+    { phase: "6–12 Months", color: B.grey, tasks: ["6-month check-in with manager", "Career development plan initiated", "Join relevant communities of practice", "Submit 6-month engagement survey", "12-month anniversary recognition", "Full onboarding journey marked complete"] },
   ];
 
   const TEMPLATES = [
-    { name: "National ΓÇö Open Ended (HQ)", category: "NAT", modality: "OE", countries: "CA, GB, CH, IT", roles: "All HQ permanent roles", phases: 6, tasks: 26, desc: "Full onboarding for permanent national staff at headquarters", color: B.accent },
-    { name: "National ΓÇö Fixed Term", category: "NAT", modality: "FT", countries: "All entity countries", roles: "Project-specific, seasonal", phases: 4, tasks: 20, desc: "Streamlined onboarding for fixed-term national staff (3ΓÇô12 months)", color: B.blue },
+    { name: "National — Open Ended (HQ)", category: "NAT", modality: "OE", countries: "CA, GB, CH, IT", roles: "All HQ permanent roles", phases: 6, tasks: 26, desc: "Full onboarding for permanent national staff at headquarters", color: B.accent },
+    { name: "National — Fixed Term", category: "NAT", modality: "FT", countries: "All entity countries", roles: "Project-specific, seasonal", phases: 4, tasks: 20, desc: "Streamlined onboarding for fixed-term national staff (3–12 months)", color: B.blue },
     { name: "National Plus (Regional/Global)", category: "NATP", modality: "OE", countries: "All", roles: "Regional/Global scope from national base", phases: 6, tasks: 28, desc: "Extended onboarding with regional/global orientation, premium structure briefing", color: B.purple },
     { name: "International Assignment (Expat)", category: "INTL", modality: "OE", countries: "All (relocating)", roles: "Expatriate assignments", phases: 6, tasks: 34, desc: "Comprehensive: relocation support, expat benefits enrollment, family logistics, cultural orientation", color: B.orange },
     { name: "Employer of Record (EOR)", category: "EOR", modality: "EOR", countries: "Non-entity locations", roles: "All (via EOR partner)", phases: 5, tasks: 22, desc: "EOR-specific compliance, local benefits setup, NI systems onboarding", color: B.teal },
@@ -5857,12 +5857,12 @@ const OnboardingModule = () => {
     const ph = journey.phase;
     const pre = PREBOARD_TASKS.flatMap(c => c.tasks.filter(t => t.owner === "New Hire").map(t => ({ ...t, cat: c.cat, icon: c.icon })));
     const onb = ph !== "Pre-boarding" ? [
-      { name: "Complete safeguarding & code of conduct training", status: ph === "Week 1" ? "progress" : "done", cat: "Learning", icon: "≡ƒôÜ", due: "Day 1", owner: "New Hire" },
-      { name: "Set up all tools & confirm access working", status: ph === "Week 1" ? "progress" : "done", cat: "IT", icon: "≡ƒÆ╗", due: "Week 1", owner: "New Hire" },
-      { name: "Complete role-specific learning path", status: ["30-Day","60-Day","90-Day"].includes(ph) ? "progress" : ph === "Week 1" ? "pending" : "done", cat: "Learning", icon: "≡ƒôÜ", due: "30 Days", owner: "New Hire" },
-      { name: "Submit 30-day pulse survey", status: ["60-Day","90-Day"].includes(ph) ? "done" : ph === "30-Day" ? "progress" : "pending", cat: "Feedback", icon: "≡ƒô¥", due: "30 Days", owner: "New Hire" },
-      { name: "Begin first project / deliverable", status: ["60-Day","90-Day"].includes(ph) ? "progress" : "pending", cat: "Work", icon: "≡ƒÄ»", due: "60 Days", owner: "New Hire" },
-      { name: "Submit 90-day NPS survey", status: ph === "90-Day" ? "progress" : "pending", cat: "Feedback", icon: "≡ƒô¥", due: "90 Days", owner: "New Hire" },
+      { name: "Complete safeguarding & code of conduct training", status: ph === "Week 1" ? "progress" : "done", cat: "Learning", icon: "=���", due: "Day 1", owner: "New Hire" },
+      { name: "Set up all tools & confirm access working", status: ph === "Week 1" ? "progress" : "done", cat: "IT", icon: "=���", due: "Week 1", owner: "New Hire" },
+      { name: "Complete role-specific learning path", status: ["30-Day","60-Day","90-Day"].includes(ph) ? "progress" : ph === "Week 1" ? "pending" : "done", cat: "Learning", icon: "=���", due: "30 Days", owner: "New Hire" },
+      { name: "Submit 30-day pulse survey", status: ["60-Day","90-Day"].includes(ph) ? "done" : ph === "30-Day" ? "progress" : "pending", cat: "Feedback", icon: "=���", due: "30 Days", owner: "New Hire" },
+      { name: "Begin first project / deliverable", status: ["60-Day","90-Day"].includes(ph) ? "progress" : "pending", cat: "Work", icon: "=���", due: "60 Days", owner: "New Hire" },
+      { name: "Submit 90-day NPS survey", status: ph === "90-Day" ? "progress" : "pending", cat: "Feedback", icon: "=���", due: "90 Days", owner: "New Hire" },
     ] : [];
     return [...pre, ...onb];
   };
@@ -5871,14 +5871,14 @@ const OnboardingModule = () => {
     <div>
       {/* VIEW AS TOGGLE */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, padding: "8px 14px", borderRadius: 8, background: viewAs !== "admin" ? `linear-gradient(135deg, ${B.charcoal}, ${B.grey})` : B.bgHover, border: `1px solid ${viewAs !== "admin" ? B.charcoal : B.border}` }}>
-        <span style={{ fontSize: 14 }}>{viewAs === "admin" ? "ΓÜÖ∩╕Å" : "≡ƒæñ"}</span>
+        <span style={{ fontSize: 14 }}>{viewAs === "admin" ? "⚙∩╕Å" : "=���"}</span>
         <span style={{ fontSize: 12, fontWeight: 700, color: viewAs !== "admin" ? "#fff" : B.textSecondary }}>View As:</span>
         <Select value={viewAs} onChange={handleViewAs} style={{ fontSize: 12, background: viewAs !== "admin" ? B.grey : B.white, color: viewAs !== "admin" ? "#fff" : B.textPrimary, borderColor: viewAs !== "admin" ? B.grey : B.border, minWidth: 240 }}
-          options={[{ value: "admin", label: "ΓÜÖ∩╕Å HR Admin / Manager View" }, ...activeJourneys.map(j => ({ value: j.id, label: `≡ƒæñ ${j.name} ΓÇö ${j.role} (${j.phase})` }))]} />
+          options={[{ value: "admin", label: "⚙∩╕Å HR Admin / Manager View" }, ...activeJourneys.map(j => ({ value: j.id, label: `=��� ${j.name} — ${j.role} (${j.phase})` }))]} />
         {viewAs !== "admin" && <Badge color={B.yellow} bg="rgba(255,184,28,0.25)" style={{ color: "#fff" }}>EMPLOYEE PREVIEW</Badge>}
       </div>
 
-      {/* ΓòÉΓòÉΓòÉ EMPLOYEE PORTAL VIEW ΓòÉΓòÉΓòÉ */}
+      {/* ═══ EMPLOYEE PORTAL VIEW ═══ */}
       {viewAs !== "admin" && viewAsJourney && (() => {
         const j = viewAsJourney; const c = COUNTRIES.find(x => x.code === j.country);
         const myTasks = getMyTasks(j); const doneTasks = myTasks.filter(t => t.status === "done").length;
@@ -5901,7 +5901,7 @@ const OnboardingModule = () => {
               </div>)}
             </div>
             <div style={{ marginTop: 14, padding: "10px 16px", borderRadius: 8, background: "rgba(255,255,255,0.08)", fontSize: 12, opacity: 0.9, lineHeight: 1.7 }}>
-              {isPreboard ? "Complete the tasks below before your start date so you're ready for day one. Your manager and buddy are expecting to hear from you ΓÇö don't hesitate to reach out!" : `You're in your ${j.phase} phase ΓÇö keep up the great progress! Reach out to ${j.buddy} or ${j.manager} anytime.`}
+              {isPreboard ? "Complete the tasks below before your start date so you're ready for day one. Your manager and buddy are expecting to hear from you — don't hesitate to reach out!" : `You're in your ${j.phase} phase — keep up the great progress! Reach out to ${j.buddy} or ${j.manager} anytime.`}
             </div>
           </Card>
           {/* Progress + Contacts */}
@@ -5939,7 +5939,7 @@ const OnboardingModule = () => {
             </div>
             {myTasks.map((t, ti) => (
               <div key={ti} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 10px", borderRadius: 6, marginBottom: 3, background: t.status === "done" ? B.successBg : t.status === "progress" ? B.warningBg : B.bgHover, border: `1px solid ${t.status === "done" ? `${B.success}15` : t.status === "progress" ? `${B.warning}15` : B.borderLight}` }}>
-                <div style={{ width: 20, height: 20, borderRadius: 10, border: `2px solid ${t.status === "done" ? B.success : t.status === "progress" ? B.warning : B.border}`, background: t.status === "done" ? B.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0 }}>{t.status === "done" ? "Γ£ô" : ""}</div>
+                <div style={{ width: 20, height: 20, borderRadius: 10, border: `2px solid ${t.status === "done" ? B.success : t.status === "progress" ? B.warning : B.border}`, background: t.status === "done" ? B.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0 }}>{t.status === "done" ? "✓" : ""}</div>
                 <span style={{ fontSize: 14 }}>{t.icon}</span>
                 <span style={{ flex: 1, fontSize: 12, color: t.status === "done" ? B.textMuted : B.textPrimary, textDecoration: t.status === "done" ? "line-through" : "none" }}>{t.name}</span>
                 <span style={{ fontSize: 10, color: B.textMuted }}>{t.due}</span>
@@ -5951,33 +5951,33 @@ const OnboardingModule = () => {
           {/* Content + FAQ + Pulse */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card>
-              <SectionTitle>≡ƒôÜ Welcome Content</SectionTitle>
-              {[{ t: "Our Mission: Nourish Life", type: "Video ┬╖ 4 min", icon: "≡ƒÄ¼", done: true },
-                { t: "NI Values & Culture", type: "Video ┬╖ 6 min", icon: "≡ƒÄ¼", done: false },
-                { t: "Employee Handbook 2026", type: "PDF ┬╖ 45 pages", icon: "≡ƒôä", done: false },
-                { t: `Benefits Guide ΓÇö ${c?.name}`, type: "Guide ┬╖ 12 pages", icon: "≡ƒôï", done: false },
-                { t: "Safeguarding Training", type: "E-learning ┬╖ 30 min", icon: "≡ƒ¢í∩╕Å", done: false },
+              <SectionTitle>=��� Welcome Content</SectionTitle>
+              {[{ t: "Our Mission: Nourish Life", type: "Video ┬╖ 4 min", icon: "=���", done: true },
+                { t: "NI Values & Culture", type: "Video ┬╖ 6 min", icon: "=���", done: false },
+                { t: "Employee Handbook 2026", type: "PDF ┬╖ 45 pages", icon: "=���", done: false },
+                { t: `Benefits Guide — ${c?.name}`, type: "Guide ┬╖ 12 pages", icon: "=���", done: false },
+                { t: "Safeguarding Training", type: "E-learning ┬╖ 30 min", icon: "=���∩╕Å", done: false },
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 3, cursor: "pointer" }}
                   onMouseEnter={ev => ev.currentTarget.style.background = B.accentBg} onMouseLeave={ev => ev.currentTarget.style.background = B.bgHover}>
                   <span style={{ fontSize: 16 }}>{item.icon}</span>
                   <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600, color: item.done ? B.textMuted : B.textPrimary, textDecoration: item.done ? "line-through" : "none" }}>{item.t}</div><div style={{ fontSize: 10, color: B.textMuted }}>{item.type}</div></div>
-                  {item.done ? <Badge color={B.success} bg={B.successBg} style={{ fontSize: 8 }}>Done</Badge> : <span style={{ color: B.accent, fontSize: 11, fontWeight: 700, cursor: "pointer" }} onClick={() => alert(`Opening: ${item.t}`)}>Open ΓåÆ</span>}
+                  {item.done ? <Badge color={B.success} bg={B.successBg} style={{ fontSize: 8 }}>Done</Badge> : <span style={{ color: B.accent, fontSize: 11, fontWeight: 700, cursor: "pointer" }} onClick={() => alert(`Opening: ${item.t}`)}>Open →</span>}
                 </div>
               ))}
             </Card>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <Card>
-                <SectionTitle>Γ¥ô FAQ</SectionTitle>
+                <SectionTitle>❓ FAQ</SectionTitle>
                 {[{ q: "How do I enroll in benefits?", a: "Visit Benefits tab after start date, or contact People & Culture." },
                   { q: "Who do I contact for IT issues?", a: "Slack #it-support or email helpdesk@nutritionintl.org" },
-                  { q: "How does flexible work operate?", a: "Check with your manager ΓÇö NI supports hybrid arrangements." },
+                  { q: "How does flexible work operate?", a: "Check with your manager — NI supports hybrid arrangements." },
                 ].map((f, i) => (<div key={i} style={{ padding: "6px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 3 }}><div style={{ fontSize: 11, fontWeight: 700 }}>{f.q}</div><div style={{ fontSize: 10, color: B.textMuted }}>{f.a}</div></div>))}
               </Card>
               <Card>
-                <SectionTitle>≡ƒÄ» How are you feeling?</SectionTitle>
+                <SectionTitle>=��� How are you feeling?</SectionTitle>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", margin: "8px 0" }}>
-                  {["≡ƒÿƒ","≡ƒÿÉ","≡ƒÖé","≡ƒÿè","≡ƒñ⌐"].map((em, i) => (
+                  {["=���","=���","=���","=���","=���"].map((em, i) => (
                     <button key={i} onClick={() => alert("Thanks for your feedback!")} style={{ fontSize: 26, background: "none", border: `2px solid ${B.border}`, borderRadius: 10, padding: "4px 8px", cursor: "pointer" }}
                       onMouseEnter={ev => { ev.currentTarget.style.borderColor = B.accent; ev.currentTarget.style.transform = "scale(1.15)"; }}
                       onMouseLeave={ev => { ev.currentTarget.style.borderColor = B.border; ev.currentTarget.style.transform = "scale(1)"; }}>{em}</button>
@@ -5990,7 +5990,7 @@ const OnboardingModule = () => {
         </div>);
       })()}
 
-      {/* ΓòÉΓòÉΓòÉ ADMIN VIEW (existing tabs) ΓòÉΓòÉΓòÉ */}
+      {/* ═══ ADMIN VIEW (existing tabs) ═══ */}
       {viewAs === "admin" && (<>
       <Tabs tabs={[
         { key: "dashboard", label: "Onboarding Dashboard" },
@@ -6002,7 +6002,7 @@ const OnboardingModule = () => {
         { key: "analytics", label: "Analytics" },
       ]} active={tab} onChange={setTab} />
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ DASHBOARD ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ DASHBOARD ════════ */}
       {tab === "dashboard" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px,1fr))", gap: 10, marginBottom: 16 }}>
@@ -6015,7 +6015,7 @@ const OnboardingModule = () => {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card style={{ borderTop: `4px solid ${B.accent}` }}>
-              <SectionTitle action={<div style={{display:"flex",gap:6}}><Btn variant="secondary" size="sm" onClick={()=>alert("Batch upload: drag Excel with Name, Role, Country, Dept, Start Date, Manager, Template columns")}>≡ƒôñ Batch Upload</Btn><Btn variant="primary" size="sm" onClick={() => setShowNewHire(true)}>+ New Hire</Btn></div>}>Active New Hires</SectionTitle>
+              <SectionTitle action={<div style={{display:"flex",gap:6}}><Btn variant="secondary" size="sm" onClick={()=>alert("Batch upload: drag Excel with Name, Role, Country, Dept, Start Date, Manager, Template columns")}>=��� Batch Upload</Btn><Btn variant="primary" size="sm" onClick={() => setShowNewHire(true)}>+ New Hire</Btn></div>}>Active New Hires</SectionTitle>
               {JOURNEYS.filter(j => j.status !== "Complete").map(j => (
                 <div key={j.id} onClick={() => { setSelectedJourney(j); setTab("preboard"); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6, cursor: "pointer", border: `1px solid ${B.border}` }}
                   onMouseEnter={ev => ev.currentTarget.style.borderColor = B.accent} onMouseLeave={ev => ev.currentTarget.style.borderColor = B.border}>
@@ -6052,14 +6052,14 @@ const OnboardingModule = () => {
                 {JOURNEYS.filter(j => j.tasks.overdue > 0).map(j => (
                   <div key={j.id} style={{ padding: "8px 12px", borderRadius: 6, background: B.dangerBg, border: `1px solid ${B.danger}20`, marginBottom: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>≡ƒÜ¿</span>
+                      <span style={{ fontSize: 14 }}>=���</span>
                       <span style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary }}>{j.name}</span>
                       <Badge color={B.danger} bg={B.dangerBg}>{j.tasks.overdue} overdue</Badge>
                     </div>
                     <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{j.role} ┬╖ Phase: {j.phase}</div>
                   </div>
                 ))}
-                {JOURNEYS.every(j => j.tasks.overdue === 0) && <div style={{ textAlign: "center", padding: 12, fontSize: 12, color: B.success }}>Γ£à No overdue tasks</div>}
+                {JOURNEYS.every(j => j.tasks.overdue === 0) && <div style={{ textAlign: "center", padding: 12, fontSize: 12, color: B.success }}>✅ No overdue tasks</div>}
               </Card>
             </div>
           </div>
@@ -6081,14 +6081,14 @@ const OnboardingModule = () => {
               <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Assign Buddy</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select buddy..." }, ...EMPLOYEES.slice(0, 10).map(e => ({ value: e.id, label: `${e.first} ${e.last} (${e.department})` }))]} /></div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
                 <Btn variant="secondary" onClick={() => setShowNewHire(false)}>Cancel</Btn>
-                <Btn variant="primary" onClick={() => { alert("Onboarding journey initiated! Welcome email & pre-boarding tasks generated."); setShowNewHire(false); }}>≡ƒÜÇ Launch Pre-boarding</Btn>
+                <Btn variant="primary" onClick={() => { alert("Onboarding journey initiated! Welcome email & pre-boarding tasks generated."); setShowNewHire(false); }}>=��� Launch Pre-boarding</Btn>
               </div>
             </div>
           </Modal>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ACTIVE JOURNEYS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ ACTIVE JOURNEYS ════════ */}
       {tab === "journeys" && (
         <div>
           {JOURNEYS.map(j => (
@@ -6116,11 +6116,11 @@ const OnboardingModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ PRE-BOARDING CHECKLIST ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ PRE-BOARDING CHECKLIST ════════ */}
       {tab === "preboard" && (
         <div>
           <div style={{ padding: "10px 14px", borderRadius: 6, background: B.warningBg, border: `1px solid ${B.warning}30`, marginBottom: 14, fontSize: 12 }}>
-            <strong>Pre-boarding Checklist</strong> ΓÇö Showing tasks for <strong>{selectedJourney?.name || "Maria Santos"}</strong> starting {fmtDate(selectedJourney?.startDate || "2026-05-05")}. Tasks are auto-assigned to HR, IT, Manager, Buddy, and the new hire.
+            <strong>Pre-boarding Checklist</strong> — Showing tasks for <strong>{selectedJourney?.name || "Maria Santos"}</strong> starting {fmtDate(selectedJourney?.startDate || "2026-05-05")}. Tasks are auto-assigned to HR, IT, Manager, Buddy, and the new hire.
           </div>
           {PREBOARD_TASKS.map((cat, ci) => (
             <Card key={ci} style={{ marginBottom: 12 }}>
@@ -6132,7 +6132,7 @@ const OnboardingModule = () => {
               {cat.tasks.map((t, ti) => (
                 <div key={ti} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 10px", borderRadius: 6, background: t.status === "done" ? B.successBg : t.status === "progress" ? B.warningBg : B.bgHover, marginBottom: 3, border: `1px solid ${t.status === "done" ? `${B.success}15` : t.status === "progress" ? `${B.warning}15` : B.borderLight}` }}>
                   <div style={{ width: 18, height: 18, borderRadius: 9, border: `2px solid ${t.status === "done" ? B.success : t.status === "progress" ? B.warning : B.border}`, background: t.status === "done" ? B.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0 }}>
-                    {t.status === "done" ? "Γ£ô" : ""}
+                    {t.status === "done" ? "✓" : ""}
                   </div>
                   <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: t.status === "done" ? B.textMuted : B.textPrimary, textDecoration: t.status === "done" ? "line-through" : "none" }}>{t.name}</span>
                   <Badge color={B.textMuted} bg={B.bgCard} style={{ fontSize: 9 }}>{t.owner}</Badge>
@@ -6144,7 +6144,7 @@ const OnboardingModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ONBOARDING PHASES ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ ONBOARDING PHASES ════════ */}
       {tab === "phases" && (
         <div>
           <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 14 }}>Multi-phase onboarding journey from Day 1 through 12 months, with milestones, manager check-ins, and learning paths at each stage.</div>
@@ -6170,7 +6170,7 @@ const OnboardingModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ JOURNEY TEMPLATES (by NI Classification) ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ JOURNEY TEMPLATES (by NI Classification) ════════ */}
       {tab === "templates" && (
         <div>
           <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 14 }}>Onboarding templates aligned to NI's employment categories and contracting modalities. Each template tailors the journey phases, tasks, and compliance requirements to the worker classification.</div>
@@ -6190,17 +6190,17 @@ const OnboardingModule = () => {
               </div>
               <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 8 }}>{t.desc}</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontSize: 11, color: B.textMuted }}>
-                <span>≡ƒîì {t.countries}</span><span>┬╖</span><span>≡ƒæñ {t.roles}</span><span>┬╖</span>
-                <span>≡ƒôè {t.phases} phases</span><span>┬╖</span><span>Γ£à {t.tasks} tasks</span>
+                <span>=��� {t.countries}</span><span>┬╖</span><span>=��� {t.roles}</span><span>┬╖</span>
+                <span>=��� {t.phases} phases</span><span>┬╖</span><span>✅ {t.tasks} tasks</span>
               </div>
-              <Btn variant="secondary" size="sm" style={{ marginTop: 8, width: "100%" }} onClick={() => alert("Template editor: modify phases, tasks, owners, and due dates for this journey template")}>Γ£Å∩╕Å Edit Template</Btn>
+              <Btn variant="secondary" size="sm" style={{ marginTop: 8, width: "100%" }} onClick={() => alert("Template editor: modify phases, tasks, owners, and due dates for this journey template")}>✏∩╕Å Edit Template</Btn>
             </Card>);
           })}
           </div>
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ PULSE SURVEYS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ PULSE SURVEYS ════════ */}
       {tab === "surveys" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card style={{ borderTop: `4px solid ${B.teal}` }}>
@@ -6244,7 +6244,7 @@ const OnboardingModule = () => {
         </div>
       )}
 
-      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ANALYTICS ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
+      {/* ════════ ANALYTICS ════════ */}
       {tab === "analytics" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card>
@@ -6295,7 +6295,7 @@ const OnboardingModule = () => {
                 </div>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: B.textMuted, marginTop: 8, textAlign: "center" }}>Avg satisfaction score across all pulse check-ins (1ΓÇô5 scale)</div>
+            <div style={{ fontSize: 11, color: B.textMuted, marginTop: 8, textAlign: "center" }}>Avg satisfaction score across all pulse check-ins (1–5 scale)</div>
           </Card>
         </div>
       )}
@@ -6304,7 +6304,7 @@ const OnboardingModule = () => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ ORG CHART MODULE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── ORG CHART MODULE ────────────────────────────────────────────────────────
 const OrgChartModule = ({ setSelectedEmployee }) => {
   const [search, setSearch] = useState("");
   const [expandedMgrs, setExpandedMgrs] = useState(new Set(EMPLOYEES.filter(e => e.isManager).map(e => e.id)));
@@ -6358,7 +6358,7 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
           {/* Expand toggle */}
           {reports.length > 0 && (
             <button onClick={ev => { ev.stopPropagation(); toggleMgr(emp.id); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 14, color: B.textMuted, width: 20, textAlign: "center", flexShrink: 0 }}>
-              {isExpanded ? "Γû╛" : "Γû╕"}
+              {isExpanded ? "▾" : "▸"}
             </button>
           )}
           {reports.length === 0 && <div style={{ width: 20, flexShrink: 0 }} />}
@@ -6451,14 +6451,14 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
         <Select value={filterCountry} onChange={setFilterCountry} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
         <Select value={filterDept} onChange={setFilterDept} options={[{ value: "ALL", label: "All Departments" }, ...DEPARTMENTS.map(d => ({ value: d, label: d }))]} />
         <div style={{ display: "flex", gap: 2, background: B.bgHover, borderRadius: 6, padding: 2, border: `1px solid ${B.border}` }}>
-          {[{ k: "tree", l: "≡ƒî│ Tree" }, { k: "grid", l: "Γûª Grid" }].map(v => (
+          {[{ k: "tree", l: "=��� Tree" }, { k: "grid", l: "▦ Grid" }].map(v => (
             <button key={v.k} onClick={() => setViewMode(v.k)} style={{ padding: "5px 12px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: viewMode === v.k ? B.accent : "transparent", color: viewMode === v.k ? "#fff" : B.textMuted, fontFamily: "Arial, sans-serif" }}>{v.l}</button>
           ))}
         </div>
         <div style={{ display: "flex", gap: 4 }}>
           <Btn variant="secondary" size="sm" onClick={expandAll}>Expand All</Btn>
           <Btn variant="secondary" size="sm" onClick={collapseAll}>Collapse All</Btn>
-          <Btn variant="primary" size="sm" onClick={() => setShowExport(true)}>Γ¼ç Export</Btn>
+          <Btn variant="primary" size="sm" onClick={() => setShowExport(true)}>⬇ Export</Btn>
         </div>
       </div>
 
@@ -6539,10 +6539,10 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
           <div>
             <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 6, fontFamily: "Arial, sans-serif" }}>Export Format</label>
             <div style={{ display: "flex", gap: 6 }}>
-              {[{ v: "pdf", l: "PDF", icon: "≡ƒôä", desc: "Best for sharing and printing" },
-                { v: "pptx", l: "PowerPoint", icon: "≡ƒôè", desc: "Editable slides for presentations" },
-                { v: "docx", l: "Word", icon: "≡ƒô¥", desc: "Editable document with org table" },
-                { v: "vsdx", l: "Visio", icon: "≡ƒö╖", desc: "Editable diagram for restructuring" },
+              {[{ v: "pdf", l: "PDF", icon: "=���", desc: "Best for sharing and printing" },
+                { v: "pptx", l: "PowerPoint", icon: "=���", desc: "Editable slides for presentations" },
+                { v: "docx", l: "Word", icon: "=���", desc: "Editable document with org table" },
+                { v: "vsdx", l: "Visio", icon: "=���", desc: "Editable diagram for restructuring" },
               ].map(f => (
                 <div key={f.v} onClick={() => setExportFormat(f.v)} style={{ flex: 1, padding: "10px 8px", borderRadius: 8, border: `2px solid ${exportFormat === f.v ? B.accent : B.border}`, background: exportFormat === f.v ? B.accentBg : B.white, cursor: "pointer", textAlign: "center", transition: "all 0.15s" }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>{f.icon}</div>
@@ -6553,11 +6553,11 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
             </div>
           </div>
           <div style={{ padding: 10, borderRadius: 6, background: B.bgHover, border: `1px solid ${B.border}`, fontSize: 12, color: B.textSecondary }}>
-            <strong>Export preview:</strong> {exportScope === "full" ? `Full organization (${EMPLOYEES.length} people, ${COUNTRIES.length} countries)` : exportScope === "current" ? `Current filtered view (${allFiltered.length} people)` : exportScope === "department" ? `${exportDept} department (${EMPLOYEES.filter(e => e.department === exportDept).length} people)` : `${COUNTRIES.find(c => c.code === filterCountry)?.name || "Selected country"}`} ΓåÆ .{exportFormat} file
+            <strong>Export preview:</strong> {exportScope === "full" ? `Full organization (${EMPLOYEES.length} people, ${COUNTRIES.length} countries)` : exportScope === "current" ? `Current filtered view (${allFiltered.length} people)` : exportScope === "department" ? `${exportDept} department (${EMPLOYEES.filter(e => e.department === exportDept).length} people)` : `${COUNTRIES.find(c => c.code === filterCountry)?.name || "Selected country"}`} → .{exportFormat} file
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <Btn variant="secondary" onClick={() => setShowExport(false)}>Cancel</Btn>
-            <Btn variant="primary" onClick={() => { alert(`Org chart exported as ${exportFormat.toUpperCase()} (${exportScope})`); setShowExport(false); }}>Γ¼ç Download .{exportFormat}</Btn>
+            <Btn variant="primary" onClick={() => { alert(`Org chart exported as ${exportFormat.toUpperCase()} (${exportScope})`); setShowExport(false); }}>⬇ Download .{exportFormat}</Btn>
           </div>
         </div>
       </Modal>
@@ -6565,8 +6565,8 @@ const OrgChartModule = ({ setSelectedEmployee }) => {
   );
 };
 
-// ΓöÇΓöÇΓöÇ NAVIGATION ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-// ΓöÇΓöÇΓöÇ NI BRANDED ICON SYSTEM (Circle-Square Motif) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────
+// ─── NI BRANDED ICON SYSTEM (Circle-Square Motif) ────────────────────────────
 const NIcon = ({ name, size = 18, color = "currentColor" }) => {
   const s = size; const h = s / 2; const r = s * 0.22; const sq = s * 0.36;
   const icons = {
@@ -6607,13 +6607,13 @@ const NAV = [
 ];
 
 const ROLE_META = {
-  employee:  { label: "Employee",  icon: "≡ƒæñ", color: B.teal },
-  manager:   { label: "Manager",   icon: "≡ƒæÑ", color: B.blue },
-  hr:        { label: "HR Admin",  icon: "ΓÜÖ∩╕Å", color: B.orange },
-  superuser: { label: "Superuser", icon: "≡ƒöÉ", color: B.yellow },
+  employee:  { label: "Employee",  icon: "\u{1F464}", color: B.teal },
+  manager:   { label: "Manager",   icon: "\u{1F465}", color: B.blue },
+  hr:        { label: "HR Admin",  icon: "\u{1F4BC}", color: B.orange },
+  superuser: { label: "Superuser", icon: "\u{1F510}", color: B.yellow },
 };
 
-// ΓöÇΓöÇΓöÇ MAIN APP ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ─── MAIN APP ───────────────────────────────────────────────────────────────
 export default function App() {
   const [module, setModule] = useState("dashboard");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -6709,7 +6709,7 @@ export default function App() {
             })}
           </div>
 
-          {/* Role Picker ΓÇö custom styled dropdown */}
+          {/* Role Picker — custom styled dropdown */}
           {sidebarOpen && (
             <div style={{ padding: "8px 10px", borderTop: `1px solid ${B.grey}`, position: "relative" }}>
               {/* Role picker popup */}
@@ -6731,7 +6731,7 @@ export default function App() {
                   </div>
                 </>
               )}
-              {/* Current role button ΓÇö triggers picker */}
+              {/* Current role button — triggers picker */}
               <button onClick={() => setRolePickerOpen(p => !p)}
                 style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 10px", borderRadius: 8, border: `1px solid ${B.grey}`, background: "rgba(255,255,255,0.06)", cursor: "pointer", transition: "background 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.background = B.grey}
@@ -6770,14 +6770,14 @@ export default function App() {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ display: "flex", gap: 1, background: B.bgHover, borderRadius: 6, padding: 2, border: `1px solid ${B.border}` }}>
-              {[{ key: "desktop", label: "≡ƒûÑ∩╕Å" }, { key: "tablet", label: "≡ƒô▒" }, { key: "mobile", label: "≡ƒô▓" }].map(v => (
+              {[{ key: "desktop", label: "\u{1F5A5}\uFE0F" }, { key: "tablet", label: "\u{1F4F1}" }, { key: "mobile", label: "\u{1F4F2}" }].map(v => (
                 <button key={v.key} onClick={() => setViewMode(v.key)} style={{ padding: "4px 10px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 12, background: viewMode === v.key ? B.accent : "transparent", color: viewMode === v.key ? "#fff" : B.textMuted }}>
                   {v.label}
                 </button>
               ))}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, background: B.bgHover, border: `1px solid ${B.border}`, fontSize: 12, color: B.textSecondary }}>
-              ≡ƒîÉ 14 countries
+              {"\u{1F310}"} 14 countries
             </div>
           </div>
         </div>
