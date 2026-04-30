@@ -6918,6 +6918,365 @@ const NIcon = ({ name, size = 18, color = "currentColor" }) => {
   return <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} fill="none" style={{ flexShrink:0, display:"block" }}>{icons[name] || icons.placeholder}</svg>;
 };
 
+// ─── LEARNING ADMIN DATA ────────────────────────────────────────────────────
+const LA_COURSES = [
+  { id:"CRS-001", title:"Safeguarding Essentials", category:"Compliance", duration:"2h", enrolled:28, completed:22, status:"Active", mandatory:true, due:"2026-06-30" },
+  { id:"CRS-002", title:"Nutrition Program Design", category:"Technical", duration:"4h", enrolled:18, completed:10, status:"Active", mandatory:false, due:null },
+  { id:"CRS-003", title:"Grant Management 101", category:"Finance", duration:"3h", enrolled:24, completed:20, status:"Active", mandatory:true, due:"2026-05-31" },
+  { id:"CRS-004", title:"Leadership Foundations", category:"Leadership", duration:"6h", enrolled:12, completed:5, status:"Active", mandatory:false, due:null },
+  { id:"CRS-005", title:"Data Analysis with Excel", category:"Digital", duration:"3h", enrolled:20, completed:14, status:"Active", mandatory:false, due:null },
+  { id:"CRS-006", title:"PSEA Awareness", category:"Compliance", duration:"1h", enrolled:28, completed:28, status:"Active", mandatory:true, due:"2026-03-31" },
+];
+const LA_PATHS = [
+  { id:"LP-001", title:"New Manager Essentials", courses:["CRS-004","CRS-001","CRS-003"], enrolled:8, completed:3, color: "#8031A7" },
+  { id:"LP-002", title:"Compliance Onboarding", courses:["CRS-001","CRS-006","CRS-003"], enrolled:14, completed:11, color: "#A4343A" },
+  { id:"LP-003", title:"Technical Skills Track", courses:["CRS-002","CRS-005"], enrolled:10, completed:4, color: "#307FE2" },
+];
+const LA_MENTORS = [
+  { id:"NI-01000", name:"Sarah Chen",     title:"Programs Director",    dept:"Programs",           available:true  },
+  { id:"NI-01001", name:"Marcus Johnson", title:"Finance Director",      dept:"Finance",            available:true  },
+  { id:"NI-01002", name:"Priya Patel",    title:"P&C Director",         dept:"People & Culture",   available:false },
+  { id:"NI-01003", name:"Takeshi Yamamoto",title:"Technical Director",  dept:"Technical",          available:true  },
+];
+const LA_MENTEES = EMPLOYEES.filter(e => !e.isManager).slice(0, 10).map(e => ({
+  id: e.id, name:`${e.first} ${e.last}`, title:e.title, dept:e.department, enrolled: Math.random()>0.5,
+  mentorId: Math.random()>0.5 ? LA_MENTORS[Math.floor(Math.random()*LA_MENTORS.length)].id : null,
+}));
+
+const LearningAdminModule = ({ tab = "dashboard", setModule }) => {
+  const [activeTab, setActiveTab] = useState(tab);
+  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [showPathModal, setShowPathModal] = useState(false);
+  const [courses, setCourses] = useState(LA_COURSES);
+  const [paths, setPaths] = useState(LA_PATHS);
+  const [mentees, setMentees] = useState(LA_MENTEES);
+  const [newCourse, setNewCourse] = useState({ title:"", category:"Compliance", duration:"1h", mandatory:false });
+  const [newPath, setNewPath] = useState({ title:"", courses:[] });
+  const [search, setSearch] = useState("");
+
+  useEffect(() => { setActiveTab(tab); }, [tab]);
+
+  const navTabs = [
+    { key:"dashboard", label:"Dashboard" },
+    { key:"courses",   label:"Courses" },
+    { key:"paths",     label:"Learning Paths" },
+    { key:"thrive",    label:"Thrive Mentorship" },
+    { key:"analytics", label:"Analytics" },
+  ];
+
+  const totalEnrolled = courses.reduce((a,c)=>a+c.enrolled,0);
+  const totalCompleted = courses.reduce((a,c)=>a+c.completed,0);
+  const compRate = totalEnrolled ? Math.round((totalCompleted/totalEnrolled)*100) : 0;
+  const thriveEnrolled = mentees.filter(m=>m.enrolled).length;
+  const paired = mentees.filter(m=>m.mentorId).length;
+
+  const toggleEnroll = (id) => setMentees(prev => prev.map(m => m.id===id ? {...m, enrolled:!m.enrolled, mentorId: m.enrolled?null:m.mentorId} : m));
+  const assignMentor = (menteeId, mentorId) => setMentees(prev => prev.map(m => m.id===menteeId ? {...m, mentorId} : m));
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:20}}>
+      {/* Header */}
+      <div style={{borderRadius:14,background:`linear-gradient(135deg,${B.dkPurple},${B.purple})`,padding:"22px 28px",position:"relative",overflow:"hidden"}}>
+        <BrandElement style={{top:-20,right:-20,opacity:0.08}}/>
+        <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.6)",textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Learning & Development Admin</div>
+        <div style={{fontSize:22,fontWeight:700,color:"#fff",fontFamily:"Georgia,serif",marginBottom:6}}>Learning Admin Console</div>
+        <div style={{display:"flex",gap:20,flexWrap:"wrap"}}>
+          {[{l:"Courses",v:courses.length},{l:"Enrolled",v:totalEnrolled},{l:"Completion",v:compRate+"%"},{l:"Thrive Pairs",v:paired}].map((s,i)=>(
+            <div key={i} style={{textAlign:"center",padding:"8px 16px",borderRadius:8,background:"rgba(255,255,255,0.12)"}}>
+              <div style={{fontSize:18,fontWeight:700,color:"#fff",fontFamily:"Georgia,serif"}}>{s.v}</div>
+              <div style={{fontSize:10,color:"rgba(255,255,255,0.6)"}}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{display:"flex",gap:2,borderBottom:`2px solid ${B.border}`}}>
+        {navTabs.map(t=>(
+          <button key={t.key} onClick={()=>setActiveTab(t.key)} style={{padding:"10px 18px",border:"none",background:"none",cursor:"pointer",fontSize:13,fontWeight:activeTab===t.key?700:500,color:activeTab===t.key?B.purple:B.textMuted,borderBottom:`2px solid ${activeTab===t.key?B.purple:"transparent"}`,marginBottom:-2,transition:"all 0.15s"}}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── DASHBOARD ── */}
+      {activeTab==="dashboard" && (
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12}}>
+            {[
+              {label:"Active Courses",   value:courses.length,    sub:"across all categories", color:B.purple},
+              {label:"Learning Paths",   value:paths.length,      sub:"structured tracks",     color:B.blue},
+              {label:"Completion Rate",  value:compRate+"%",      sub:`${totalCompleted}/${totalEnrolled} completions`, color:B.teal},
+              {label:"Thrive Enrolled",  value:thriveEnrolled,    sub:`${paired} mentor pairs`, color:B.pink},
+            ].map((m,i)=><MetricCard key={i} label={m.label} value={m.value} sub={m.sub} color={m.color}/>)}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+            <Card>
+              <SectionTitle>Course Completion by Category</SectionTitle>
+              {["Compliance","Technical","Finance","Leadership","Digital"].map((cat,i)=>{
+                const cs = courses.filter(c=>c.category===cat);
+                const e = cs.reduce((a,c)=>a+c.enrolled,0);
+                const d = cs.reduce((a,c)=>a+c.completed,0);
+                const r = e?Math.round((d/e)*100):0;
+                return (
+                  <div key={i} style={{marginBottom:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:3}}>
+                      <span style={{fontWeight:600}}>{cat}</span><span style={{color:B.textMuted}}>{r}%</span>
+                    </div>
+                    <ProgressBar value={r} max={100} color={r>=80?B.teal:r>=50?B.blue:B.orange}/>
+                  </div>
+                );
+              })}
+            </Card>
+            <Card>
+              <SectionTitle>Mandatory Courses Status</SectionTitle>
+              {courses.filter(c=>c.mandatory).map((c,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:`1px solid ${B.borderLight}`}}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:600}}>{c.title}</div>
+                    <div style={{fontSize:11,color:B.textMuted}}>Due: {c.due||"N/A"} · {c.completed}/{c.enrolled} done</div>
+                  </div>
+                  <Badge color={c.completed===c.enrolled?B.success:B.orange} bg={c.completed===c.enrolled?B.successBg:B.warningBg}>
+                    {c.completed===c.enrolled?"Complete":"In Progress"}
+                  </Badge>
+                </div>
+              ))}
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* ── COURSES ── */}
+      {activeTab==="courses" && (
+        <div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:8}}>
+            <SearchBar value={search} onChange={setSearch} placeholder="Search courses..."/>
+            <Btn variant="primary" onClick={()=>setShowCourseModal(true)}>+ Add Course</Btn>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {courses.filter(c=>!search||c.title.toLowerCase().includes(search.toLowerCase())).map((c,i)=>(
+              <Card key={i} style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+                <div style={{width:44,height:44,borderRadius:10,background:`${B.purple}15`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <NIcon name="learning" size={22} color={B.purple}/>
+                </div>
+                <div style={{flex:1,minWidth:160}}>
+                  <div style={{fontSize:14,fontWeight:700}}>{c.title}</div>
+                  <div style={{fontSize:11,color:B.textMuted}}>{c.category} · {c.duration} · {c.id}</div>
+                </div>
+                <div style={{textAlign:"center"}}>
+                  <div style={{fontSize:14,fontWeight:700}}>{c.enrolled}</div>
+                  <div style={{fontSize:10,color:B.textMuted}}>Enrolled</div>
+                </div>
+                <div style={{textAlign:"center"}}>
+                  <div style={{fontSize:14,fontWeight:700,color:B.teal}}>{Math.round((c.completed/c.enrolled)*100)}%</div>
+                  <div style={{fontSize:10,color:B.textMuted}}>Done</div>
+                </div>
+                {c.mandatory && <Badge color={B.orange} bg={B.warningBg}>Mandatory</Badge>}
+                <StatusBadge status="Active"/>
+                <Btn variant="danger" size="sm" onClick={()=>setCourses(prev=>prev.filter(x=>x.id!==c.id))}>Delete</Btn>
+              </Card>
+            ))}
+          </div>
+          <Modal open={showCourseModal} onClose={()=>setShowCourseModal(false)} title="Add New Course" width={500}>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {[{l:"Course Title",k:"title",type:"text"},{l:"Duration (e.g. 2h)",k:"duration",type:"text"}].map(f=>(
+                <div key={f.k}>
+                  <label style={{fontSize:11,fontWeight:700,color:B.textMuted,display:"block",marginBottom:4}}>{f.l}</label>
+                  <input value={newCourse[f.k]} onChange={e=>setNewCourse(p=>({...p,[f.k]:e.target.value}))} style={{width:"100%",padding:"8px 10px",borderRadius:6,border:`1px solid ${B.border}`,fontSize:13,boxSizing:"border-box"}}/>
+                </div>
+              ))}
+              <div>
+                <label style={{fontSize:11,fontWeight:700,color:B.textMuted,display:"block",marginBottom:4}}>Category</label>
+                <select value={newCourse.category} onChange={e=>setNewCourse(p=>({...p,category:e.target.value}))} style={{width:"100%",padding:"8px 10px",borderRadius:6,border:`1px solid ${B.border}`,fontSize:13}}>
+                  {["Compliance","Technical","Finance","Leadership","Digital"].map(c=><option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,cursor:"pointer"}}>
+                <input type="checkbox" checked={newCourse.mandatory} onChange={e=>setNewCourse(p=>({...p,mandatory:e.target.checked}))}/>
+                Mandatory for all staff
+              </label>
+              <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:8}}>
+                <Btn variant="secondary" onClick={()=>setShowCourseModal(false)}>Cancel</Btn>
+                <Btn variant="primary" onClick={()=>{
+                  if(!newCourse.title.trim()) return;
+                  setCourses(prev=>[...prev,{...newCourse,id:`CRS-${String(prev.length+1).padStart(3,"0")}`,enrolled:0,completed:0,status:"Active",due:null}]);
+                  setNewCourse({title:"",category:"Compliance",duration:"1h",mandatory:false});
+                  setShowCourseModal(false);
+                }}>Add Course</Btn>
+              </div>
+            </div>
+          </Modal>
+        </div>
+      )}
+
+      {/* ── LEARNING PATHS ── */}
+      {activeTab==="paths" && (
+        <div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+            <div style={{fontSize:13,color:B.textMuted}}>Structured learning journeys combining multiple courses.</div>
+            <Btn variant="primary" onClick={()=>setShowPathModal(true)}>+ Create Path</Btn>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:14}}>
+            {paths.map((p,i)=>(
+              <Card key={i} style={{borderTop:`4px solid ${p.color}`}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                  <div>
+                    <div style={{fontSize:15,fontWeight:700}}>{p.title}</div>
+                    <div style={{fontSize:11,color:B.textMuted}}>{p.courses.length} courses · {p.enrolled} enrolled</div>
+                  </div>
+                  <Btn variant="danger" size="sm" onClick={()=>setPaths(prev=>prev.filter(x=>x.id!==p.id))}>Delete</Btn>
+                </div>
+                <div style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:4}}>
+                    <span>Completion</span><span style={{fontWeight:700}}>{p.enrolled?Math.round((p.completed/p.enrolled)*100):0}%</span>
+                  </div>
+                  <ProgressBar value={p.completed} max={p.enrolled||1} color={p.color}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  {p.courses.map((cid,ci)=>{
+                    const course = courses.find(c=>c.id===cid);
+                    return course ? (
+                      <div key={ci} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",borderRadius:6,background:B.bgHover}}>
+                        <div style={{width:6,height:6,borderRadius:3,background:p.color,flexShrink:0}}/>
+                        <span style={{fontSize:12}}>{course.title}</span>
+                        <span style={{fontSize:10,color:B.textMuted,marginLeft:"auto"}}>{course.duration}</span>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </Card>
+            ))}
+          </div>
+          <Modal open={showPathModal} onClose={()=>setShowPathModal(false)} title="Create Learning Path" width={500}>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <div>
+                <label style={{fontSize:11,fontWeight:700,color:B.textMuted,display:"block",marginBottom:4}}>Path Title</label>
+                <input value={newPath.title} onChange={e=>setNewPath(p=>({...p,title:e.target.value}))} style={{width:"100%",padding:"8px 10px",borderRadius:6,border:`1px solid ${B.border}`,fontSize:13,boxSizing:"border-box"}}/>
+              </div>
+              <div>
+                <label style={{fontSize:11,fontWeight:700,color:B.textMuted,display:"block",marginBottom:6}}>Select Courses</label>
+                {courses.map(c=>(
+                  <label key={c.id} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",fontSize:13,cursor:"pointer",borderBottom:`1px solid ${B.borderLight}`}}>
+                    <input type="checkbox" checked={newPath.courses.includes(c.id)} onChange={e=>setNewPath(p=>({...p,courses:e.target.checked?[...p.courses,c.id]:p.courses.filter(x=>x!==c.id)}))}/>
+                    {c.title} <span style={{fontSize:10,color:B.textMuted,marginLeft:"auto"}}>{c.category}</span>
+                  </label>
+                ))}
+              </div>
+              <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:8}}>
+                <Btn variant="secondary" onClick={()=>setShowPathModal(false)}>Cancel</Btn>
+                <Btn variant="primary" onClick={()=>{
+                  if(!newPath.title.trim()||!newPath.courses.length) return;
+                  setPaths(prev=>[...prev,{...newPath,id:`LP-${String(prev.length+1).padStart(3,"0")}`,enrolled:0,completed:0,color:B.purple}]);
+                  setNewPath({title:"",courses:[]});
+                  setShowPathModal(false);
+                }}>Create Path</Btn>
+              </div>
+            </div>
+          </Modal>
+        </div>
+      )}
+
+      {/* ── THRIVE MENTORSHIP ── */}
+      {activeTab==="thrive" && (
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{padding:"12px 16px",borderRadius:10,background:`linear-gradient(135deg,${B.pink}15,${B.purple}15)`,border:`1px solid ${B.pink}30`}}>
+            <div style={{fontSize:15,fontWeight:700,color:B.dkPink,marginBottom:2}}>Thrive Mentorship Program</div>
+            <div style={{fontSize:12,color:B.textSecondary}}>Connect mentees with experienced mentors across NI to support growth, career development, and cross-functional learning.</div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            {[{l:"Mentors Available",v:LA_MENTORS.filter(m=>m.available).length,c:B.teal},{l:"Mentees Enrolled",v:thriveEnrolled,c:B.purple},{l:"Active Pairs",v:paired,c:B.pink},{l:"Unpaired",v:thriveEnrolled-paired,c:B.orange}].map((s,i)=>(
+              <MetricCard key={i} label={s.l} value={s.v} color={s.c}/>
+            ))}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+            <Card>
+              <SectionTitle>Available Mentors</SectionTitle>
+              {LA_MENTORS.map((m,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${B.borderLight}`}}>
+                  <Avatar name={m.name} size={36}/>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:700}}>{m.name}</div>
+                    <div style={{fontSize:11,color:B.textMuted}}>{m.title}</div>
+                  </div>
+                  <Badge color={m.available?B.teal:B.textMuted} bg={m.available?B.successBg:B.bgHover}>{m.available?"Available":"At Capacity"}</Badge>
+                </div>
+              ))}
+            </Card>
+            <Card>
+              <SectionTitle>Mentee Enrollment</SectionTitle>
+              {mentees.map((m,i)=>(
+                <div key={i} style={{padding:"8px 0",borderBottom:`1px solid ${B.borderLight}`}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:m.enrolled?4:0}}>
+                    <Avatar name={m.name} size={28}/>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:12,fontWeight:600}}>{m.name}</div>
+                      <div style={{fontSize:10,color:B.textMuted}}>{m.dept}</div>
+                    </div>
+                    <label style={{display:"flex",alignItems:"center",gap:4,cursor:"pointer",fontSize:11}}>
+                      <input type="checkbox" checked={m.enrolled} onChange={()=>toggleEnroll(m.id)}/>
+                      Enroll
+                    </label>
+                  </div>
+                  {m.enrolled && (
+                    <div style={{paddingLeft:36}}>
+                      <select value={m.mentorId||""} onChange={e=>assignMentor(m.id,e.target.value||null)}
+                        style={{width:"100%",padding:"4px 8px",borderRadius:6,border:`1px solid ${B.border}`,fontSize:11,background:B.white}}>
+                        <option value="">Assign mentor...</option>
+                        {LA_MENTORS.filter(x=>x.available).map(x=><option key={x.id} value={x.id}>{x.name}</option>)}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* ── ANALYTICS ── */}
+      {activeTab==="analytics" && (
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+            <Card>
+              <SectionTitle>Course Completion Overview</SectionTitle>
+              {courses.map((c,i)=>(
+                <div key={i} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:3}}>
+                    <span style={{fontWeight:600,flex:1,marginRight:8}}>{c.title}</span>
+                    <span style={{color:B.textMuted}}>{c.completed}/{c.enrolled}</span>
+                  </div>
+                  <ProgressBar value={c.completed} max={c.enrolled||1} color={B.purple} height={5}/>
+                </div>
+              ))}
+            </Card>
+            <Card>
+              <SectionTitle>Learning Path Uptake</SectionTitle>
+              {paths.map((p,i)=>(
+                <div key={i} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:3}}>
+                    <span style={{fontWeight:600}}>{p.title}</span>
+                    <span style={{fontWeight:700,color:p.color}}>{p.enrolled} enrolled</span>
+                  </div>
+                  <ProgressBar value={p.completed} max={p.enrolled||1} color={p.color} height={5}/>
+                </div>
+              ))}
+              <SectionTitle>Thrive Mentorship</SectionTitle>
+              {[{l:"Enrolled in Thrive",v:thriveEnrolled,max:mentees.length,c:B.pink},{l:"Mentor Pairs Active",v:paired,max:thriveEnrolled||1,c:B.purple}].map((s,i)=>(
+                <div key={i} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:3}}>
+                    <span style={{fontWeight:600}}>{s.l}</span><span style={{fontWeight:700,color:s.c}}>{s.v}</span>
+                  </div>
+                  <ProgressBar value={s.v} max={s.max} color={s.c} height={5}/>
+                </div>
+              ))}
+            </Card>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const NAV = [
   // ── Available to ALL roles ───────────────────────────────────────────────
   { key: "dashboard",  label: "Dashboard",      icon: "dashboard",   roles: ["employee", "manager", "hr", "superuser", "learningadmin"] },
