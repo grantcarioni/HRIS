@@ -6920,15 +6920,15 @@ const NIcon = ({ name, size = 18, color = "currentColor" }) => {
 
 const NAV = [
   // ── Available to ALL roles ───────────────────────────────────────────────
-  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",   roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "myprofile",  label: "My Profile",     icon: "employee",    roles: ["employee"] },                              // ESS: own profile, payslips, benefits, docs
+  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",   roles: ["employee", "manager", "hr", "superuser", "learningadmin"] },
+  { key: "myprofile",  label: "My Profile",     icon: "employee",    roles: ["employee"] },
   { key: "time",       label: "Time & Leave",   icon: "time",        roles: ["employee", "manager", "hr", "superuser"] },
   { key: "allowances", label: "Allowances",     icon: "allowances",  roles: ["employee", "manager", "hr", "superuser"] },
   { key: "lms",        label: "Learning",       icon: "learning",    roles: ["employee", "manager", "hr", "superuser"] },
   { key: "performance",label: "Performance",    icon: "performance", roles: ["employee", "manager", "hr", "superuser"] },
   { key: "surveys",    label: "Surveys",        icon: "surveys",     roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "directory",  label: "Directory",      icon: "people",      roles: ["employee"] },                              // ESS: read-only colleague lookup
-  { key: "orgchart",   label: "Org Chart",      icon: "orgchart",    roles: ["employee", "manager", "hr", "superuser"] }, // ESS: read-only org chart
+  { key: "directory",  label: "Directory",      icon: "people",      roles: ["employee"] },
+  { key: "orgchart",   label: "Org Chart",      icon: "orgchart",    roles: ["employee", "manager", "hr", "superuser"] },
   // ── Manager-level ────────────────────────────────────────────────────────
   { key: "approvals",  label: "Approvals",      icon: "approvals",   roles: ["manager", "hr", "superuser"] },
   { key: "workflows",  label: "Workflows",      icon: "workflows",   roles: ["manager", "hr", "superuser"] },
@@ -6939,13 +6939,20 @@ const NAV = [
   { key: "analytics",  label: "Analytics",      icon: "analytics",   roles: ["hr", "superuser"] },
   { key: "settings",   label: "Admin",          icon: "admin",       roles: ["hr", "superuser"] },
   { key: "superuser",  label: "Superuser",      icon: "superuser",   roles: ["superuser"], superOnly: true },
+  // ── Learning Admin only ──────────────────────────────────────────────────
+  { key: "la_dashboard",   label: "L&D Dashboard",    icon: "learning",  roles: ["learningadmin", "superuser"] },
+  { key: "la_courses",     label: "Courses",          icon: "learning",  roles: ["learningadmin", "superuser"] },
+  { key: "la_paths",       label: "Learning Paths",   icon: "orgchart",  roles: ["learningadmin", "superuser"] },
+  { key: "la_thrive",      label: "Thrive Mentorship",icon: "heart",     roles: ["learningadmin", "superuser"] },
+  { key: "la_analytics",   label: "L&D Analytics",   icon: "analytics", roles: ["learningadmin", "superuser"] },
 ];
 
 const ROLE_META = {
-  employee:  { label: "Employee",  icon: <NIcon name="employee"  size={18}/>, color: B.teal   },
-  manager:   { label: "Manager",   icon: <NIcon name="manager"   size={18}/>, color: B.blue   },
-  hr:        { label: "HR Admin",  icon: <NIcon name="hr"        size={18}/>, color: B.orange },
-  superuser: { label: "Superuser", icon: <NIcon name="superuser" size={18}/>, color: B.yellow },
+  employee:     { label: "Employee",       icon: <NIcon name="employee"  size={18}/>, color: B.teal   },
+  manager:      { label: "Manager",        icon: <NIcon name="manager"   size={18}/>, color: B.blue   },
+  hr:           { label: "HR Admin",       icon: <NIcon name="hr"        size={18}/>, color: B.orange },
+  superuser:    { label: "Superuser",      icon: <NIcon name="superuser" size={18}/>, color: B.yellow },
+  learningadmin:{ label: "Learning Admin", icon: <NIcon name="learning"  size={18}/>, color: B.purple },
 };
 
 // ─── MAIN APP ───────────────────────────────────────────────────────────────
@@ -6998,6 +7005,11 @@ export default function App() {
       case "analytics":   return <AnalyticsModule />;
       case "settings":    return <SettingsModule />;
       case "superuser":   return isSuperuser ? <SuperuserModule /> : <DashboardModule setModule={setModule} />;
+      case "la_dashboard":  return <LearningAdminModule tab="dashboard" setModule={setModule} />;
+      case "la_courses":    return <LearningAdminModule tab="courses"   setModule={setModule} />;
+      case "la_paths":      return <LearningAdminModule tab="paths"     setModule={setModule} />;
+      case "la_thrive":     return <LearningAdminModule tab="thrive"    setModule={setModule} />;
+      case "la_analytics":  return <LearningAdminModule tab="analytics" setModule={setModule} />;
       default:            return <DashboardModule setModule={setModule} />;
     }
   };
