@@ -9746,21 +9746,21 @@ const NIcon = ({ name, size = 18, color = "currentColor" }) => {
 
 const NAV = [
   // ── Available to ALL roles ───────────────────────────────────────────────
-  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",   roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "dashboard",  label: "Dashboard",      icon: "dashboard",   roles: ["employee", "manager", "hr", "lmsadmin", "superuser"] },
   { key: "myprofile",  label: "My Profile",     icon: "employee",    roles: ["employee"] },                              // ESS: own profile, payslips, benefits, docs
   { key: "time",       label: "Time & Leave",   icon: "time",        roles: ["employee", "manager", "hr", "superuser"] },
   { key: "allowances", label: "Allowances",     icon: "allowances",  roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "lms",        label: "Learning",       icon: "learning",    roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "performance",label: "Performance",    icon: "performance", roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "lms",        label: "Learning",       icon: "learning",    roles: ["employee", "manager", "hr", "lmsadmin", "superuser"] },
+  { key: "performance",label: "Performance",    icon: "performance", roles: ["employee", "manager", "hr", "lmsadmin", "superuser"] },
   { key: "surveys",    label: "Surveys",        icon: "surveys",     roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "career",     label: "Career Path",    icon: "analytics",   roles: ["employee", "manager", "hr", "superuser"] },
-  { key: "directory",  label: "Directory",      icon: "people",      roles: ["employee"] },                              // ESS: read-only colleague lookup
-  { key: "orgchart",   label: "Org Chart",      icon: "orgchart",    roles: ["employee", "manager", "hr", "superuser"] }, // ESS: read-only org chart
+  { key: "career",     label: "Career Path",    icon: "analytics",   roles: ["employee", "manager", "hr", "lmsadmin", "superuser"] },
+  { key: "directory",  label: "Directory",      icon: "people",      roles: ["employee", "lmsadmin"] },                  // ESS + L&D Admin: read-only colleague lookup
+  { key: "orgchart",   label: "Org Chart",      icon: "orgchart",    roles: ["employee", "manager", "hr", "lmsadmin", "superuser"] }, // ESS: read-only org chart
   // ── Manager-level ────────────────────────────────────────────────────────
   { key: "approvals",  label: "Approvals",      icon: "approvals",   roles: ["manager", "hr", "superuser"] },
   { key: "workflows",  label: "Workflows",      icon: "workflows",   roles: ["manager", "hr", "superuser"] },
   // ── HR Admin only ────────────────────────────────────────────────────────
-  { key: "people",     label: "People (HR)",    icon: "people",      roles: ["hr", "superuser"] },
+  { key: "people",     label: "People (HR)",    icon: "people",      roles: ["hr", "lmsadmin", "superuser"] },
   { key: "onboarding", label: "Onboarding",     icon: "onboarding",  roles: ["hr", "superuser"] },
   { key: "compplan",   label: "Comp Planning",  icon: "comp",        roles: ["hr", "superuser"] },
   { key: "analytics",  label: "Analytics",      icon: "analytics",   roles: ["hr", "superuser"] },
@@ -9769,10 +9769,11 @@ const NAV = [
 ];
 
 const ROLE_META = {
-  employee:  { label: "Employee",  icon: <NIcon name="employee"  size={18}/>, color: B.teal   },
-  manager:   { label: "Manager",   icon: <NIcon name="manager"   size={18}/>, color: B.blue   },
-  hr:        { label: "HR Admin",  icon: <NIcon name="hr"        size={18}/>, color: B.orange },
-  superuser: { label: "Superuser", icon: <NIcon name="superuser" size={18}/>, color: B.yellow },
+  employee:  { label: "Employee",         icon: <NIcon name="employee"  size={18}/>, color: B.teal   },
+  manager:   { label: "Manager",          icon: <NIcon name="manager"   size={18}/>, color: B.blue   },
+  hr:        { label: "HR Admin",         icon: <NIcon name="hr"        size={18}/>, color: B.orange },
+  lmsadmin:  { label: "L&D Administrator",icon: <NIcon name="learning"  size={18}/>, color: B.purple },
+  superuser: { label: "Superuser",        icon: <NIcon name="superuser" size={18}/>, color: B.yellow },
 };
 
 // ─── MAIN APP ───────────────────────────────────────────────────────────────
