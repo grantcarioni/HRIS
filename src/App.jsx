@@ -3146,6 +3146,1003 @@ const AnalyticsModule = () => {
   );
 };
 
+// ─── SETTINGS SUPER CENTER ───────────────────────────────────────────────────
+const SettingsSuperCenter = ({ role }) => {
+  const isSU = role === "superuser";
+  const [section, setSection] = useState("company-profile");
+
+  // ── Company Profile ─────────────────────────────────────────────────────
+  const [company, setCompany] = useState({ name: "Nutrition International", legalName: "Nutrition International (Micronutrient Initiative)", hq: "Ottawa, Ontario, Canada", website: "https://www.nutritionintl.org", fiscalYearStart: "04", industry: "Non-Governmental Organization", founded: "1992", primaryContact: "grant.carioni@nutritionintl.org", phone: "+1 613-782-6800" });
+  const [editingCompany, setEditingCompany] = useState(false);
+  const [companyDraft, setCompanyDraft] = useState(company);
+
+  // ── Legal Entities ───────────────────────────────────────────────────────
+  const [entities, setEntities] = useState(COUNTRIES.map(c => ({ id: `ENT-${c.code}`, code: c.code, name: c.entity, country: c.name, flag: c.flag, currency: c.currency, locale: c.locale, tz: c.tz, status: "Active", type: c.code === "CA" ? "HQ" : ["GB","IT","CH"].includes(c.code) ? "Regional Office" : "Country Office", registrationNo: `NI-${c.code}-${Math.floor(1000 + Math.random() * 9000)}`, address: `${c.name} Office, ${c.entity}`, headcount: EMPLOYEES.filter(e => e.country === c.code).length, established: `${2000 + Math.floor(Math.random() * 20)}-01-01` })));
+  const [showEntityModal, setShowEntityModal] = useState(null);
+  const [editEntity, setEditEntity] = useState({ name: "", country: "", currency: "", tz: "", type: "Country Office", address: "", code: "" });
+
+  // ── Users ────────────────────────────────────────────────────────────────
+  const [users, setUsers] = useState([
+    { id: "USR-001", name: "Grant Carioni", email: "grant.carioni@nutritionintl.org", role: "Superuser", country: "CA", lastLogin: "2026-04-30T14:30:00Z", ip: "198.51.100.42", status: "Active", mfa: true },
+    { id: "USR-002", name: "Admin User", email: "admin@nutritionintl.org", role: "HR Admin", country: "CA", lastLogin: "2026-04-30T09:15:00Z", ip: "198.51.100.55", status: "Active", mfa: true },
+    { id: "USR-003", name: "Sarah Chen", email: "sarah.chen@nutritionintl.org", role: "Manager", country: "CA", lastLogin: "2026-04-30T11:00:00Z", ip: "192.0.2.17", status: "Active", mfa: true },
+    { id: "USR-004", name: "Marcus Johnson", email: "marcus.johnson@nutritionintl.org", role: "Country HR Admin", country: "NG", lastLogin: "2026-04-29T16:45:00Z", ip: "203.0.113.12", status: "Active", mfa: false },
+    { id: "USR-005", name: "Priya Patel", email: "priya.patel@nutritionintl.org", role: "Manager", country: "IT", lastLogin: "2026-04-29T14:00:00Z", ip: "93.184.216.34", status: "Active", mfa: true },
+    { id: "USR-006", name: "Finance Lead", email: "finance@nutritionintl.org", role: "Grants Finance", country: "CA", lastLogin: "2026-04-28T10:30:00Z", ip: "198.51.100.60", status: "Active", mfa: true },
+  ]);
+
+  // ── Security Roles ───────────────────────────────────────────────────────
+  const [securityRoles, setSecurityRoles] = useState([
+    { id: "ROLE-001", name: "Superuser", desc: "Full system access — all modules, all data, all configuration", level: "System", users: 1, permissions: { people: "Full", comp: "Full", surveys: "Full", performance: "Full", lms: "Full", time: "Full", admin: "Full", reports: "Full" }, locked: true },
+    { id: "ROLE-002", name: "HR Admin", desc: "Full HR access — employee records, compensation, onboarding, reporting", level: "Global", users: 1, permissions: { people: "Full", comp: "Full", surveys: "Full", performance: "Full", lms: "Admin", time: "Full", admin: "Limited", reports: "Full" }, locked: false },
+    { id: "ROLE-003", name: "Country HR Admin", desc: "HR access scoped to a specific country/entity", level: "Country", users: 1, permissions: { people: "Country", comp: "Country", surveys: "Country", performance: "Country", lms: "Country", time: "Country", admin: "None", reports: "Country" }, locked: false },
+    { id: "ROLE-004", name: "Manager", desc: "Access to direct reports — reviews, leave approvals, team analytics", level: "Team", users: 2, permissions: { people: "Team", comp: "View Own", surveys: "Participate", performance: "Team", lms: "View", time: "Team", admin: "None", reports: "Team" }, locked: false },
+    { id: "ROLE-005", name: "Employee", desc: "Self-service — own profile, leave requests, learning, feedback", level: "Self", users: 20, permissions: { people: "Self", comp: "View Own", surveys: "Participate", performance: "Self", lms: "Learner", time: "Self", admin: "None", reports: "None" }, locked: false },
+    { id: "ROLE-006", name: "Grants Finance", desc: "Grant allocations, compensation cost views, budget reports", level: "Functional", users: 1, permissions: { people: "View", comp: "View", surveys: "None", performance: "None", lms: "None", time: "View", admin: "None", reports: "Finance" }, locked: false },
+    { id: "ROLE-007", name: "L&D Administrator", desc: "Learning management — course admin, content uploads, analytics", level: "Functional", users: 0, permissions: { people: "View", comp: "None", surveys: "None", performance: "View", lms: "Full", time: "None", admin: "None", reports: "LMS" }, locked: false },
+    { id: "ROLE-008", name: "External Auditor", desc: "Read-only access to compliance reports and audit logs", level: "Audit", users: 0, permissions: { people: "None", comp: "View", surveys: "None", performance: "None", lms: "None", time: "View", admin: "Audit Log", reports: "Audit" }, locked: false },
+  ]);
+  const [showRoleModal, setShowRoleModal] = useState(null);
+  const [editRole, setEditRole] = useState({ name: "", desc: "", level: "Team", permissions: {} });
+
+  // ── Salary Structures ────────────────────────────────────────────────────
+  const [salaryStructures, setSalaryStructures] = useState(JOB_LEVELS.map((l, i) => ({ id: `SS-${i}`, level: l, band: `Band ${Math.ceil((i + 1) / 2)}`, min: 35000 + i * 12000, mid: 50000 + i * 14000, max: 65000 + i * 16000, currency: "CAD", spread: Math.round(((65000 + i * 16000) - (35000 + i * 12000)) / (35000 + i * 12000) * 100) })));
+  const [showSalaryEdit, setShowSalaryEdit] = useState(null);
+  const [salaryForm, setSalaryForm] = useState({ level: "", band: "", min: 0, mid: 0, max: 0, currency: "CAD" });
+  const [dragIdx, setDragIdx] = useState(null);
+
+  // ── Job Grades ───────────────────────────────────────────────────────────
+  const [jobGrades, setJobGrades] = useState([
+    { id: "JG-01", grade: "P1", title: "Associate / Entry", category: "Professional", minExp: 0, maxExp: 2, benchmarks: "Market P25-P40", factor: "Individual contributor, learning role", points: 100 },
+    { id: "JG-02", grade: "P2", title: "Officer", category: "Professional", minExp: 1, maxExp: 4, benchmarks: "Market P40-P50", factor: "Independent contributor, applied expertise", points: 200 },
+    { id: "JG-03", grade: "P3", title: "Senior Officer", category: "Professional", minExp: 3, maxExp: 7, benchmarks: "Market P50-P60", factor: "Specialist, project leadership", points: 300 },
+    { id: "JG-04", grade: "P4", title: "Lead / Specialist", category: "Professional", minExp: 5, maxExp: 10, benchmarks: "Market P55-P65", factor: "Technical authority, cross-functional", points: 400 },
+    { id: "JG-05", grade: "P5", title: "Principal / Expert", category: "Professional", minExp: 8, maxExp: 15, benchmarks: "Market P60-P75", factor: "Org-wide expertise, strategy input", points: 500 },
+    { id: "JG-06", grade: "M1", title: "Manager", category: "Management", minExp: 5, maxExp: 10, benchmarks: "Market P55-P65", factor: "Team leadership, budget accountability", points: 450 },
+    { id: "JG-07", grade: "M2", title: "Senior Manager", category: "Management", minExp: 8, maxExp: 15, benchmarks: "Market P60-P75", factor: "Department leadership, strategic delivery", points: 550 },
+    { id: "JG-08", grade: "M3", title: "Director", category: "Management", minExp: 10, maxExp: 20, benchmarks: "Market P65-P80", factor: "Multi-team or country leadership", points: 650 },
+    { id: "JG-09", grade: "D1", title: "Senior Director", category: "Executive", minExp: 12, maxExp: 25, benchmarks: "Market P75-P90", factor: "Function or regional leadership", points: 800 },
+    { id: "JG-10", grade: "VP", title: "Vice President", category: "Executive", minExp: 15, maxExp: 30, benchmarks: "Market P80-P95", factor: "Organizational strategy, board-level", points: 950 },
+  ]);
+  const [showGradeEdit, setShowGradeEdit] = useState(null);
+  const [gradeForm, setGradeForm] = useState({ grade: "", title: "", category: "Professional", minExp: 0, maxExp: 0, benchmarks: "", factor: "", points: 0 });
+
+  // ── Feature Toggles ──────────────────────────────────────────────────────
+  const [featureToggles, setFeatureToggles] = useState({ dashboard: true, people: true, time: true, approvals: true, allowances: true, workflows: true, analytics: true, settings: true, recruiting: true, clockInOut: true, gpsTracking: true, offlineMode: true, grantTimesheets: true, laborCompliance: true, multiCurrency: true, verificationLetters: true, benefitsTab: true, reportingCenter: true, customReports: true, workableIntegration: true, leaveManagement: true, hwAllowance: true, ldAllowance: true });
+  const [showConfirm, setShowConfirm] = useState(null);
+
+  // ── Add-On Modules ───────────────────────────────────────────────────────
+  const [addOnModules, setAddOnModules] = useState([
+    { id: "ADDON-001", name: "Expense Management", desc: "Travel and expense claims with receipt scanning and multi-currency reimbursement", status: "active", assignedTo: "all", assignedGroups: [], created: "2026-02-15" },
+    { id: "ADDON-002", name: "Asset & Equipment Tracker", desc: "Assign, track, and recover organizational assets per employee", status: "active", assignedTo: "groups", assignedGroups: ["IT & Digital", "Operations"], created: "2026-03-01" },
+    { id: "ADDON-003", name: "Travel & Security Clearance", desc: "Travel request approvals, security briefings, and field travel risk assessments", status: "active", assignedTo: "all", assignedGroups: [], created: "2026-03-10" },
+    { id: "ADDON-004", name: "Document Vault (e-Signature)", desc: "Secure document storage with e-signature workflows and retention policy enforcement", status: "active", assignedTo: "individuals", assignedGroups: [], created: "2026-04-01" },
+    { id: "ADDON-005", name: "Internal Job Board & Mobility", desc: "Post internal opportunities and track internal transfers", status: "active", assignedTo: "all", assignedGroups: [], created: "2026-01-15" },
+    { id: "ADDON-006", name: "Mentorship & Coaching Platform", desc: "Match mentors with mentees, schedule sessions, track goals", status: "draft", assignedTo: "none", assignedGroups: [], created: "2026-04-18" },
+  ]);
+
+  // ── Formatting ───────────────────────────────────────────────────────────
+  const [formatSettings, setFormatSettings] = useState({ dateFormat: "MMM D, YYYY", timeFormat: "12h", currency: "local", decimals: "0", tableRows: "25", theme: "light", sidebarDefault: "expanded", lang: "en", logoPosition: "sidebar", cardStyle: "shadow", fontScale: "100" });
+
+  // ── Notifications ────────────────────────────────────────────────────────
+  const [notifications, setNotifications] = useState({ newHireAlert: true, leaveRequest: true, approvalNeeded: true, contractExpiry: true, birthdayReminder: false, anniversaryAlert: true, performanceDeadline: true, payrollReminder: true, certExpiry: true, weeklyDigest: true, mfaAlerts: true, loginAlerts: false });
+
+  // ── Integrations ─────────────────────────────────────────────────────────
+  const [integrations] = useState([
+    { id: "INT-001", name: "Workable ATS", desc: "Applicant tracking — candidate sync every 15 min", status: "connected", logo: "W", color: B.blue, lastSync: "2026-04-30T14:00:00Z", url: "https://nutrition-intl.workable.com" },
+    { id: "INT-002", name: "Azure Active Directory", desc: "SSO and identity management via Microsoft Entra ID", status: "connected", logo: "Az", color: B.accent, lastSync: "2026-04-30T13:45:00Z", url: "" },
+    { id: "INT-003", name: "DocuSign", desc: "E-signature workflows for contracts and offer letters", status: "connected", logo: "DS", color: B.teal, lastSync: "2026-04-29T09:00:00Z", url: "" },
+    { id: "INT-004", name: "SAP Concur", desc: "Expense management and travel booking integration", status: "disconnected", logo: "SC", color: B.orange, lastSync: null, url: "" },
+    { id: "INT-005", name: "Slack", desc: "Notifications and approval workflows via Slack", status: "disconnected", logo: "Sl", color: B.purple, lastSync: null, url: "" },
+    { id: "INT-006", name: "LinkedIn Learning", desc: "External course catalog sync for LMS", status: "disconnected", logo: "Li", color: B.blue, lastSync: null, url: "" },
+  ]);
+  const [apiKeys] = useState([
+    { id: "KEY-001", name: "Workable Open API", scope: "ATS Read", created: "2026-01-15", lastUsed: "2026-04-30", status: "active" },
+    { id: "KEY-002", name: "Analytics Export Webhook", scope: "Reports Read", created: "2026-02-01", lastUsed: "2026-04-28", status: "active" },
+    { id: "KEY-003", name: "Payroll Integration", scope: "Comp Read", created: "2025-11-10", lastUsed: "2026-03-31", status: "active" },
+  ]);
+
+  // ── Leave Types ──────────────────────────────────────────────────────────
+  const [leaveTypes, setLeaveTypes] = useState([
+    { id: "LT-001", name: "Annual Leave", accrual: "1.67 days/month", cap: 20, carryover: 5, paid: true, countries: "All", requiresApproval: true },
+    { id: "LT-002", name: "Sick Leave", accrual: "Per policy", cap: 10, carryover: 0, paid: true, countries: "All", requiresApproval: false },
+    { id: "LT-003", name: "Parental Leave (Maternity)", accrual: "Statutory", cap: 17, carryover: 0, paid: true, countries: "CA, GB, IT, CH", requiresApproval: true },
+    { id: "LT-004", name: "Parental Leave (Paternity)", accrual: "Statutory", cap: 5, carryover: 0, paid: true, countries: "CA, GB, IT, CH", requiresApproval: true },
+    { id: "LT-005", name: "Bereavement", accrual: "On request", cap: 5, carryover: 0, paid: true, countries: "All", requiresApproval: false },
+    { id: "LT-006", name: "Unpaid Leave", accrual: "On request", cap: 90, carryover: 0, paid: false, countries: "All", requiresApproval: true },
+    { id: "LT-007", name: "Study / Exam Leave", accrual: "On request", cap: 5, carryover: 0, paid: true, countries: "All", requiresApproval: true },
+    { id: "LT-008", name: "Compensatory Off", accrual: "Earned", cap: 10, carryover: 3, paid: true, countries: "IN, BD, PK, PH, ID", requiresApproval: true },
+  ]);
+  const [showLeaveEdit, setShowLeaveEdit] = useState(null);
+  const [leaveForm, setLeaveForm] = useState({ name: "", accrual: "", cap: 0, carryover: 0, paid: true, countries: "All", requiresApproval: true });
+
+  // ── Data Retention ───────────────────────────────────────────────────────
+  const [retention, setRetention] = useState({ employeeRecords: "7y", auditLogs: "5y", payrollData: "7y", leaveRecords: "5y", performanceReviews: "3y", documentScans: "5y", sessionLogs: "1y", surveyResponses: "3y" });
+
+  // ── Reporting ────────────────────────────────────────────────────────────
+  const [reportType, setReportType] = useState("");
+  const [reportCountry, setReportCountry] = useState("ALL");
+  const [reportDept, setReportDept] = useState("ALL");
+  const [reportDateFrom, setReportDateFrom] = useState("2026-01-01");
+  const [reportDateTo, setReportDateTo] = useState("2026-04-30");
+  const [reportFormat, setReportFormat] = useState("pdf");
+  const [reportGenerated, setReportGenerated] = useState(false);
+  const [savedReports, setSavedReports] = useState([
+    { id: "RPT-001", name: "Q1 2026 Headcount by Region", type: "Headcount", created: "2026-04-01", createdBy: "Admin User", format: "XLSX", rows: 248 },
+    { id: "RPT-002", name: "Overtime Compliance — March 2026", type: "Compliance", created: "2026-04-05", createdBy: "Admin User", format: "PDF", rows: 42 },
+    { id: "RPT-003", name: "Grant Allocation — BMGF Fortification", type: "Grant", created: "2026-03-28", createdBy: "Finance Lead", format: "CSV", rows: 156 },
+    { id: "RPT-004", name: "Leave Balance Snapshot — All Countries", type: "Leave", created: "2026-04-10", createdBy: "Admin User", format: "XLSX", rows: 28 },
+    { id: "RPT-005", name: "Turnover Analysis 2025", type: "Turnover", created: "2026-01-15", createdBy: "Admin User", format: "PDF", rows: 14 },
+  ]);
+
+  // ── Edit History ─────────────────────────────────────────────────────────
+  const [historySearch, setHistorySearch] = useState("");
+
+  // ── Audit ────────────────────────────────────────────────────────────────
+  const [auditFilter, setAuditFilter] = useState("ALL");
+  const [auditUserFilter, setAuditUserFilter] = useState("ALL");
+  const [auditSearch, setAuditSearch] = useState("");
+
+  const uniqueAuditUsers = [...new Set(AUDIT_LOG.map(a => a.user))];
+  const uniqueAuditActions = [...new Set(AUDIT_LOG.map(a => a.action))];
+  const filteredAudit = AUDIT_LOG.filter(a =>
+    (auditFilter === "ALL" || a.action === auditFilter) &&
+    (auditUserFilter === "ALL" || a.user === auditUserFilter) &&
+    (auditSearch === "" || `${a.target} ${a.detail} ${a.user} ${a.ip}`.toLowerCase().includes(auditSearch.toLowerCase()))
+  );
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const inp = { width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" };
+  const FL = ({ children }) => <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>{children}</label>;
+  const ToggleSw = ({ on, onToggle, label, desc }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 4 }}>
+      <div onClick={onToggle} style={{ width: 40, height: 22, borderRadius: 11, background: on ? B.success : B.textMuted, cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+        <div style={{ width: 18, height: 18, borderRadius: 9, background: "#fff", position: "absolute", top: 2, left: on ? 20 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: B.textPrimary }}>{label}</div>
+        {desc && <div style={{ fontSize: 11, color: B.textMuted }}>{desc}</div>}
+      </div>
+      <Badge color={on ? B.success : B.textMuted} bg={on ? B.successBg : B.bgHover}>{on ? "ON" : "OFF"}</Badge>
+    </div>
+  );
+
+  const NAV_GROUPS = [
+    { group: "COMPANY SETUP", items: [
+      { key: "company-profile", label: "Company Profile" },
+      { key: "legal-entities", label: "Legal Entities" },
+      { key: "localization", label: "Localization & Regional" },
+    ]},
+    { group: "PEOPLE & ACCESS", items: [
+      { key: "users", label: "User Administration" },
+      { key: "security-roles", label: "Security Roles" },
+      { key: "sessions", label: "Active Sessions", superOnly: true },
+    ]},
+    { group: "COMPENSATION", items: [
+      { key: "salary-structures", label: "Salary Structures" },
+      { key: "job-grades", label: "Job Evaluation Grades" },
+    ]},
+    { group: "TIME OFF & LEAVE", items: [
+      { key: "leave-types", label: "Leave Types & Policies" },
+    ]},
+    { group: "NOTIFICATIONS", items: [
+      { key: "notifications", label: "Email & Alert Settings" },
+    ]},
+    { group: "INTEGRATIONS", items: [
+      { key: "integrations", label: "Connected Apps" },
+      { key: "api-keys", label: "API Keys & Webhooks" },
+    ]},
+    { group: "SYSTEM", items: [
+      { key: "features", label: "Feature Management", superOnly: true },
+      { key: "addons", label: "Add-On Modules", superOnly: true },
+      { key: "mass-upload", label: "Mass Data Upload", superOnly: true },
+      { key: "formatting", label: "Display & Formatting", superOnly: true },
+    ]},
+    { group: "REPORTING", items: [
+      { key: "report-builder", label: "Report Builder" },
+      { key: "saved-reports", label: "Saved Reports" },
+    ]},
+    { group: "COMPLIANCE & AUDIT", items: [
+      { key: "audit-log", label: "Audit Log" },
+      { key: "edit-history", label: "Edit History" },
+      { key: "data-retention", label: "Data Retention", superOnly: true },
+    ]},
+  ];
+
+  const REPORT_TEMPLATES = [
+    { value: "headcount", label: "Headcount Report", desc: "Workforce count by country, department, level, gender, status" },
+    { value: "compensation", label: "Compensation Report", desc: "Salary, bonus, total comp by entity with currency conversion" },
+    { value: "leave", label: "Leave & Absence Report", desc: "Leave balances, usage, accruals, carryover by employee" },
+    { value: "compliance", label: "Compliance & Overtime", desc: "Labor law violations, overtime hours, rest break gaps" },
+    { value: "grant", label: "Grant / Donor Allocation", desc: "Hours, costs, and FTE allocation by grant/project code" },
+    { value: "turnover", label: "Turnover & Retention", desc: "Attrition rate, voluntary/involuntary, tenure analysis" },
+    { value: "diversity", label: "Diversity & Inclusion", desc: "Gender balance, nationality mix, level distribution" },
+    { value: "performance", label: "Performance Review", desc: "Ratings distribution, calibration, goal completion" },
+    { value: "custom", label: "Custom Report Builder", desc: "Select fields, filters, grouping, and calculations from scratch" },
+  ];
+
+  const renderSection = () => {
+    switch (section) {
+
+      // ── COMPANY PROFILE ────────────────────────────────────────────────
+      case "company-profile": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Company Profile</div>
+              <div style={{ fontSize: 12, color: B.textMuted }}>Core organization details used across all modules, documents, and reports.</div>
+            </div>
+            {!editingCompany && <Btn variant="primary" size="sm" onClick={() => { setCompanyDraft({ ...company }); setEditingCompany(true); }}>Edit Profile</Btn>}
+          </div>
+          {editingCompany ? (
+            <Card>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[{ l: "Organization Name", k: "name" }, { l: "Legal Name", k: "legalName" }, { l: "Headquarters", k: "hq" }, { l: "Website", k: "website" }, { l: "Industry / Sector", k: "industry" }, { l: "Year Founded", k: "founded" }, { l: "Primary Contact Email", k: "primaryContact" }, { l: "Phone Number", k: "phone" }].map(f => (
+                  <div key={f.k}><FL>{f.l}</FL><input value={companyDraft[f.k]} onChange={e => setCompanyDraft(p => ({ ...p, [f.k]: e.target.value }))} style={inp} /></div>
+                ))}
+                <div><FL>Fiscal Year Start Month</FL>
+                  <Select value={companyDraft.fiscalYearStart} onChange={v => setCompanyDraft(p => ({ ...p, fiscalYearStart: v }))} style={{ width: "100%" }} options={[["01","January"],["02","February"],["03","March"],["04","April"],["07","July"],["10","October"]].map(([v,l]) => ({ value: v, label: l }))} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
+                <Btn variant="secondary" onClick={() => setEditingCompany(false)}>Cancel</Btn>
+                <Btn variant="primary" onClick={() => { setCompany(companyDraft); setEditingCompany(false); alert("Company profile updated. Changes reflected across all modules."); }}>Save Changes</Btn>
+              </div>
+            </Card>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {[
+                { label: "Organization Name", value: company.name },
+                { label: "Legal Name", value: company.legalName },
+                { label: "Headquarters", value: company.hq },
+                { label: "Website", value: company.website },
+                { label: "Industry / Sector", value: company.industry },
+                { label: "Year Founded", value: company.founded },
+                { label: "Primary Contact", value: company.primaryContact },
+                { label: "Phone", value: company.phone },
+                { label: "Fiscal Year Start", value: ["01","February","03","April","April","07","October","10"].includes(company.fiscalYearStart) ? company.fiscalYearStart : `Month ${company.fiscalYearStart}` },
+                { label: "Active Countries", value: `${COUNTRIES.length} countries` },
+                { label: "Total Employees", value: `${EMPLOYEES.length} staff` },
+                { label: "Legal Entities", value: `${COUNTRIES.length} entities` },
+              ].map(item => (
+                <div key={item.label} style={{ padding: "12px 14px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}` }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: B.textPrimary }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+
+      // ── LEGAL ENTITIES ─────────────────────────────────────────────────
+      case "legal-entities": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Legal Entities</div><div style={{ fontSize: 12, color: B.textMuted }}>Manage NI's {entities.length} legal entities across all countries.</div></div>
+            {isSU && <Btn variant="primary" size="sm" onClick={() => { setEditEntity({ name: "", country: "", currency: "", tz: "", type: "Country Office", address: "", code: "" }); setShowEntityModal("new"); }}>+ Add Entity</Btn>}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {entities.map(ent => {
+              const typeColors = { HQ: B.accent, "Regional Office": B.purple, "Country Office": B.teal, "Project Office": B.blue, "EOR Partner": B.orange };
+              return (
+                <Card key={ent.id} style={{ borderLeft: `4px solid ${typeColors[ent.type] || B.textMuted}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>{ent.flag}</span>
+                      <div><div style={{ fontSize: 14, fontWeight: 700 }}>{ent.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{ent.country} · {ent.id}</div></div>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}><Badge color={typeColors[ent.type]} bg={`${typeColors[ent.type]}14`}>{ent.type}</Badge><StatusBadge status={ent.status} /></div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, fontSize: 12, marginBottom: 8 }}>
+                    <div><span style={{ color: B.textMuted }}>Currency: </span><strong>{ent.currency}</strong></div>
+                    <div><span style={{ color: B.textMuted }}>Headcount: </span><strong>{ent.headcount}</strong></div>
+                    <div><span style={{ color: B.textMuted }}>Timezone: </span><strong>{ent.tz}</strong></div>
+                    <div><span style={{ color: B.textMuted }}>Est: </span><strong>{ent.established?.split("-")[0]}</strong></div>
+                  </div>
+                  {isSU && <div style={{ display: "flex", gap: 4 }}>
+                    <Btn variant="secondary" size="sm" onClick={() => { setEditEntity({ ...ent }); setShowEntityModal(ent.id); }}>Edit</Btn>
+                    {ent.headcount === 0 && ent.type !== "HQ" && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setEntities(prev => prev.filter(e => e.id !== ent.id))}>Remove</Btn>}
+                  </div>}
+                </Card>
+              );
+            })}
+          </div>
+          <Modal open={!!showEntityModal} onClose={() => setShowEntityModal(null)} title={showEntityModal === "new" ? "Add Legal Entity" : `Edit: ${editEntity.name}`} width={560}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {[{ l: "Entity Name", k: "name" }, { l: "Entity Code", k: "code" }, { l: "Country", k: "country" }, { l: "Currency", k: "currency" }, { l: "Timezone", k: "tz" }, { l: "Address", k: "address" }].map(f => (
+                <div key={f.k} style={f.k === "address" ? { gridColumn: "1 / -1" } : {}}><FL>{f.l}</FL><input value={editEntity[f.k] || ""} onChange={e => setEditEntity(p => ({ ...p, [f.k]: e.target.value }))} style={inp} /></div>
+              ))}
+              <div><FL>Type</FL><Select value={editEntity.type} onChange={v => setEditEntity(p => ({ ...p, type: v }))} style={{ width: "100%" }} options={["HQ","Regional Office","Country Office","Project Office","EOR Partner"].map(t => ({ value: t, label: t }))} /></div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="secondary" onClick={() => setShowEntityModal(null)}>Cancel</Btn>
+              <Btn variant="primary" onClick={() => {
+                if (showEntityModal === "new") setEntities(prev => [...prev, { ...editEntity, id: `ENT-${editEntity.code || Date.now()}`, flag: "", status: "Active", headcount: 0, registrationNo: `NI-${editEntity.code}-${Math.floor(1000 + Math.random() * 9000)}`, established: new Date().toISOString().split("T")[0] }]);
+                else setEntities(prev => prev.map(e => e.id === showEntityModal ? { ...e, ...editEntity } : e));
+                setShowEntityModal(null);
+              }}>{showEntityModal === "new" ? "Create Entity" : "Save Changes"}</Btn>
+            </div>
+          </Modal>
+        </div>
+      );
+
+      // ── LOCALIZATION ───────────────────────────────────────────────────
+      case "localization": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Localization & Regional Settings</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Country-specific locale, currency, and timezone configuration for each active entity.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {COUNTRIES.map(c => (
+              <div key={c.code} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}` }}>
+                <span style={{ fontSize: 24 }}>{c.flag}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 13 }}>{c.name}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>{c.locale} · {c.currency} · {c.tz}</div>
+                </div>
+                <Badge color={B.success} bg={B.successBg}>Active</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+      // ── USERS ──────────────────────────────────────────────────────────
+      case "users": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>User Administration</div><div style={{ fontSize: 12, color: B.textMuted }}>{users.length} system users across {COUNTRIES.length} countries.</div></div>
+            {isSU && <Btn variant="primary" size="sm" onClick={() => alert("Add User — enter name, email, role, country, and MFA settings")}>+ Add User</Btn>}
+          </div>
+          <Card>
+            <Table columns={[
+              { label: "User", render: r => <div style={{ display: "flex", alignItems: "center", gap: 8 }}><Avatar name={r.name} size={28} /><div><div style={{ fontWeight: 700, fontSize: 12 }}>{r.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{r.email}</div></div></div> },
+              { label: "Role", render: r => <Badge color={r.role === "Superuser" ? B.yellow : r.role === "HR Admin" ? B.accent : r.role === "Country HR Admin" ? B.orange : B.blue} bg={`${r.role === "Superuser" ? B.yellow : B.textMuted}14`}>{r.role}</Badge> },
+              { label: "Country", render: r => <span>{COUNTRIES.find(c => c.code === r.country)?.flag} {COUNTRIES.find(c => c.code === r.country)?.name}</span> },
+              { label: "Last Login", render: r => new Date(r.lastLogin).toLocaleString("en-CA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) },
+              { label: "MFA", render: r => r.mfa ? <Badge color={B.success} bg={B.successBg}>Enabled</Badge> : <Badge color={B.danger} bg={B.dangerBg}>Disabled</Badge> },
+              { label: "Status", render: r => <StatusBadge status={r.status} /> },
+              { label: "Actions", render: r => <div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => alert(`Edit ${r.name}`)}>Edit</Btn>{r.role !== "Superuser" && isSU && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => alert(`Lock account: ${r.name}`)}>Lock</Btn>}</div> },
+            ]} data={users} />
+          </Card>
+        </div>
+      );
+
+      // ── SECURITY ROLES ─────────────────────────────────────────────────
+      case "security-roles": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Security Roles</div><div style={{ fontSize: 12, color: B.textMuted }}>Define module-level permissions for each role. Changes take effect immediately.</div></div>
+            {isSU && <Btn variant="primary" size="sm" onClick={() => { setEditRole({ name: "", desc: "", level: "Team", permissions: { people: "None", comp: "None", surveys: "None", performance: "None", lms: "None", time: "None", admin: "None", reports: "None" } }); setShowRoleModal("new"); }}>+ Create Role</Btn>}
+          </div>
+          {securityRoles.map(r => {
+            const lc = { System: B.danger, Global: B.accent, Country: B.teal, Team: B.blue, Self: B.textMuted, Functional: B.purple, Audit: B.orange };
+            return (
+              <Card key={r.id} style={{ marginBottom: 10, borderLeft: `4px solid ${lc[r.level] || B.textMuted}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700 }}>{r.name}</span>
+                      <Badge color={lc[r.level]} bg={`${lc[r.level]}14`}>{r.level}</Badge>
+                      {r.locked && <Badge color={B.danger} bg={B.dangerBg}>SYSTEM LOCKED</Badge>}
+                    </div>
+                    <div style={{ fontSize: 12, color: B.textMuted, marginTop: 2 }}>{r.desc} · {r.users} user(s)</div>
+                  </div>
+                  {!r.locked && <Btn variant="secondary" size="sm" onClick={() => { setEditRole({ ...r }); setShowRoleModal(r.id); }}>Edit</Btn>}
+                </div>
+                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                  {Object.entries(r.permissions).map(([mod, level]) => {
+                    const pc = { Full: B.success, Admin: B.success, View: B.blue, "View Own": B.blue, Country: B.teal, Team: B.blue, Self: B.textMuted, Learner: B.blue, Participate: B.blue, Finance: B.orange, LMS: B.purple, Audit: B.orange, "Audit Log": B.orange, Limited: B.warning, None: B.bgHover };
+                    const col = pc[level] || B.textMuted;
+                    return <Badge key={mod} color={level === "None" ? B.textMuted : col} bg={level === "None" ? B.bgHover : `${col}14`} style={{ fontSize: 8 }}>{mod}: {level}</Badge>;
+                  })}
+                </div>
+              </Card>
+            );
+          })}
+          <Modal open={!!showRoleModal} onClose={() => setShowRoleModal(null)} title={showRoleModal === "new" ? "Create Security Role" : `Edit Role: ${editRole.name}`} width={620}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 10 }}>
+                <div><FL>Role Name</FL><input value={editRole.name} onChange={e => setEditRole(p => ({ ...p, name: e.target.value }))} style={inp} /></div>
+                <div><FL>Access Level</FL><Select value={editRole.level} onChange={v => setEditRole(p => ({ ...p, level: v }))} style={{ width: "100%" }} options={["System","Global","Country","Team","Self","Functional","Audit"].map(l => ({ value: l, label: l }))} /></div>
+              </div>
+              <div><FL>Description</FL><input value={editRole.desc} onChange={e => setEditRole(p => ({ ...p, desc: e.target.value }))} style={inp} /></div>
+              <div>
+                <FL>Module Permissions</FL>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  {[{ key: "people", label: "People & Profiles" }, { key: "comp", label: "Compensation" }, { key: "surveys", label: "Surveys" }, { key: "performance", label: "Performance" }, { key: "lms", label: "Learning (LMS)" }, { key: "time", label: "Time & Leave" }, { key: "admin", label: "Administration" }, { key: "reports", label: "Reports & Analytics" }].map(m => (
+                    <div key={m.key} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 6, background: B.bgHover }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, width: 100 }}>{m.label}</span>
+                      <Select value={editRole.permissions?.[m.key] || "None"} onChange={v => setEditRole(p => ({ ...p, permissions: { ...p.permissions, [m.key]: v } }))} style={{ flex: 1, fontSize: 11 }} options={["Full","Admin","Country","Team","Self","View","View Own","Learner","Participate","Finance","Audit","Audit Log","LMS","Limited","None"].map(l => ({ value: l, label: l }))} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <Btn variant="secondary" onClick={() => setShowRoleModal(null)}>Cancel</Btn>
+                <Btn variant="primary" onClick={() => {
+                  if (showRoleModal === "new") setSecurityRoles(prev => [...prev, { ...editRole, id: `ROLE-${Date.now()}`, users: 0, locked: false }]);
+                  else setSecurityRoles(prev => prev.map(r => r.id === showRoleModal ? { ...r, ...editRole } : r));
+                  setShowRoleModal(null);
+                }}>{showRoleModal === "new" ? "Create Role" : "Save Changes"}</Btn>
+              </div>
+            </div>
+          </Modal>
+        </div>
+      );
+
+      // ── SESSIONS ───────────────────────────────────────────────────────
+      case "sessions": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Active Sessions</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>{users.filter(u => u.status === "Active").length} active sessions. Terminate any session immediately.</div>
+          <Card>
+            {users.filter(u => u.status === "Active").map((u, i) => {
+              const dur = [18, 42, 67, 95, 124, 8][i] || 30;
+              return (
+                <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: 4, background: B.success, flexShrink: 0 }} />
+                  <Avatar name={u.name} size={28} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{u.name}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>{u.role} · {COUNTRIES.find(c => c.code === u.country)?.flag} {u.ip}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>{dur} min</div>
+                    <div style={{ fontSize: 10, color: B.textMuted }}>Active</div>
+                  </div>
+                  {u.role !== "Superuser" && <Btn variant="danger" size="sm" onClick={() => alert(`Session terminated for ${u.name}`)}>Terminate</Btn>}
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+      );
+
+      // ── SALARY STRUCTURES ──────────────────────────────────────────────
+      case "salary-structures": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Salary Structures</div><div style={{ fontSize: 12, color: B.textMuted }}>Define salary bands by job level. Drag rows to reorder.</div></div>
+            <Btn variant="primary" size="sm" onClick={() => { setSalaryForm({ level: "", band: "", min: 0, mid: 0, max: 0, currency: "CAD" }); setShowSalaryEdit("new"); }}>+ Add Band</Btn>
+          </div>
+          <Card>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
+                <thead><tr style={{ background: B.bg }}>{["", "Level", "Band", "Minimum", "Midpoint", "Maximum", "Spread", "Currency", "Staff", "Actions"].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
+                <tbody>
+                  {salaryStructures.map((ss, i) => {
+                    const emp = EMPLOYEES.filter(e => e.level === ss.level).length;
+                    return (
+                      <tr key={ss.id} draggable onDragStart={() => setDragIdx(i)} onDragOver={e => e.preventDefault()} onDrop={() => { if (dragIdx !== null && dragIdx !== i) { setSalaryStructures(prev => { const n = [...prev]; const [m] = n.splice(dragIdx, 1); n.splice(i, 0, m); return n; }); setDragIdx(null); } }} style={{ background: dragIdx === i ? B.accentBg : "transparent" }} onMouseEnter={e => { if (dragIdx === null) e.currentTarget.style.background = B.bgHover; }} onMouseLeave={e => { if (dragIdx === null) e.currentTarget.style.background = "transparent"; }}>
+                        <td style={{ padding: "8px 6px", borderBottom: `1px solid ${B.borderLight}`, color: B.textMuted, cursor: "grab" }}>⋮⋮</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{ss.level}</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={B.blue} bg={`${B.blue}12`}>{ss.band}</Badge></td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.min, ss.currency)}</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{fmt(ss.mid, ss.currency)}</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.max, ss.currency)}</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{ss.spread}%</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{ss.currency}</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{emp}</td>
+                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => { setSalaryForm({ ...ss }); setShowSalaryEdit(ss.id); }}>Edit</Btn>{emp === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => prev.filter(s => s.id !== ss.id))}>Del</Btn>}</div></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+          <Modal open={!!showSalaryEdit} onClose={() => setShowSalaryEdit(null)} title={showSalaryEdit === "new" ? "Add Salary Band" : `Edit: ${salaryForm.level}`} width={500}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div><FL>Job Level</FL><Select value={salaryForm.level} onChange={v => setSalaryForm(p => ({ ...p, level: v }))} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...JOB_LEVELS.map(l => ({ value: l, label: l }))]} /></div>
+              <div><FL>Band Name</FL><input value={salaryForm.band} onChange={e => setSalaryForm(p => ({ ...p, band: e.target.value }))} placeholder="e.g. Band 4" style={inp} /></div>
+              <div><FL>Minimum</FL><input type="number" value={salaryForm.min} onChange={e => setSalaryForm(p => ({ ...p, min: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div><FL>Midpoint</FL><input type="number" value={salaryForm.mid} onChange={e => setSalaryForm(p => ({ ...p, mid: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div><FL>Maximum</FL><input type="number" value={salaryForm.max} onChange={e => setSalaryForm(p => ({ ...p, max: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div><FL>Currency</FL><Select value={salaryForm.currency} onChange={v => setSalaryForm(p => ({ ...p, currency: v }))} style={{ width: "100%" }} options={[...new Set(COUNTRIES.map(c => c.currency))].map(c => ({ value: c, label: c }))} /></div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="secondary" onClick={() => setShowSalaryEdit(null)}>Cancel</Btn>
+              <Btn variant="primary" onClick={() => {
+                const spread = salaryForm.min > 0 ? Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100) : 0;
+                if (showSalaryEdit === "new") setSalaryStructures(prev => [...prev, { ...salaryForm, id: `SS-${Date.now()}`, spread }]);
+                else setSalaryStructures(prev => prev.map(s => s.id === showSalaryEdit ? { ...s, ...salaryForm, spread } : s));
+                setShowSalaryEdit(null);
+              }}>{showSalaryEdit === "new" ? "Create" : "Save"}</Btn>
+            </div>
+          </Modal>
+        </div>
+      );
+
+      // ── JOB GRADES ─────────────────────────────────────────────────────
+      case "job-grades": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Job Evaluation Grades</div><div style={{ fontSize: 12, color: B.textMuted }}>Define the job evaluation framework: grades, categories, experience bands, market benchmarks.</div></div>
+            <Btn variant="primary" size="sm" onClick={() => { setGradeForm({ grade: "", title: "", category: "Professional", minExp: 0, maxExp: 0, benchmarks: "", factor: "", points: 0 }); setShowGradeEdit("new"); }}>+ Add Grade</Btn>
+          </div>
+          <Card>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
+                <thead><tr style={{ background: B.bg }}>{["Grade","Title","Category","Experience","Market Bench","Factor","Points","Staff",""].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
+                <tbody>{jobGrades.map(jg => {
+                  const cc = { Professional: B.blue, Management: B.purple, Executive: B.accent };
+                  const emp = EMPLOYEES.filter(e => e.level === jg.grade).length;
+                  return (
+                    <tr key={jg.id} onMouseEnter={e => e.currentTarget.style.background = B.bgHover} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{jg.grade}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.title}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={cc[jg.category] || B.textMuted} bg={`${cc[jg.category] || B.textMuted}14`}>{jg.category}</Badge></td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.minExp}-{jg.maxExp} yrs</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{jg.benchmarks}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11, color: B.textSecondary, maxWidth: 160 }}>{jg.factor}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{jg.points}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{emp}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => { setGradeForm({ ...jg }); setShowGradeEdit(jg.id); }}>Edit</Btn>{emp === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}>Del</Btn>}</div></td>
+                    </tr>
+                  );
+                })}</tbody>
+              </table>
+            </div>
+          </Card>
+          <Modal open={!!showGradeEdit} onClose={() => setShowGradeEdit(null)} title={showGradeEdit === "new" ? "Add Job Grade" : `Edit: ${gradeForm.grade}`} width={540}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div><FL>Grade Code</FL><input value={gradeForm.grade} onChange={e => setGradeForm(p => ({ ...p, grade: e.target.value }))} placeholder="e.g. P6" style={inp} /></div>
+              <div><FL>Title</FL><input value={gradeForm.title} onChange={e => setGradeForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Principal Specialist" style={inp} /></div>
+              <div><FL>Category</FL><Select value={gradeForm.category} onChange={v => setGradeForm(p => ({ ...p, category: v }))} style={{ width: "100%" }} options={["Professional","Management","Executive","Support","Intern"].map(c => ({ value: c, label: c }))} /></div>
+              <div><FL>Evaluation Points</FL><input type="number" value={gradeForm.points} onChange={e => setGradeForm(p => ({ ...p, points: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div><FL>Min Experience (yrs)</FL><input type="number" value={gradeForm.minExp} onChange={e => setGradeForm(p => ({ ...p, minExp: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div><FL>Max Experience (yrs)</FL><input type="number" value={gradeForm.maxExp} onChange={e => setGradeForm(p => ({ ...p, maxExp: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div style={{ gridColumn: "1 / -1" }}><FL>Market Benchmark</FL><input value={gradeForm.benchmarks} onChange={e => setGradeForm(p => ({ ...p, benchmarks: e.target.value }))} placeholder="e.g. Market P50-P65" style={inp} /></div>
+              <div style={{ gridColumn: "1 / -1" }}><FL>Evaluation Factor</FL><input value={gradeForm.factor} onChange={e => setGradeForm(p => ({ ...p, factor: e.target.value }))} placeholder="e.g. Team leadership, budget accountability" style={inp} /></div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="secondary" onClick={() => setShowGradeEdit(null)}>Cancel</Btn>
+              <Btn variant="primary" onClick={() => {
+                if (showGradeEdit === "new") setJobGrades(prev => [...prev, { ...gradeForm, id: `JG-${Date.now()}` }]);
+                else setJobGrades(prev => prev.map(g => g.id === showGradeEdit ? { ...g, ...gradeForm } : g));
+                setShowGradeEdit(null);
+              }}>{showGradeEdit === "new" ? "Create" : "Save"}</Btn>
+            </div>
+          </Modal>
+        </div>
+      );
+
+      // ── LEAVE TYPES ────────────────────────────────────────────────────
+      case "leave-types": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Leave Types & Policies</div><div style={{ fontSize: 12, color: B.textMuted }}>Configure leave types, accrual rules, caps, and carryover per policy.</div></div>
+            <Btn variant="primary" size="sm" onClick={() => { setLeaveForm({ name: "", accrual: "", cap: 0, carryover: 0, paid: true, countries: "All", requiresApproval: true }); setShowLeaveEdit("new"); }}>+ Add Leave Type</Btn>
+          </div>
+          <Card>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
+              <thead><tr style={{ background: B.bg }}>{["Leave Type","Accrual","Cap (days)","Carryover","Paid","Approval","Countries",""].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
+              <tbody>{leaveTypes.map(lt => (
+                <tr key={lt.id} onMouseEnter={e => e.currentTarget.style.background = B.bgHover} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{lt.name}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{lt.accrual}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 600 }}>{lt.cap}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.carryover > 0 ? `${lt.carryover} days` : "None"}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.paid ? <Badge color={B.success} bg={B.successBg}>Paid</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Unpaid</Badge>}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.requiresApproval ? <Badge color={B.blue} bg={`${B.blue}12`}>Required</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Auto</Badge>}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11, color: B.textMuted }}>{lt.countries}</td>
+                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Btn variant="ghost" size="sm" onClick={() => { setLeaveForm({ ...lt }); setShowLeaveEdit(lt.id); }}>Edit</Btn></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </Card>
+          <Modal open={!!showLeaveEdit} onClose={() => setShowLeaveEdit(null)} title={showLeaveEdit === "new" ? "Add Leave Type" : `Edit: ${leaveForm.name}`} width={500}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={{ gridColumn: "1 / -1" }}><FL>Leave Type Name</FL><input value={leaveForm.name} onChange={e => setLeaveForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Study Leave" style={inp} /></div>
+              <div style={{ gridColumn: "1 / -1" }}><FL>Accrual Rule</FL><input value={leaveForm.accrual} onChange={e => setLeaveForm(p => ({ ...p, accrual: e.target.value }))} placeholder="e.g. 1.67 days/month" style={inp} /></div>
+              <div><FL>Annual Cap (days)</FL><input type="number" value={leaveForm.cap} onChange={e => setLeaveForm(p => ({ ...p, cap: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div><FL>Carryover (days)</FL><input type="number" value={leaveForm.carryover} onChange={e => setLeaveForm(p => ({ ...p, carryover: parseInt(e.target.value) || 0 }))} style={inp} /></div>
+              <div style={{ gridColumn: "1 / -1" }}><FL>Applicable Countries</FL><input value={leaveForm.countries} onChange={e => setLeaveForm(p => ({ ...p, countries: e.target.value }))} placeholder="e.g. All or CA, GB, IT" style={inp} /></div>
+              <div style={{ display: "flex", gap: 12 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer" }}><input type="checkbox" checked={leaveForm.paid} onChange={e => setLeaveForm(p => ({ ...p, paid: e.target.checked }))} /> Paid Leave</label>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer" }}><input type="checkbox" checked={leaveForm.requiresApproval} onChange={e => setLeaveForm(p => ({ ...p, requiresApproval: e.target.checked }))} /> Requires Approval</label>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="secondary" onClick={() => setShowLeaveEdit(null)}>Cancel</Btn>
+              <Btn variant="primary" onClick={() => {
+                if (showLeaveEdit === "new") setLeaveTypes(prev => [...prev, { ...leaveForm, id: `LT-${Date.now()}` }]);
+                else setLeaveTypes(prev => prev.map(l => l.id === showLeaveEdit ? { ...l, ...leaveForm } : l));
+                setShowLeaveEdit(null);
+              }}>{showLeaveEdit === "new" ? "Add Leave Type" : "Save"}</Btn>
+            </div>
+          </Modal>
+        </div>
+      );
+
+      // ── NOTIFICATIONS ──────────────────────────────────────────────────
+      case "notifications": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Email & Alert Settings</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Configure system-wide email notifications and automated alerts. Changes apply to all applicable users.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <Card>
+              <SectionTitle>HR & People Alerts</SectionTitle>
+              <ToggleSw on={notifications.newHireAlert} onToggle={() => setNotifications(p => ({ ...p, newHireAlert: !p.newHireAlert }))} label="New Hire Notification" desc="Alert HR when a new employee is added to the system" />
+              <ToggleSw on={notifications.contractExpiry} onToggle={() => setNotifications(p => ({ ...p, contractExpiry: !p.contractExpiry }))} label="Contract Expiry Alert" desc="30-day advance notice for expiring fixed-term contracts" />
+              <ToggleSw on={notifications.birthdayReminder} onToggle={() => setNotifications(p => ({ ...p, birthdayReminder: !p.birthdayReminder }))} label="Birthday Reminders" desc="Notify managers of team member birthdays" />
+              <ToggleSw on={notifications.anniversaryAlert} onToggle={() => setNotifications(p => ({ ...p, anniversaryAlert: !p.anniversaryAlert }))} label="Work Anniversary Alert" desc="Celebrate employment milestones automatically" />
+              <ToggleSw on={notifications.certExpiry} onToggle={() => setNotifications(p => ({ ...p, certExpiry: !p.certExpiry }))} label="Certification Expiry" desc="Alert employees and HR 60 days before cert expiry" />
+            </Card>
+            <Card>
+              <SectionTitle>Workflow & Approvals</SectionTitle>
+              <ToggleSw on={notifications.leaveRequest} onToggle={() => setNotifications(p => ({ ...p, leaveRequest: !p.leaveRequest }))} label="Leave Request Submitted" desc="Notify approver immediately on new leave request" />
+              <ToggleSw on={notifications.approvalNeeded} onToggle={() => setNotifications(p => ({ ...p, approvalNeeded: !p.approvalNeeded }))} label="Approval Pending Reminder" desc="Daily reminder for outstanding approvals older than 48h" />
+              <ToggleSw on={notifications.performanceDeadline} onToggle={() => setNotifications(p => ({ ...p, performanceDeadline: !p.performanceDeadline }))} label="Review Cycle Deadlines" desc="7-day and 1-day warnings for review completion" />
+              <ToggleSw on={notifications.payrollReminder} onToggle={() => setNotifications(p => ({ ...p, payrollReminder: !p.payrollReminder }))} label="Payroll Processing Reminder" desc="Alert payroll admin 3 days before close date" />
+              <ToggleSw on={notifications.weeklyDigest} onToggle={() => setNotifications(p => ({ ...p, weeklyDigest: !p.weeklyDigest }))} label="Weekly HR Digest" desc="Summary of new hires, leavers, approvals, and alerts" />
+            </Card>
+            <Card>
+              <SectionTitle>Security Alerts</SectionTitle>
+              <ToggleSw on={notifications.mfaAlerts} onToggle={() => setNotifications(p => ({ ...p, mfaAlerts: !p.mfaAlerts }))} label="MFA Disabled Alert" desc="Alert Superuser when a user disables multi-factor auth" />
+              <ToggleSw on={notifications.loginAlerts} onToggle={() => setNotifications(p => ({ ...p, loginAlerts: !p.loginAlerts }))} label="Suspicious Login Alert" desc="Flag logins from new IP addresses or unusual locations" />
+            </Card>
+          </div>
+        </div>
+      );
+
+      // ── INTEGRATIONS ───────────────────────────────────────────────────
+      case "integrations": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Connected Apps</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Manage third-party integrations and data sync connections.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {integrations.map(int => (
+              <Card key={int.id} style={{ borderLeft: `4px solid ${int.status === "connected" ? B.success : B.border}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: `${int.color}18`, border: `1px solid ${int.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: int.color }}>{int.logo}</div>
+                    <div><div style={{ fontWeight: 700, fontSize: 14 }}>{int.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{int.desc}</div></div>
+                  </div>
+                  {int.status === "connected" ? <Badge color={B.success} bg={B.successBg}>Connected</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Not Connected</Badge>}
+                </div>
+                {int.lastSync && <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 8 }}>Last sync: {new Date(int.lastSync).toLocaleString("en-CA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</div>}
+                <div style={{ display: "flex", gap: 6 }}>
+                  {int.status === "connected" ? (
+                    <><Btn variant="secondary" size="sm" onClick={() => alert(`Configure ${int.name} settings`)}>Configure</Btn><Btn variant="ghost" size="sm" onClick={() => alert(`Syncing ${int.name}...`)}>Sync Now</Btn></>
+                  ) : (
+                    <Btn variant="primary" size="sm" onClick={() => alert(`Connect ${int.name} — enter credentials to enable`)}>Connect</Btn>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      );
+
+      // ── API KEYS ───────────────────────────────────────────────────────
+      case "api-keys": return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>API Keys & Webhooks</div><div style={{ fontSize: 12, color: B.textMuted }}>Manage API credentials for external integrations.</div></div>
+            {isSU && <Btn variant="primary" size="sm" onClick={() => alert("Generate new API key — set name, scope, and expiry")}>+ Generate Key</Btn>}
+          </div>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Active API Keys</SectionTitle>
+            <Table columns={[
+              { label: "Key Name", render: r => <div><div style={{ fontWeight: 700, fontSize: 12 }}>{r.name}</div><div style={{ fontSize: 10, color: B.textMuted, fontFamily: "monospace" }}>{r.id} · •••••••••••••••••••</div></div> },
+              { label: "Scope", render: r => <Badge color={B.blue} bg={`${B.blue}12`}>{r.scope}</Badge> },
+              { label: "Created", render: r => fmtDate(r.created) },
+              { label: "Last Used", render: r => fmtDate(r.lastUsed) },
+              { label: "Status", render: r => <StatusBadge status={r.status === "active" ? "Active" : "Expired"} /> },
+              { label: "Actions", render: r => <div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => alert(`Viewing key details for ${r.name}`)}>View</Btn>{isSU && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => alert(`API key ${r.name} revoked`)}>Revoke</Btn>}</div> },
+            ]} data={apiKeys} />
+          </Card>
+          <Card>
+            <SectionTitle>Webhook Endpoints</SectionTitle>
+            <div style={{ padding: "12px 14px", borderRadius: 6, background: B.bgHover, marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div><div style={{ fontSize: 13, fontWeight: 700 }}>Employee Change Webhook</div><div style={{ fontSize: 11, color: B.textMuted, fontFamily: "monospace" }}>POST https://api.nutritionintl.org/webhooks/hris/employee</div></div>
+              <Badge color={B.success} bg={B.successBg}>Active</Badge>
+            </div>
+            <div style={{ padding: "12px 14px", borderRadius: 6, background: B.bgHover, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div><div style={{ fontSize: 13, fontWeight: 700 }}>Payroll Sync Webhook</div><div style={{ fontSize: 11, color: B.textMuted, fontFamily: "monospace" }}>POST https://api.nutritionintl.org/webhooks/hris/payroll</div></div>
+              <Badge color={B.success} bg={B.successBg}>Active</Badge>
+            </div>
+            {isSU && <Btn variant="secondary" size="sm" style={{ marginTop: 10 }} onClick={() => alert("Add webhook endpoint — set URL, events, and secret")}>+ Add Endpoint</Btn>}
+          </Card>
+        </div>
+      );
+
+      // ── FEATURE MANAGEMENT ─────────────────────────────────────────────
+      case "features": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Feature Management</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Enable or disable modules and feature flags globally. Changes affect all users immediately.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <Card>
+              <SectionTitle>Core Modules</SectionTitle>
+              {[{ key: "dashboard", label: "Dashboard", desc: "Main overview, metrics, and announcements" }, { key: "people", label: "People Directory", desc: "Employee directory, profiles, and search" }, { key: "time", label: "Time & Attendance", desc: "Clock in/out, timesheets, leave management" }, { key: "approvals", label: "Approvals Inbox", desc: "Leave, compensation, and allowance approvals" }, { key: "allowances", label: "Allowances (H&W / L&D)", desc: "Receipt upload and reimbursement claims" }, { key: "workflows", label: "Workflow Engine", desc: "Configurable approval chains and routing" }, { key: "analytics", label: "Analytics & Reporting", desc: "Workforce analytics and visual dashboards" }, { key: "recruiting", label: "Recruiting (Workable)", desc: "ATS integration and candidate pipeline" }].map(f => <ToggleSw key={f.key} on={featureToggles[f.key]} onToggle={() => setShowConfirm(f.key)} label={f.label} desc={f.desc} />)}
+            </Card>
+            <Card>
+              <SectionTitle>Feature Flags</SectionTitle>
+              {[{ key: "clockInOut", label: "Mobile Clock In/Out", desc: "GPS-enabled remote time tracking" }, { key: "gpsTracking", label: "GPS Location Tracking", desc: "Field staff location verification" }, { key: "offlineMode", label: "Offline Mode", desc: "Queue events when no connectivity" }, { key: "grantTimesheets", label: "Grant / Project Timesheets", desc: "Donor allocation tracking" }, { key: "laborCompliance", label: "Labor Compliance Engine", desc: "14-country overtime and rest rules" }, { key: "multiCurrency", label: "Multi-Currency Payroll", desc: "Cross-border payroll consolidation" }, { key: "verificationLetters", label: "Verification Letters", desc: "Auto-generated employment letters" }, { key: "benefitsTab", label: "Benefits Package View", desc: "Country-specific benefits display" }, { key: "hwAllowance", label: "Health & Wellness Claims", desc: "Receipt-based wellness reimbursement" }, { key: "ldAllowance", label: "L&D Claims", desc: "Learning and development reimbursement" }].map(f => <ToggleSw key={f.key} on={featureToggles[f.key]} onToggle={() => setShowConfirm(f.key)} label={f.label} desc={f.desc} />)}
+            </Card>
+          </div>
+          <Modal open={!!showConfirm} onClose={() => setShowConfirm(null)} title="Confirm Feature Change" width={440}>
+            <div style={{ fontSize: 13, color: B.textSecondary, marginBottom: 16, lineHeight: 1.6 }}>Are you sure you want to <strong>{featureToggles[showConfirm] ? "DISABLE" : "ENABLE"}</strong> <strong>{showConfirm}</strong>? This takes effect immediately for all users.</div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <Btn variant="secondary" onClick={() => setShowConfirm(null)}>Cancel</Btn>
+              <Btn variant={featureToggles[showConfirm] ? "danger" : "success"} onClick={() => { setFeatureToggles(p => ({ ...p, [showConfirm]: !p[showConfirm] })); setShowConfirm(null); }}>{featureToggles[showConfirm] ? "Disable" : "Enable"}</Btn>
+            </div>
+          </Modal>
+        </div>
+      );
+
+      // ── ADD-ONS ────────────────────────────────────────────────────────
+      case "addons": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Add-On Modules</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Extend the core HRIS with specialized tools. Assign to all staff, departments, or individuals.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {addOnModules.map(mod => (
+              <Card key={mod.id} style={{ borderLeft: `4px solid ${mod.status === "active" ? B.success : B.textMuted}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{mod.name}</div>
+                  <StatusBadge status={mod.status === "active" ? "Active" : "Pending"} />
+                </div>
+                <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 10 }}>{mod.desc}</div>
+                <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 8 }}>Assigned to: <strong>{mod.assignedTo === "all" ? `All staff (${EMPLOYEES.length})` : mod.assignedTo === "groups" ? mod.assignedGroups.join(", ") : mod.assignedTo === "none" ? "Not assigned (draft)" : "Individuals"}</strong></div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <Btn variant="primary" size="sm" onClick={() => alert(`Configure assignment for ${mod.name}`)}>Assign</Btn>
+                  {mod.status === "draft" ? <Btn variant="success" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "active" } : m))}>Activate</Btn> : <Btn variant="secondary" size="sm" onClick={() => setAddOnModules(prev => prev.map(m => m.id === mod.id ? { ...m, status: "draft" } : m))}>Deactivate</Btn>}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      );
+
+      // ── MASS UPLOAD ────────────────────────────────────────────────────
+      case "mass-upload": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Mass Data Upload</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Batch-upload data into any module. Files are validated, auto-mapped, and previewed before import.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            {[{ label: "Employee Master Data", color: B.accent, desc: "Initial population or bulk update of employee records", module: "employee data", fields: ["Employee ID","First Name","Last Name","Email","Country","Department","Title","Level","Hire Date","Salary"] },
+              { label: "Compensation & Payroll", color: B.teal, desc: "Batch upload salary changes, bonus payments, or COLA adjustments", module: "compensation data", fields: ["Employee ID","Effective Date","Change Type","Old Salary","New Salary","Currency","Reason"] },
+              { label: "Leave & Time Records", color: B.blue, desc: "Import historical leave records or leave balance adjustments", module: "leave records", fields: ["Employee ID","Leave Type","Start Date","End Date","Days","Status","Approved By"] },
+              { label: "Performance Reviews", color: B.purple, desc: "Import performance ratings, review cycles, and goals", module: "performance data", fields: ["Employee ID","Review Cycle","Rating","Reviewer","Goals Met","Status"] },
+              { label: "Grant / Project Allocations", color: B.dkTeal, desc: "Import grant allocation percentages and project assignments", module: "grant allocation data", fields: ["Employee ID","Grant Code","Grant Name","Allocation %","Period","Hours"] },
+              { label: "Allowance Claims", color: B.ltPurple, desc: "Batch import historical allowance claims", module: "allowance claims", fields: ["Employee ID","Type","Description","Amount","Currency","Date","Status"] },
+            ].map(({ label, color, desc, module, fields }) => (
+              <Card key={label} style={{ borderTop: `4px solid ${color}` }}>
+                <SectionTitle>{label}</SectionTitle>
+                <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>{desc}</div>
+                <BatchUpload module={module} color={color} fields={fields} sampleRows={[fields.map(() => "...")]} onUpload={n => alert(`${n} ${module} records imported successfully`)} />
+              </Card>
+            ))}
+          </div>
+        </div>
+      );
+
+      // ── FORMATTING ─────────────────────────────────────────────────────
+      case "formatting": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 16 }}>Display & Formatting</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <Card>
+              <SectionTitle>Global Formatting</SectionTitle>
+              {[{ key: "dateFormat", label: "Date Format", opts: [{ value: "MMM D, YYYY", label: "Apr 30, 2026" }, { value: "DD/MM/YYYY", label: "30/04/2026" }, { value: "YYYY-MM-DD", label: "2026-04-30" }, { value: "MM/DD/YYYY", label: "04/30/2026" }] }, { key: "timeFormat", label: "Time Format", opts: [{ value: "12h", label: "12-hour (2:30 PM)" }, { value: "24h", label: "24-hour (14:30)" }] }, { key: "currency", label: "Currency Display", opts: [{ value: "local", label: "Local Currency" }, { value: "usd", label: "USD Equivalent" }, { value: "both", label: "Both (local + USD)" }] }, { key: "decimals", label: "Decimal Places", opts: [{ value: "0", label: "No decimals ($1,234)" }, { value: "2", label: "2 decimals ($1,234.56)" }] }, { key: "tableRows", label: "Default Table Rows", opts: [{ value: "10", label: "10 rows" }, { value: "25", label: "25 rows" }, { value: "50", label: "50 rows" }] }].map(s => (
+                <div key={s.key} style={{ marginBottom: 12 }}><FL>{s.label}</FL><Select value={formatSettings[s.key]} onChange={v => setFormatSettings(p => ({ ...p, [s.key]: v }))} style={{ width: "100%" }} options={s.opts} /></div>
+              ))}
+            </Card>
+            <Card>
+              <SectionTitle>UI & Layout</SectionTitle>
+              {[{ key: "theme", label: "Color Theme", opts: [{ value: "light", label: "Light (NI Standard)" }, { value: "dark", label: "Dark Mode" }, { value: "highContrast", label: "High Contrast (WCAG AAA)" }] }, { key: "sidebarDefault", label: "Sidebar Default", opts: [{ value: "expanded", label: "Expanded" }, { value: "collapsed", label: "Collapsed" }] }, { key: "lang", label: "System Language", opts: [{ value: "en", label: "English" }, { value: "fr", label: "Francais" }, { value: "es", label: "Espanol" }] }, { key: "cardStyle", label: "Card Style", opts: [{ value: "shadow", label: "Subtle shadow" }, { value: "border", label: "Border only" }, { value: "flat", label: "Flat" }] }, { key: "fontScale", label: "Font Scale", opts: [{ value: "90", label: "90% (Compact)" }, { value: "100", label: "100% (Default)" }, { value: "110", label: "110% (Large)" }, { value: "120", label: "120% (Extra Large)" }] }].map(s => (
+                <div key={s.key} style={{ marginBottom: 12 }}><FL>{s.label}</FL><Select value={formatSettings[s.key]} onChange={v => setFormatSettings(p => ({ ...p, [s.key]: v }))} style={{ width: "100%" }} options={s.opts} /></div>
+              ))}
+              <Btn variant="primary" style={{ width: "100%", marginTop: 8 }} onClick={() => alert("Formatting saved and applied globally")}>Save Changes</Btn>
+            </Card>
+          </div>
+        </div>
+      );
+
+      // ── REPORT BUILDER ─────────────────────────────────────────────────
+      case "report-builder": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 16 }}>Report Builder</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <Card style={{ gridRow: "1 / 3" }}>
+              <SectionTitle>Select Report Template</SectionTitle>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {REPORT_TEMPLATES.map(r => (
+                  <div key={r.value} onClick={() => setReportType(r.value)} style={{ padding: "10px 12px", borderRadius: 6, cursor: "pointer", border: `1px solid ${reportType === r.value ? B.accent : B.border}`, background: reportType === r.value ? B.accentBg : B.white }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: reportType === r.value ? B.accent : B.textPrimary }}>{r.label}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>{r.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            <Card>
+              <SectionTitle>Filters</SectionTitle>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div><FL>Country / Entity</FL><Select value={reportCountry} onChange={setReportCountry} style={{ width: "100%" }} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} /></div>
+                <div><FL>Department</FL><Select value={reportDept} onChange={setReportDept} style={{ width: "100%" }} options={[{ value: "ALL", label: "All Departments" }, ...DEPARTMENTS.map(d => ({ value: d, label: d }))]} /></div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <div><FL>From Date</FL><input type="date" value={reportDateFrom} onChange={e => setReportDateFrom(e.target.value)} style={inp} /></div>
+                  <div><FL>To Date</FL><input type="date" value={reportDateTo} onChange={e => setReportDateTo(e.target.value)} style={inp} /></div>
+                </div>
+                <div><FL>Export Format</FL>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {["pdf","xlsx","csv","json"].map(f => <button key={f} onClick={() => setReportFormat(f)} style={{ flex: 1, padding: "7px 0", borderRadius: 6, border: `1px solid ${reportFormat === f ? B.accent : B.border}`, background: reportFormat === f ? B.accentBg : B.white, color: reportFormat === f ? B.accent : B.textMuted, fontWeight: 700, fontSize: 11, cursor: "pointer", fontFamily: "Arial, sans-serif" }}>{f.toUpperCase()}</button>)}
+                  </div>
+                </div>
+                <Btn variant="primary" onClick={() => { setReportGenerated(true); setTimeout(() => setReportGenerated(false), 3000); }} disabled={!reportType}>Generate Report</Btn>
+                {reportGenerated && <div style={{ padding: "10px 14px", borderRadius: 6, background: B.successBg, fontSize: 12, color: B.success, fontWeight: 700 }}>Report generated — {reportFormat.toUpperCase()} ready for download</div>}
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+
+      // ── SAVED REPORTS ──────────────────────────────────────────────────
+      case "saved-reports": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 16 }}>Saved Reports</div>
+          <Card>
+            <Table columns={[
+              { label: "Report", render: r => <div><div style={{ fontWeight: 700 }}>{r.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{r.id}</div></div> },
+              { label: "Type", key: "type" },
+              { label: "Created", render: r => fmtDate(r.created) },
+              { label: "By", key: "createdBy" },
+              { label: "Format", render: r => <Badge color={B.blue} bg={`${B.blue}12`}>{r.format}</Badge> },
+              { label: "Rows", key: "rows" },
+              { label: "Actions", render: r => <div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => alert(`Downloading ${r.name}`)}>Download</Btn><Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSavedReports(prev => prev.filter(x => x.id !== r.id))}>Delete</Btn></div> },
+            ]} data={savedReports} />
+          </Card>
+        </div>
+      );
+
+      // ── AUDIT LOG ──────────────────────────────────────────────────────
+      case "audit-log": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 12 }}>Audit Log</div>
+          <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 200 }}><SearchBar value={auditSearch} onChange={setAuditSearch} placeholder="Search by target, detail, user, IP..." /></div>
+            <Select value={auditFilter} onChange={setAuditFilter} options={[{ value: "ALL", label: "All Actions" }, ...uniqueAuditActions.map(a => ({ value: a, label: a }))]} />
+            <Select value={auditUserFilter} onChange={setAuditUserFilter} options={[{ value: "ALL", label: "All Users" }, ...uniqueAuditUsers.map(u => ({ value: u, label: u }))]} />
+          </div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 8 }}>{filteredAudit.length} entries</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {filteredAudit.slice(0, 50).map(a => {
+              const ac = { Modified: B.blue, Created: B.success, Approved: B.teal, Deleted: B.danger, "Config Change": B.purple, Submitted: B.orange, "Feature Toggle": B.yellow, "Role Change": B.pink, Generated: B.teal };
+              const col = ac[a.action] || B.textMuted;
+              return (
+                <Card key={a.id} style={{ padding: 12 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: 4, background: col, marginTop: 5, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
+                        <Badge color={col} bg={`${col}14`}>{a.action}</Badge>
+                        <span style={{ fontSize: 13, fontWeight: 700 }}>{a.target}</span>
+                        <span style={{ fontSize: 11, color: B.textMuted, marginLeft: "auto" }}>{new Date(a.timestamp).toLocaleString("en-CA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                      </div>
+                      <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 3 }}>{a.detail}</div>
+                      <div style={{ fontSize: 11, color: B.textMuted }}>{a.user} · {a.ip} · {a.location}</div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      );
+
+      // ── EDIT HISTORY ───────────────────────────────────────────────────
+      case "edit-history": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Edit History</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 14 }}>Search for any employee and view or correct their effective-dated record history. All edits are audit-logged.</div>
+          <SearchBar value={historySearch} onChange={setHistorySearch} placeholder="Search employee by name or ID..." />
+          <div style={{ marginTop: 14 }}>
+            {historySearch.length < 2 ? (
+              <div style={{ textAlign: "center", padding: 30, color: B.textMuted, fontSize: 13 }}>Type at least 2 characters to search.</div>
+            ) : (
+              EMPLOYEES.filter(e => `${e.first} ${e.last} ${e.id}`.toLowerCase().includes(historySearch.toLowerCase())).slice(0, 5).map(emp => (
+                <Card key={emp.id} style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <Avatar name={`${emp.first} ${emp.last}`} size={32} />
+                    <div><div style={{ fontSize: 13, fontWeight: 700 }}>{emp.first} {emp.last}</div><div style={{ fontSize: 11, color: B.textMuted }}>{emp.id} · {emp.title} · {emp.flag} {emp.countryName}</div></div>
+                  </div>
+                  {emp.employmentHistory.slice(0, 6).map((h, i) => {
+                    const fc = { Status: B.success, Title: B.blue, Level: B.purple, Department: B.orange, Entity: B.teal, Compensation: B.accent };
+                    return (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 3, fontSize: 11 }}>
+                        <Badge color={fc[h.field] || B.textMuted} bg={`${fc[h.field] || B.textMuted}14`} style={{ fontSize: 8, width: 70 }}>{h.field}</Badge>
+                        <span style={{ color: B.textMuted, width: 80 }}>{fmtDate(h.effectiveDate)}</span>
+                        <span style={{ color: B.textMuted, textDecoration: "line-through" }}>{h.oldValue}</span>
+                        <span style={{ color: B.textMuted }}>→</span>
+                        <span style={{ fontWeight: 700, flex: 1 }}>{h.newValue}</span>
+                        <span style={{ color: B.textMuted, fontSize: 10 }}>{h.reason}</span>
+                        <Btn variant="ghost" size="sm" onClick={() => alert(`Edit record for ${emp.first} ${emp.last} — field: ${h.field}`)}>Edit</Btn>
+                      </div>
+                    );
+                  })}
+                </Card>
+              ))
+            )}
+          </div>
+        </div>
+      );
+
+      // ── DATA RETENTION ─────────────────────────────────────────────────
+      case "data-retention": return (
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Data Retention Policies</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Configure how long each data category is retained before automatic archival or deletion. All policies must comply with local labor law.</div>
+          <div style={{ padding: "10px 14px", borderRadius: 6, background: B.warningBg, border: `1px solid ${B.warning}30`, fontSize: 12, color: B.textSecondary, marginBottom: 16 }}>
+            Changes to retention policies take effect on the next scheduled data review. Consult Legal before reducing any retention period.
+          </div>
+          <Card>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {[{ k: "employeeRecords", l: "Employee Records" }, { k: "payrollData", l: "Payroll Data" }, { k: "leaveRecords", l: "Leave Records" }, { k: "auditLogs", l: "Audit Logs" }, { k: "performanceReviews", l: "Performance Reviews" }, { k: "documentScans", l: "Document Scans" }, { k: "sessionLogs", l: "Session Logs" }, { k: "surveyResponses", l: "Survey Responses" }].map(({ k, l }) => (
+                <div key={k} style={{ padding: "10px 12px", borderRadius: 8, background: B.bgHover, border: `1px solid ${B.border}` }}>
+                  <FL>{l}</FL>
+                  <Select value={retention[k]} onChange={v => setRetention(p => ({ ...p, [k]: v }))} style={{ width: "100%" }} options={[{ value: "1y", label: "1 year" }, { value: "2y", label: "2 years" }, { value: "3y", label: "3 years" }, { value: "5y", label: "5 years" }, { value: "7y", label: "7 years" }, { value: "10y", label: "10 years" }, { value: "indefinite", label: "Indefinitely" }]} />
+                </div>
+              ))}
+            </div>
+            <Btn variant="primary" style={{ marginTop: 16 }} onClick={() => alert("Data retention policies saved. Changes will apply at next scheduled review.")}>Save Retention Policies</Btn>
+          </Card>
+        </div>
+      );
+
+      default: return <div style={{ padding: 30, textAlign: "center", color: B.textMuted }}>Select a setting from the left menu.</div>;
+    }
+  };
+
+  return (
+    <div>
+      {/* Banner */}
+      <div style={{ padding: "12px 18px", borderRadius: 8, background: `linear-gradient(135deg, ${B.charcoal}, ${B.grey})`, color: "#fff", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+        <NIcon name="admin" size={24} color="#fff" />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 700 }}>Settings Super Center</div>
+          <div style={{ fontSize: 11, opacity: 0.75 }}>All setup, configuration, and administration settings in one place. All changes are audit-logged.</div>
+        </div>
+        <Badge color={isSU ? B.yellow : B.accent} bg={isSU ? "rgba(255,184,28,0.2)" : "rgba(255,255,255,0.15)"}>{isSU ? "SUPERUSER" : "HR ADMIN"}</Badge>
+      </div>
+
+      {/* Two-panel layout */}
+      <div style={{ display: "flex", gap: 0, border: `1px solid ${B.border}`, borderRadius: 8, overflow: "hidden", minHeight: 620, background: B.white }}>
+        {/* Left nav */}
+        <div style={{ width: 220, borderRight: `1px solid ${B.border}`, background: B.bg, flexShrink: 0, overflowY: "auto" }}>
+          {NAV_GROUPS.map(group => (
+            <div key={group.group}>
+              <div style={{ padding: "10px 14px 4px", fontSize: 9, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 1, fontFamily: "Arial, sans-serif" }}>{group.group}</div>
+              {group.items.map(item => {
+                const locked = item.superOnly && !isSU;
+                const active = section === item.key;
+                if (locked) return null;
+                return (
+                  <button key={item.key} onClick={() => setSection(item.key)}
+                    style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", padding: "7px 14px 7px 12px", border: "none", borderLeft: `3px solid ${active ? B.accent : "transparent"}`, background: active ? B.accentBg : "transparent", color: active ? B.accent : B.textSecondary, fontWeight: active ? 700 : 500, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "Arial, sans-serif", transition: "all 0.1s" }}
+                    onMouseEnter={e => { if (!active) e.currentTarget.style.background = B.bgHover; }}
+                    onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}>
+                    {item.label}
+                    {item.superOnly && <Badge color={B.yellow} bg={`${B.yellow}18`} style={{ fontSize: 8, marginLeft: "auto" }}>SU</Badge>}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div style={{ flex: 1, padding: 24, overflowY: "auto" }}>
+          {renderSection()}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── SETTINGS / ADMIN (ENHANCED with Reporting Center) ──────────────────────
 const SettingsModule = () => {
   const [tab, setTab] = useState("reports");
@@ -7092,8 +8089,7 @@ const NAV = [
   { key: "onboarding", label: "Onboarding",     icon: "onboarding",  roles: ["hr", "superuser"] },
   { key: "compplan",   label: "Comp Planning",  icon: "comp",        roles: ["hr", "superuser"] },
   { key: "analytics",  label: "Analytics",      icon: "analytics",   roles: ["hr", "superuser"] },
-  { key: "settings",   label: "Admin",          icon: "admin",       roles: ["hr", "superuser"] },
-  { key: "superuser",  label: "Superuser",      icon: "superuser",   roles: ["superuser"], superOnly: true },
+  { key: "settings",   label: "Settings",       icon: "admin",       roles: ["hr", "superuser"] },
 ];
 
 const ROLE_META = {
@@ -7151,8 +8147,7 @@ export default function App() {
       case "surveys":     return <SurveyModule />;
       case "workflows":   return <WorkflowModule />;
       case "analytics":   return <AnalyticsModule />;
-      case "settings":    return <SettingsModule />;
-      case "superuser":   return isSuperuser ? <SuperuserModule /> : <DashboardModule setModule={setModule} />;
+      case "settings":    return <SettingsSuperCenter role={role} />;
       default:            return <DashboardModule setModule={setModule} />;
     }
   };
