@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 // ─── NI BRAND COLORS ────────────────────────────────────────────────────────
 const B = {
@@ -7879,82 +7879,754 @@ const SuperuserModule = () => {
 };
 
 // ─── PERFORMANCE MANAGEMENT MODULE ───────────────────────────────────────────
-const PerformanceModule = ({ employee: empProp } = {}) => {
+const PerformanceModule = ({ employee: empProp, role } = {}) => {
   const emp = empProp || ME;
-  const [tab, setTab] = useState("dashboard");
-  const [selectedCycle, setSelectedCycle] = useState("2026-H1");
-  const [showGoalModal, setShowGoalModal] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [showCheckin, setShowCheckin] = useState(false);
-  const [show360, setShow360] = useState(false);
-  const [nineBoxView, setNineBoxView] = useState(false);
+  const isEmp   = role === "employee";
+  const isMgr   = role === "manager";
+  const isAdmin = role === "hr" || role === "superuser";
+  // ── Reference data ─────────────────────────────────────────────────────────
+  const KRAs = [
+    { id: "KRA-1", title: "Reach 200M people with vitamin A supplementation by year-end", area: "Programs" },
+    { id: "KRA-2", title: "Achieve 95% grant reporting compliance across all donors", area: "Finance" },
+    { id: "KRA-3", title: "Strengthen country office capacity in 5 regions", area: "Operations" },
+    { id: "KRA-4", title: "Build a high-performing, engaged global workforce", area: "People" },
+    { id: "KRA-5", title: "Expand strategic partnerships by 20% in 2026", area: "External Relations" },
+  ];
+  const MANAGER_GOALS = [
+    { id: "MG-1", title: "Deliver Q2 program targets across 3 country offices", owner: "Sarah Chen", progress: 72 },
+    { id: "MG-2", title: "Achieve 90% stakeholder satisfaction in annual survey", owner: "Sarah Chen", progress: 58 },
+    { id: "MG-3", title: "Build inclusive team culture — 85% engagement score", owner: "Sarah Chen", progress: 65 },
+  ];
+  const COMP_FRAMEWORKS = {
+    default: [
+      { id: "CF-1", name: "Delivering Results", desc: "Sets ambitious goals and takes ownership through completion", weight: 20 },
+      { id: "CF-2", name: "Collaboration & Teamwork", desc: "Builds trust across teams; contributes to collective success", weight: 20 },
+      { id: "CF-3", name: "Technical Excellence", desc: "Applies specialist knowledge with rigour; stays current in field", weight: 25 },
+      { id: "CF-4", name: "Communication", desc: "Communicates clearly and adapts message to diverse audiences", weight: 15 },
+      { id: "CF-5", name: "Mission Commitment", desc: "Embodies NI's values; links daily work to nutrition impact", weight: 10 },
+      { id: "CF-6", name: "Innovation & Problem Solving", desc: "Identifies creative solutions; adapts in complex contexts", weight: 10 },
+    ],
+    P4: [
+      { id: "CF-1", name: "Delivering Results", desc: "Leads delivery of complex, multi-stakeholder goals", weight: 20 },
+      { id: "CF-2", name: "Strategic Thinking", desc: "Connects operational decisions to organizational strategy", weight: 20 },
+      { id: "CF-3", name: "Technical Authority", desc: "Recognized subject-matter expert; guides others' practice", weight: 20 },
+      { id: "CF-4", name: "People Development", desc: "Actively coaches and develops peers and junior colleagues", weight: 15 },
+      { id: "CF-5", name: "Stakeholder Influence", desc: "Builds external relationships and influences partners", weight: 15 },
+      { id: "CF-6", name: "Mission Commitment", desc: "Champions NI's mission in all internal and external work", weight: 10 },
+    ],
+    M1: [
+      { id: "CF-1", name: "Delivering Through Others", desc: "Sets clear expectations and holds team accountable", weight: 25 },
+      { id: "CF-2", name: "Strategic Planning", desc: "Translates strategy into actionable team plans", weight: 20 },
+      { id: "CF-3", name: "Team Development", desc: "Builds capability; provides meaningful feedback and coaching", weight: 20 },
+      { id: "CF-4", name: "Stakeholder Management", desc: "Manages relationships across levels and boundaries", weight: 20 },
+      { id: "CF-5", name: "Mission Leadership", desc: "Models NI values; creates a culture of inclusion and purpose", weight: 15 },
+    ],
+  };
+  const myComps = COMP_FRAMEWORKS[emp.level] || COMP_FRAMEWORKS.default;
 
   const CYCLES = [
     { id: "2026-H1", name: "H1 2026 Review Cycle", period: "Jan–Jun 2026", status: "Active", due: "2026-06-30", completion: 42, selfDone: 14, mgrDone: 8, total: 28 },
     { id: "2025-Annual", name: "2025 Annual Review", period: "Jan–Dec 2025", status: "Closed", due: "2026-01-31", completion: 96, selfDone: 27, mgrDone: 26, total: 28 },
     { id: "2025-H1", name: "H1 2025 Mid-Year Check-In", period: "Jan–Jun 2025", status: "Closed", due: "2025-07-15", completion: 89, selfDone: 25, mgrDone: 24, total: 28 },
   ];
+  const RATING_LABELS = { 1: "Needs Development", 2: "Developing", 3: "Meets Expectations", 4: "Exceeds Expectations", 5: "Outstanding" };
+  const RATING_COLORS = { 1: B.danger, 2: B.orange, 3: B.blue, 4: B.teal, 5: B.success };
+  const goalTypeColors = { Performance: B.accent, Development: B.blue, Project: B.teal, Competency: B.purple };
+  const statusColors   = { "On Track": B.success, "At Risk": B.orange, "Completed": B.teal, "Not Started": B.textMuted };
+  const feedbackColors = { Praise: B.success, Coaching: B.blue };
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  const [selectedCycle, setSelectedCycle] = useState("2026-H1");
   const activeCycle = CYCLES.find(c => c.id === selectedCycle) || CYCLES[0];
+  const [tab, setTab] = useState(isEmp ? "goals" : isMgr ? "goals" : "dashboard");
 
-  // Goal data
+  // My Goals
+  const [myGoals, setMyGoals] = useState([
+    { id: "G1", title: "Lead implementation of Q2 micronutrient supplementation campaign in 3 provinces", description: "Coordinate with country teams to achieve 85% coverage in target population by June 30.", type: "Performance", alignedKRA: "KRA-1", alignedMgrGoal: "MG-1", targetDate: "2026-06-30", progress: 65, status: "On Track", updates: [{ date: "2026-04-15", pct: 65, note: "Completed planning phase; field teams mobilized in 2 of 3 provinces." }, { date: "2026-03-01", pct: 40, note: "Inception workshop completed; logistical arrangements underway." }] },
+    { id: "G2", title: "Achieve PMP certification", description: "Complete PMI-accredited training and pass PMP exam by June 2026.", type: "Development", alignedKRA: "", alignedMgrGoal: "MG-3", targetDate: "2026-06-15", progress: 50, status: "On Track", updates: [{ date: "2026-04-10", pct: 50, note: "Completed 35 contact hours. Exam booked for May 28." }] },
+    { id: "G3", title: "Publish findings from Malawi fortification baseline study", description: "Submit paper to peer-reviewed journal and present at regional conference.", type: "Performance", alignedKRA: "KRA-1", alignedMgrGoal: "", targetDate: "2026-09-30", progress: 25, status: "At Risk", updates: [{ date: "2026-03-20", pct: 25, note: "Data cleaning complete. Analysis delayed due to field team availability." }] },
+  ]);
+  const blankGoalForm = { title: "", description: "", type: "Performance", alignedKRA: "", alignedMgrGoal: "", targetDate: "", progress: 0 };
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [editGoalId, setEditGoalId] = useState(null);
+  const [goalForm, setGoalForm] = useState(blankGoalForm);
+  const [showProgressModal, setShowProgressModal] = useState(null);
+  const [progressForm, setProgressForm] = useState({ pct: "", note: "" });
+  const [expandedGoal, setExpandedGoal] = useState(null);
+
+  // Direct reports (manager)
+  const DIRECT_REPORTS = EMPLOYEES.slice(1, 5);
+  const [selectedDR, setSelectedDR] = useState(DIRECT_REPORTS[0]?.id);
+  const [drGoals, setDrGoals] = useState(() => {
+    const m = {};
+    DIRECT_REPORTS.forEach((dr, i) => {
+      m[dr.id] = [
+        { id: `DG${i}A`, title: ["Lead country program delivery in Q2","Develop Q2 donor reporting package","Coordinate partner engagement strategy","Complete data quality audit"][i], type: "Performance", alignedKRA: KRAs[i % 5].id, alignedMgrGoal: MANAGER_GOALS[i % 3].id, targetDate: "2026-06-30", progress: [72,55,80,40][i], status: ["On Track","On Track","On Track","At Risk"][i], updates: [], mgrNote: "" },
+        { id: `DG${i}B`, title: ["Attend leadership development programme","Complete French language certification","Mentor 2 junior programme officers","Achieve Salesforce Admin certification"][i], type: "Development", alignedKRA: "", alignedMgrGoal: "MG-3", targetDate: "2026-12-31", progress: [45,60,75,30][i], status: ["On Track","On Track","On Track","At Risk"][i], updates: [], mgrNote: "" },
+      ];
+    });
+    return m;
+  });
+  const [showMgrGoalEdit, setShowMgrGoalEdit] = useState(null);
+  const [mgrGoalEditForm, setMgrGoalEditForm] = useState({ title: "", progress: 0, status: "On Track", mgrNote: "" });
+
+  // Evaluations (manager)
+  const [evalDR, setEvalDR] = useState(null);
+  const [evalGoalRatings, setEvalGoalRatings]   = useState({});
+  const [evalGoalComments, setEvalGoalComments] = useState({});
+  const [evalCompRatings, setEvalCompRatings]   = useState({});
+  const [evalCompComments, setEvalCompComments] = useState({});
+  const [evalSubmitted, setEvalSubmitted]       = useState({});
+  const [evalSection, setEvalSection]           = useState("goals");
+
+  // Self-review
+  const [selfGoalRatings, setSelfGoalRatings]   = useState({});
+  const [selfGoalComments, setSelfGoalComments] = useState({});
+  const [selfCompRatings, setSelfCompRatings]   = useState({});
+  const [selfCompComments, setSelfCompComments] = useState({});
+  const [reviewSummary, setReviewSummary]       = useState("");
+  const [devPlan, setDevPlan]                   = useState("");
+  const [selfSubmitted, setSelfSubmitted]       = useState(false);
+  const [reviewSection, setReviewSection]       = useState("goals");
+
+  // Peer feedback
+  const [showFeedbackReq, setShowFeedbackReq] = useState(false);
+  const [fbReviewers, setFbReviewers]         = useState([]);
+  const [fbGoalIds, setFbGoalIds]             = useState([]);
+  const [fbMessage, setFbMessage]             = useState("");
+  const [fbDue, setFbDue]                     = useState("");
+  const [sentRequests, setSentRequests]       = useState([
+    { id: "FR-1", to: "Sarah Chen", goals: ["Lead Q2 campaign implementation"], due: "2026-05-15", status: "Pending" },
+    { id: "FR-2", to: "Marcus Johnson", goals: ["All goals"], due: "2026-05-15", status: "Responded", response: { date: "2026-04-28", text: "Priya consistently delivers high-quality work. Her Q2 coordination was particularly strong — she pre-empted several logistical issues before they became blockers.", competency: "Delivering Results" } },
+  ]);
+  const [receivedFeedback, setReceivedFeedback] = useState([
+    { id: "RF-1", from: "Sarah Chen", date: "2026-04-22", goalLinked: "Q2 campaign implementation", text: "Priya's coordination of the provincial rollout has been exceptional. Her stakeholder briefings were clear and drove quick decision-making.", type: "Praise", competency: "Delivering Results" },
+    { id: "RF-2", from: "Oliver Wright", date: "2026-04-10", goalLinked: "", text: "Strong technical insight in the fortification review. Encourage Priya to document methodology more formally — it would be a real asset to the team.", type: "Coaching", competency: "Technical Excellence" },
+  ]);
+
+  // Check-ins
+  const [showCheckin, setShowCheckin] = useState(false);
+
+  // HR admin extras
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [compGrade, setCompGrade]       = useState("default");
+  const [compFrameworks, setCompFrameworks] = useState(COMP_FRAMEWORKS);
+  const [editingComp, setEditingComp]   = useState(null);
+  const [compEditForm, setCompEditForm] = useState({ name: "", desc: "", weight: 0 });
+
+  // HR dashboard shared data
   const ORG_GOALS = [
-    { id: "OG1", title: "Reach 1 billion people with nutrition interventions by 2030", type: "Mission", progress: 62, owner: "Executive Office" },
-    { id: "OG2", title: "Achieve 95% grant compliance across all programs", type: "Operational", progress: 88, owner: "Finance" },
-    { id: "OG3", title: "Increase staff engagement index to 80%", type: "People", progress: 76, owner: "People & Culture" },
+    { id: "OG1", title: "Reach 1 billion people with nutrition interventions by 2030", type: "Mission",    progress: 62, owner: "Executive Office" },
+    { id: "OG2", title: "Achieve 95% grant compliance across all programs",           type: "Operational", progress: 88, owner: "Finance" },
+    { id: "OG3", title: "Increase staff engagement index to 80%",                    type: "People",      progress: 76, owner: "People & Culture" },
   ];
-
-  const EMPLOYEE_GOALS = EMPLOYEES.slice(0, 12).map((e, i) => ({
-    emp: e, goals: [
-      { title: ["Deliver Q2 program targets", "Complete grant reporting on time", "Lead stakeholder engagement plan", "Implement M&E framework", "Strengthen country office capacity"][i % 5], type: "Performance", progress: [75, 90, 60, 85, 45][i % 5], aligned: ORG_GOALS[i % 3].id, status: "On Track" },
-      { title: ["Build team competency in data analytics", "Achieve PMP certification", "Mentor 2 junior staff", "Complete leadership development path", "Publish research findings"][i % 5], type: "Development", progress: [40, 65, 80, 30, 55][i % 5], aligned: "OG3", status: [40, 65, 80, 30, 55][i % 5] >= 60 ? "On Track" : "At Risk" },
+  const orgGoalColors = { Mission: B.teal, Operational: B.orange, People: B.purple };
+  const EMPLOYEE_GOALS_HR = EMPLOYEES.slice(0,12).map((e,i) => ({
+    emp: e,
+    goals: [
+      { title: ["Deliver Q2 program targets","Complete grant reporting","Lead stakeholder plan","Implement M&E","Strengthen capacity"][i%5], type: "Performance", progress: [75,90,60,85,45][i%5], aligned: ORG_GOALS[i%3].id, status: "On Track" },
+      { title: ["Build data analytics skills","Achieve PMP","Mentor 2 junior staff","Complete leadership path","Publish research"][i%5],   type: "Development", progress: [40,65,80,30,55][i%5], aligned: "OG3", status: [40,65,80,30,55][i%5] >= 60 ? "On Track" : "At Risk" },
     ],
     selfAssessment: activeCycle.status === "Active" ? (i < 14 ? "Submitted" : "Pending") : "Submitted",
     mgrReview: activeCycle.status === "Active" ? (i < 8 ? "Complete" : "Pending") : "Complete",
-    rating: [3.2, 3.8, 4.1, 4.5, 3.9, 4.3, 3.6, 4.0, 4.4, 3.7, 3.5, 4.2][i],
-    nineBox: { performance: [2, 3, 3, 3, 2, 3, 2, 3, 3, 2, 2, 3][i], potential: [2, 2, 3, 3, 2, 3, 1, 2, 3, 2, 2, 3][i] },
+    rating: [3.2,3.8,4.1,4.5,3.9,4.3,3.6,4.0,4.4,3.7,3.5,4.2][i],
+    nineBox: { performance: [2,3,3,3,2,3,2,3,3,2,2,3][i], potential: [2,2,3,3,2,3,1,2,3,2,2,3][i] },
   }));
-
-  // Feedback wall
-  const FEEDBACK = [
-    { from: "Sarah Chen", to: "Marcus Johnson", type: "Praise", text: "Outstanding job leading the Nigeria country review — your preparation and facilitation were exceptional.", competency: "Leadership", date: "2026-04-20" },
-    { from: "Oliver Wright", to: "Sophie Dubois", type: "Coaching", text: "Consider structuring your donor reports with the executive summary first — it helps busy readers.", competency: "Communication", date: "2026-04-18" },
-    { from: "Priya Patel", to: "Ana Silva", type: "Praise", text: "Your policy brief on fortification standards was cited by the WHO regional office. Incredible impact!", competency: "Technical Excellence", date: "2026-04-15" },
-    { from: "Raj Krishnamurthy", to: "Mei Wong", type: "Praise", text: "Thank you for staying late to fix the data pipeline before the donor deadline. True team player.", competency: "Collaboration", date: "2026-04-12" },
-    { from: "Lars M├╝ller", to: "David Kim", type: "Coaching", text: "Try breaking the sprint into smaller deliverables — it will help the team see progress more clearly.", competency: "Project Management", date: "2026-04-10" },
+  const NI_COMPETENCIES = ["Leadership","Technical Excellence","Collaboration","Communication","Innovation","Mission Commitment","Project Management","Stakeholder Engagement"];
+  const FEEDBACK_WALL = [
+    { from: "Sarah Chen",      to: "Marcus Johnson", type: "Praise",   text: "Outstanding job leading the Nigeria country review — your facilitation was exceptional.",         competency: "Leadership",         date: "2026-04-20" },
+    { from: "Oliver Wright",   to: "Sophie Dubois",  type: "Coaching", text: "Consider structuring donor reports with the executive summary first — it helps busy readers.",     competency: "Communication",      date: "2026-04-18" },
+    { from: "Priya Patel",     to: "Ana Silva",      type: "Praise",   text: "Your policy brief on fortification standards was cited by the WHO regional office. Incredible!",  competency: "Technical Excellence",date: "2026-04-15" },
+    { from: "Raj K.",          to: "Mei Wong",       type: "Praise",   text: "Thank you for staying late to fix the data pipeline before the donor deadline. True team player.", competency: "Collaboration",       date: "2026-04-12" },
   ];
-
-  const NI_COMPETENCIES = ["Leadership", "Technical Excellence", "Collaboration", "Communication", "Innovation", "Mission Commitment", "Project Management", "Stakeholder Engagement"];
-
-  const goalTypeColors = { Performance: B.accent, Development: B.blue, Mission: B.teal, Operational: B.orange, People: B.purple };
-  const feedbackColors = { Praise: B.success, Coaching: B.blue, "Needs Improvement": B.warning };
-
-  // 9-box grid
   const nineBoxLabels = [["Underperformer","Effective","Star"],["Inconsistent","Core Player","High Performer"],["Risk","Moderate","Emerging Talent"]];
-  const nineBoxColors = [[B.danger, B.warning, B.success],[B.orange, B.blue, B.teal],[B.dangerBg, B.warningBg, B.successBg]];
+  const nineBoxColors = [[B.danger,B.warning,B.success],[B.orange,B.blue,B.teal],[B.dangerBg,B.warningBg,B.successBg]];
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const FL = ({ children }) => <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>{children}</label>;
+  const inp = { width: "100%", padding: "8px 10px", borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" };
+
+  const openAddGoal  = () => { setEditGoalId(null);  setGoalForm(blankGoalForm); setShowGoalModal(true); };
+  const openEditGoal = (g) => { setEditGoalId(g.id); setGoalForm({ title: g.title, description: g.description, type: g.type, alignedKRA: g.alignedKRA, alignedMgrGoal: g.alignedMgrGoal, targetDate: g.targetDate, progress: g.progress }); setShowGoalModal(true); };
+  const saveGoal = () => {
+    if (!goalForm.title.trim()) { alert("Please enter a goal title."); return; }
+    if (editGoalId) {
+      setMyGoals(p => p.map(g => g.id === editGoalId ? { ...g, ...goalForm, status: goalForm.progress >= 100 ? "Completed" : goalForm.progress >= 50 ? "On Track" : goalForm.progress > 0 ? "At Risk" : "Not Started" } : g));
+    } else {
+      setMyGoals(p => [...p, { id: `G${Date.now()}`, ...goalForm, status: "Not Started", updates: [] }]);
+    }
+    setShowGoalModal(false);
+  };
+  const submitProgress = (goalId) => {
+    const pct = parseInt(progressForm.pct);
+    if (isNaN(pct) || pct < 0 || pct > 100) { alert("Enter a percentage between 0 and 100."); return; }
+    setMyGoals(p => p.map(g => g.id === goalId ? { ...g, progress: pct, status: pct >= 100 ? "Completed" : pct >= 50 ? "On Track" : "At Risk", updates: [{ date: new Date().toISOString().slice(0,10), pct, note: progressForm.note }, ...g.updates] } : g));
+    setShowProgressModal(null); setProgressForm({ pct: "", note: "" });
+  };
+
+  const RatingPicker = ({ value, onChange, small }) => (
+    <div style={{ display: "flex", gap: small ? 3 : 5, alignItems: "center", flexWrap: "wrap" }}>
+      {[1,2,3,4,5].map(n => (
+        <button key={n} onClick={() => onChange(n)}
+          style={{ width: small ? 30 : 36, height: small ? 30 : 36, borderRadius: 6, border: `2px solid ${value === n ? RATING_COLORS[n] : B.border}`, background: value === n ? `${RATING_COLORS[n]}18` : "transparent", fontSize: small ? 12 : 14, fontWeight: 700, cursor: "pointer", color: value === n ? RATING_COLORS[n] : B.textMuted, fontFamily: "Arial,sans-serif", flexShrink: 0 }}>
+          {n}
+        </button>
+      ))}
+      {value > 0 && <span style={{ fontSize: 10, color: RATING_COLORS[value], fontWeight: 700, marginLeft: 4 }}>{RATING_LABELS[value]}</span>}
+    </div>
+  );
 
   return (
     <div>
-      <EmpModuleHeader emp={emp} label="My Performance" sub={`Current rating: ${emp.performanceRating}/5.0 · Next review: July 2026`} color={B.orange} />
-      <Tabs tabs={[
-        { key: "dashboard", label: "Performance Dashboard" },
-        { key: "goals", label: "Goals & OKRs" },
-        { key: "reviews", label: "Review Cycles" },
-        { key: "feedback", label: "Feedback & Recognition" },
-        { key: "checkins", label: "Check-Ins & 1:1s" },
-        { key: "talent", label: "Talent & 9-Box" },
-        { key: "analytics", label: "Analytics" },
-      ]} active={tab} onChange={setTab} />
+      {(isEmp || isMgr) && <EmpModuleHeader emp={emp} label={isMgr ? "Performance" : "My Performance"} sub={`Current rating: ${emp.performanceRating}/5.0 · Next review: Jun 2026`} color={B.orange} />}
+      <Tabs tabs={
+        isEmp ? [
+          { key: "goals",    label: "My Goals" },
+          { key: "review",   label: "My Review" },
+          { key: "feedback", label: "Peer Feedback" },
+          { key: "checkins", label: "Check-Ins" },
+        ] : isMgr ? [
+          { key: "goals",    label: "My Goals" },
+          { key: "team",     label: "Team Goals" },
+          { key: "evaluate", label: "Evaluations" },
+          { key: "review",   label: "My Review" },
+          { key: "feedback", label: "Feedback" },
+          { key: "checkins", label: "Check-Ins" },
+        ] : [
+          { key: "dashboard",    label: "Dashboard" },
+          { key: "cycles",       label: "Review Cycles" },
+          { key: "cascade",      label: "Goal Cascade" },
+          { key: "competencies", label: "Competency Framework" },
+          { key: "talent",       label: "Talent & 9-Box" },
+          { key: "analytics",    label: "Analytics" },
+        ]
+      } active={tab} onChange={setTab} />
 
-      {/* ════════ DASHBOARD ════════ */}
-      {tab === "dashboard" && (
+      {/* ════════ MY GOALS (employee + manager own goals) ════════ */}
+      {tab === "goals" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>My Goals — H1 2026</div>
+              <div style={{ fontSize: 12, color: B.textMuted }}>Link goals to Key Result Areas and your manager's objectives</div>
+            </div>
+            <Btn onClick={openAddGoal}>+ Add Goal</Btn>
+          </div>
+
+          {myGoals.map(g => (
+            <Card key={g.id} style={{ marginBottom: 12, borderLeft: `4px solid ${goalTypeColors[g.type] || B.textMuted}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <Badge color={goalTypeColors[g.type]} bg={`${goalTypeColors[g.type]}14`}>{g.type}</Badge>
+                    <Badge color={statusColors[g.status]} bg={`${statusColors[g.status]}14`}>{g.status}</Badge>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{g.title}</div>
+                  {g.description && <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: 6 }}>{g.description}</div>}
+                  <div style={{ display: "flex", gap: 16, fontSize: 11, color: B.textMuted, marginBottom: 8, flexWrap: "wrap" }}>
+                    {g.alignedKRA && <span>KRA: {KRAs.find(k => k.id === g.alignedKRA)?.area}</span>}
+                    {g.alignedMgrGoal && <span>Mgr Goal: {MANAGER_GOALS.find(m => m.id === g.alignedMgrGoal)?.owner}</span>}
+                    {g.targetDate && <span>Due: {fmtDate(g.targetDate)}</span>}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ flex: 1 }}><ProgressBar value={g.progress} max={100} color={statusColors[g.status]} /></div>
+                    <span style={{ fontSize: 13, fontWeight: 700, width: 38, textAlign: "right" }}>{g.progress}%</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
+                  <Btn size="sm" onClick={() => openEditGoal(g)}>Edit</Btn>
+                  <Btn size="sm" variant="ghost" onClick={() => { setShowProgressModal(g.id); setProgressForm({ pct: g.progress, note: "" }); }}>Update %</Btn>
+                  <Btn size="sm" variant="ghost" onClick={() => setExpandedGoal(expandedGoal === g.id ? null : g.id)}>History</Btn>
+                </div>
+              </div>
+              {expandedGoal === g.id && g.updates.length > 0 && (
+                <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${B.borderLight}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, marginBottom: 6 }}>PROGRESS HISTORY</div>
+                  {g.updates.map((u, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 12 }}>
+                      <span style={{ color: B.textMuted, whiteSpace: "nowrap" }}>{fmtDate(u.date)}</span>
+                      <span style={{ fontWeight: 700, color: B.accent }}>{u.pct}%</span>
+                      <span style={{ color: B.textSecondary }}>{u.note}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          ))}
+
+          {myGoals.length === 0 && (
+            <div style={{ textAlign: "center", padding: 40, color: B.textMuted }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>🎯</div>
+              <div>No goals yet. Click <strong>+ Add Goal</strong> to get started.</div>
+            </div>
+          )}
+
+          {/* Add/Edit Goal Modal */}
+          <Modal open={showGoalModal} onClose={() => setShowGoalModal(false)} title={editGoalId ? "Edit Goal" : "Add Goal"} width={540}>
+            <FL>Goal Title *</FL>
+            <input style={inp} value={goalForm.title} onChange={e => setGoalForm(p => ({...p, title: e.target.value}))} placeholder="e.g. Complete Q2 program delivery targets" />
+            <div style={{ marginTop: 10 }}>
+              <FL>Description</FL>
+              <textarea style={{ ...inp, minHeight: 70, resize: "vertical" }} value={goalForm.description} onChange={e => setGoalForm(p => ({...p, description: e.target.value}))} placeholder="Describe the goal, success criteria, and approach..." />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 10 }}>
+              <div>
+                <FL>Type</FL>
+                <select style={inp} value={goalForm.type} onChange={e => setGoalForm(p => ({...p, type: e.target.value}))}>
+                  {["Performance","Development","Project","Competency"].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <FL>Target Date</FL>
+                <input type="date" style={inp} value={goalForm.targetDate} onChange={e => setGoalForm(p => ({...p, targetDate: e.target.value}))} />
+              </div>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <FL>Align to Key Result Area (optional)</FL>
+              <select style={inp} value={goalForm.alignedKRA} onChange={e => setGoalForm(p => ({...p, alignedKRA: e.target.value}))}>
+                <option value="">— None —</option>
+                {KRAs.map(k => <option key={k.id} value={k.id}>{k.area}: {k.title}</option>)}
+              </select>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <FL>Align to Manager Goal (optional)</FL>
+              <select style={inp} value={goalForm.alignedMgrGoal} onChange={e => setGoalForm(p => ({...p, alignedMgrGoal: e.target.value}))}>
+                <option value="">— None —</option>
+                {MANAGER_GOALS.map(m => <option key={m.id} value={m.id}>{m.owner}: {m.title}</option>)}
+              </select>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <FL>Initial Progress (%)</FL>
+              <input type="number" min={0} max={100} style={inp} value={goalForm.progress} onChange={e => setGoalForm(p => ({...p, progress: parseInt(e.target.value)||0}))} />
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="ghost" onClick={() => setShowGoalModal(false)}>Cancel</Btn>
+              <Btn onClick={saveGoal}>{editGoalId ? "Save Changes" : "Add Goal"}</Btn>
+            </div>
+          </Modal>
+
+          {/* Progress Update Modal */}
+          {showProgressModal && (
+            <Modal open={true} onClose={() => setShowProgressModal(null)} title="Update Progress" width={400}>
+              <FL>New Progress (%)</FL>
+              <input type="number" min={0} max={100} style={inp} value={progressForm.pct} onChange={e => setProgressForm(p => ({...p, pct: e.target.value}))} />
+              <div style={{ marginTop: 10 }}>
+                <FL>Update Note</FL>
+                <textarea style={{ ...inp, minHeight: 80, resize: "vertical" }} value={progressForm.note} onChange={e => setProgressForm(p => ({...p, note: e.target.value}))} placeholder="What progress did you make? Any blockers?" />
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+                <Btn variant="ghost" onClick={() => setShowProgressModal(null)}>Cancel</Btn>
+                <Btn onClick={() => submitProgress(showProgressModal)}>Save Update</Btn>
+              </div>
+            </Modal>
+          )}
+        </div>
+      )}
+
+      {/* ════════ MY REVIEW (self-assessment) ════════ */}
+      {tab === "review" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>Self-Assessment — H1 2026</div>
+              <div style={{ fontSize: 12, color: B.textMuted }}>Rate your performance on each goal and competency</div>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["goals","competencies"].map(s => (
+                <button key={s} onClick={() => setReviewSection(s)}
+                  style={{ padding: "6px 14px", borderRadius: 8, border: `1px solid ${reviewSection === s ? B.accent : B.border}`, background: reviewSection === s ? B.accentBg : "transparent", fontWeight: reviewSection === s ? 700 : 400, fontSize: 12, cursor: "pointer", textTransform: "capitalize", fontFamily: "Arial,sans-serif" }}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {selfSubmitted && (
+            <div style={{ background: B.successBg, border: `1px solid ${B.success}`, borderRadius: 10, padding: "10px 14px", marginBottom: 14, display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+              <span style={{ color: B.success }}>✓</span><span style={{ fontWeight: 700 }}>Self-assessment submitted</span> — your manager will be notified.
+            </div>
+          )}
+
+          {reviewSection === "goals" && myGoals.map(g => (
+            <Card key={g.id} style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <Badge color={goalTypeColors[g.type]} bg={`${goalTypeColors[g.type]}14`} style={{ marginBottom: 4 }}>{g.type}</Badge>
+                  <div style={{ fontWeight: 700, fontSize: 13 }}>{g.title}</div>
+                </div>
+                <span style={{ fontSize: 12, color: B.textMuted }}>Progress: {g.progress}%</span>
+              </div>
+              <FL>Your Rating</FL>
+              <RatingPicker value={selfGoalRatings[g.id] || 0} onChange={v => setSelfGoalRatings(p => ({...p, [g.id]: v}))} />
+              <div style={{ marginTop: 8 }}>
+                <FL>Comments</FL>
+                <textarea style={{ ...inp, minHeight: 60, resize: "vertical" }} value={selfGoalComments[g.id] || ""} onChange={e => setSelfGoalComments(p => ({...p, [g.id]: e.target.value}))} placeholder="Describe your achievements, challenges, and learnings on this goal..." />
+              </div>
+            </Card>
+          ))}
+
+          {reviewSection === "competencies" && (
+            <div>
+              {myComps.map(c => (
+                <Card key={c.id} style={{ marginBottom: 10 }}>
+                  <div style={{ marginBottom: 6 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13 }}>{c.name} <span style={{ fontSize: 10, color: B.textMuted }}>({c.weight}%)</span></div>
+                    <div style={{ fontSize: 11, color: B.textSecondary }}>{c.desc}</div>
+                  </div>
+                  <FL>Your Rating</FL>
+                  <RatingPicker value={selfCompRatings[c.id] || 0} onChange={v => setSelfCompRatings(p => ({...p, [c.id]: v}))} />
+                  <div style={{ marginTop: 8 }}>
+                    <FL>Evidence / Comments</FL>
+                    <textarea style={{ ...inp, minHeight: 55, resize: "vertical" }} value={selfCompComments[c.id] || ""} onChange={e => setSelfCompComments(p => ({...p, [c.id]: e.target.value}))} placeholder="Provide specific examples that demonstrate this competency..." />
+                  </div>
+                </Card>
+              ))}
+              <Card>
+                <FL>Overall Summary</FL>
+                <textarea style={{ ...inp, minHeight: 90, resize: "vertical" }} value={reviewSummary} onChange={e => setReviewSummary(e.target.value)} placeholder="Summarize your key accomplishments and reflections for this review period..." />
+                <div style={{ marginTop: 10 }}>
+                  <FL>Development Plan</FL>
+                  <textarea style={{ ...inp, minHeight: 70, resize: "vertical" }} value={devPlan} onChange={e => setDevPlan(e.target.value)} placeholder="What skills or areas would you like to develop in the next period?" />
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                  <Btn onClick={() => setSelfSubmitted(true)} disabled={selfSubmitted}>
+                    {selfSubmitted ? "✓ Submitted" : "Submit Self-Assessment"}
+                  </Btn>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ════════ PEER FEEDBACK ════════ */}
+      {tab === "feedback" && !isMgr && !isAdmin && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>Peer Feedback</div>
+              <div style={{ fontSize: 12, color: B.textMuted }}>Request feedback from colleagues on your goals and competencies</div>
+            </div>
+            <Btn onClick={() => setShowFeedbackReq(true)}>+ Request Feedback</Btn>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div>
+              <SectionTitle>Requests Sent</SectionTitle>
+              {sentRequests.map(r => (
+                <Card key={r.id} style={{ marginBottom: 10, borderLeft: `3px solid ${r.status === "Responded" ? B.success : B.warning}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={r.to} size={24} /><strong style={{ fontSize: 13 }}>{r.to}</strong></div>
+                    <Badge color={r.status === "Responded" ? B.success : B.warning} bg={`${r.status === "Responded" ? B.success : B.warning}14`}>{r.status}</Badge>
+                  </div>
+                  <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 4 }}>Goals: {r.goals.join(", ")}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Due: {fmtDate(r.due)}</div>
+                  {r.response && (
+                    <div style={{ marginTop: 8, padding: "8px 10px", background: B.accentBg, borderRadius: 6, fontSize: 12 }}>
+                      <div style={{ color: B.textMuted, marginBottom: 2 }}>{fmtDate(r.response.date)}</div>
+                      <div style={{ color: B.textSecondary, fontStyle: "italic" }}>"{r.response.text}"</div>
+                      <Badge color={B.teal} bg={`${B.teal}14`} style={{ marginTop: 4 }}>{r.response.competency}</Badge>
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+            <div>
+              <SectionTitle>Feedback Received</SectionTitle>
+              {receivedFeedback.map(f => (
+                <Card key={f.id} style={{ marginBottom: 10, borderLeft: `3px solid ${feedbackColors[f.type] || B.textMuted}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={f.from} size={24} /><strong style={{ fontSize: 13 }}>{f.from}</strong></div>
+                    <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`}>{f.type}</Badge>
+                  </div>
+                  {f.goalLinked && <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 4 }}>Re: {f.goalLinked}</div>}
+                  <div style={{ fontSize: 12, color: B.textSecondary, fontStyle: "italic" }}>"{f.text}"</div>
+                  <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
+                    <Badge color={B.teal} bg={`${B.teal}14`}>{f.competency}</Badge>
+                    <span style={{ fontSize: 10, color: B.textMuted, marginLeft: "auto" }}>{fmtDate(f.date)}</span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <Modal open={showFeedbackReq} onClose={() => setShowFeedbackReq(false)} title="Request Peer Feedback" width={500}>
+            <FL>Select Reviewers</FL>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+              {EMPLOYEES.filter(e => e.id !== emp.id).slice(0,10).map(e => (
+                <button key={e.id} onClick={() => setFbReviewers(p => p.includes(e.id) ? p.filter(x => x !== e.id) : [...p, e.id])}
+                  style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 20, border: `1px solid ${fbReviewers.includes(e.id) ? B.accent : B.border}`, background: fbReviewers.includes(e.id) ? B.accentBg : "transparent", fontSize: 12, cursor: "pointer", fontFamily: "Arial,sans-serif" }}>
+                  <Avatar name={e.name} size={18} />{e.name}
+                </button>
+              ))}
+            </div>
+            <FL>Goals to Include (optional — leave blank for all)</FL>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 10 }}>
+              {myGoals.map(g => (
+                <label key={g.id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer" }}>
+                  <input type="checkbox" checked={fbGoalIds.includes(g.id)} onChange={e => setFbGoalIds(p => e.target.checked ? [...p, g.id] : p.filter(x => x !== g.id))} />
+                  {g.title.substring(0,60)}{g.title.length > 60 ? "..." : ""}
+                </label>
+              ))}
+            </div>
+            <FL>Personal Message (optional)</FL>
+            <textarea style={{ ...inp, minHeight: 60, resize: "vertical" }} value={fbMessage} onChange={e => setFbMessage(e.target.value)} placeholder="Add context or specific areas you'd like feedback on..." />
+            <div style={{ marginTop: 10 }}>
+              <FL>Response Due Date</FL>
+              <input type="date" style={inp} value={fbDue} onChange={e => setFbDue(e.target.value)} />
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="ghost" onClick={() => setShowFeedbackReq(false)}>Cancel</Btn>
+              <Btn onClick={() => {
+                if (fbReviewers.length === 0) { alert("Please select at least one reviewer."); return; }
+                const goals = fbGoalIds.length > 0 ? myGoals.filter(g => fbGoalIds.includes(g.id)).map(g => g.title.substring(0,40)) : ["All goals"];
+                setSentRequests(p => [...p, { id: `FR-${Date.now()}`, to: EMPLOYEES.find(e => e.id === fbReviewers[0])?.name || "Colleague", goals, due: fbDue || "2026-05-30", status: "Pending" }]);
+                setShowFeedbackReq(false); setFbReviewers([]); setFbGoalIds([]); setFbMessage(""); setFbDue("");
+              }}>Send Requests</Btn>
+            </div>
+          </Modal>
+        </div>
+      )}
+
+      {/* ════════ CHECK-INS ════════ */}
+      {tab === "checkins" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>{isMgr ? "Team Check-Ins" : "Check-Ins with Manager"}</div>
+              <div style={{ fontSize: 12, color: B.textMuted }}>{isMgr ? "Track your 1-on-1 conversations with direct reports" : "Track your regular 1-on-1 conversations with Sarah Chen"}</div>
+            </div>
+            <Btn onClick={() => setShowCheckin(true)}>+ Schedule Check-In</Btn>
+          </div>
+          {[
+            { date: "2026-04-24", type: "Monthly 1-on-1", agenda: "Q2 campaign update, PMP exam prep, Malawi paper timeline", outcome: "Agreed to push Malawi paper deadline to Sep 30. Will connect with DR Congo team for field support.", status: "Complete" },
+            { date: "2026-03-20", type: "Goal-Setting Session", agenda: "Set H1 goals, align to KRAs, review last cycle feedback", outcome: "3 goals agreed and loaded into system. Alignment to MG-1 and KRA-1 confirmed.", status: "Complete" },
+            { date: "2026-05-22", type: "Monthly 1-on-1", agenda: "Q2 campaign final push, exam results, paper review", outcome: "", status: "Upcoming" },
+          ].map((c, i) => (
+            <Card key={i} style={{ marginBottom: 10, borderLeft: `3px solid ${c.status === "Complete" ? B.success : B.blue}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontWeight: 700, fontSize: 13 }}>{fmtDate(c.date)}</span>
+                  <Badge color={c.status === "Complete" ? B.success : B.blue} bg={`${c.status === "Complete" ? B.success : B.blue}14`}>{c.status}</Badge>
+                </div>
+                <span style={{ fontSize: 12, color: B.textMuted }}>{c.type}</span>
+              </div>
+              <div style={{ fontSize: 12, color: B.textSecondary, marginBottom: c.outcome ? 6 : 0 }}><strong>Agenda:</strong> {c.agenda}</div>
+              {c.outcome && <div style={{ fontSize: 12, color: B.textSecondary }}><strong>Outcome:</strong> {c.outcome}</div>}
+            </Card>
+          ))}
+          <Modal open={showCheckin} onClose={() => setShowCheckin(false)} title="Schedule Check-In" width={400}>
+            <FL>Date</FL><input type="date" style={inp} />
+            <div style={{ marginTop: 10 }}>
+              <FL>Type</FL>
+              <select style={inp}><option>Monthly 1-on-1</option><option>Goal Check-In</option><option>Development Conversation</option><option>Ad-hoc</option></select>
+            </div>
+            <div style={{ marginTop: 10 }}><FL>Agenda Notes</FL><textarea style={{ ...inp, minHeight: 70, resize: "vertical" }} placeholder="What do you want to discuss?" /></div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+              <Btn variant="ghost" onClick={() => setShowCheckin(false)}>Cancel</Btn>
+              <Btn onClick={() => setShowCheckin(false)}>Schedule</Btn>
+            </div>
+          </Modal>
+        </div>
+      )}
+
+      {/* ════════ TEAM GOALS (manager) ════════ */}
+      {tab === "team" && isMgr && (
+        <div>
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Team Goals</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {DIRECT_REPORTS.map(dr => (
+                <button key={dr.id} onClick={() => setSelectedDR(dr.id)}
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 20, border: `1px solid ${selectedDR === dr.id ? B.accent : B.border}`, background: selectedDR === dr.id ? B.accentBg : "transparent", fontSize: 12, fontWeight: selectedDR === dr.id ? 700 : 400, cursor: "pointer", fontFamily: "Arial,sans-serif" }}>
+                  <Avatar name={dr.name} size={20} />{dr.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {selectedDR && (() => {
+            const dr = DIRECT_REPORTS.find(d => d.id === selectedDR);
+            const goals = drGoals[selectedDR] || [];
+            return (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Avatar name={dr.name} size={32} />
+                    <div><div style={{ fontWeight: 700 }}>{dr.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{dr.title} · {dr.department}</div></div>
+                  </div>
+                  <Badge color={B.blue} bg={`${B.blue}14`}>{goals.length} goals</Badge>
+                </div>
+                {goals.map(g => (
+                  <Card key={g.id} style={{ marginBottom: 10, borderLeft: `4px solid ${goalTypeColors[g.type] || B.textMuted}` }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
+                          <Badge color={goalTypeColors[g.type]} bg={`${goalTypeColors[g.type]}14`}>{g.type}</Badge>
+                          <Badge color={statusColors[g.status]} bg={`${statusColors[g.status]}14`}>{g.status}</Badge>
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>{g.title}</div>
+                        <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 8 }}>
+                          {g.alignedKRA && <span style={{ marginRight: 10 }}>KRA: {KRAs.find(k => k.id === g.alignedKRA)?.area}</span>}
+                          Due: {fmtDate(g.targetDate)}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ flex: 1 }}><ProgressBar value={g.progress} max={100} color={statusColors[g.status]} /></div>
+                          <span style={{ fontSize: 13, fontWeight: 700, width: 38, textAlign: "right" }}>{g.progress}%</span>
+                        </div>
+                        {g.mgrNote && <div style={{ marginTop: 6, fontSize: 11, color: B.textSecondary, fontStyle: "italic" }}>Manager note: {g.mgrNote}</div>}
+                      </div>
+                      <Btn size="sm" onClick={() => { setShowMgrGoalEdit(g.id); setMgrGoalEditForm({ title: g.title, progress: g.progress, status: g.status, mgrNote: g.mgrNote || "" }); }}>Edit</Btn>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            );
+          })()}
+
+          {showMgrGoalEdit && (
+            <Modal open={true} onClose={() => setShowMgrGoalEdit(null)} title="Edit Team Member Goal" width={460}>
+              <FL>Goal Title</FL>
+              <input style={inp} value={mgrGoalEditForm.title} onChange={e => setMgrGoalEditForm(p => ({...p, title: e.target.value}))} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 10 }}>
+                <div>
+                  <FL>Progress (%)</FL>
+                  <input type="number" min={0} max={100} style={inp} value={mgrGoalEditForm.progress} onChange={e => setMgrGoalEditForm(p => ({...p, progress: parseInt(e.target.value)||0}))} />
+                </div>
+                <div>
+                  <FL>Status</FL>
+                  <select style={inp} value={mgrGoalEditForm.status} onChange={e => setMgrGoalEditForm(p => ({...p, status: e.target.value}))}>
+                    {["On Track","At Risk","Completed","Not Started"].map(s => <option key={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <FL>Manager Note</FL>
+                <textarea style={{ ...inp, minHeight: 70, resize: "vertical" }} value={mgrGoalEditForm.mgrNote} onChange={e => setMgrGoalEditForm(p => ({...p, mgrNote: e.target.value}))} placeholder="Add coaching notes or context for this team member..." />
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+                <Btn variant="ghost" onClick={() => setShowMgrGoalEdit(null)}>Cancel</Btn>
+                <Btn onClick={() => {
+                  setDrGoals(p => ({ ...p, [selectedDR]: (p[selectedDR] || []).map(g => g.id === showMgrGoalEdit ? { ...g, ...mgrGoalEditForm } : g) }));
+                  setShowMgrGoalEdit(null);
+                }}>Save Changes</Btn>
+              </div>
+            </Modal>
+          )}
+        </div>
+      )}
+
+      {/* ════════ EVALUATIONS (manager) ════════ */}
+      {tab === "evaluate" && isMgr && (
+        <div>
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Evaluate Direct Reports</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {DIRECT_REPORTS.map(dr => (
+                <button key={dr.id} onClick={() => { setEvalDR(dr.id); setEvalSection("goals"); }}
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 20, border: `1px solid ${evalDR === dr.id ? B.orange : B.border}`, background: evalDR === dr.id ? `${B.orange}14` : "transparent", fontSize: 12, fontWeight: evalDR === dr.id ? 700 : 400, cursor: "pointer", fontFamily: "Arial,sans-serif" }}>
+                  <Avatar name={dr.name} size={20} />{dr.name}
+                  {evalSubmitted[dr.id] && <span style={{ color: B.success, marginLeft: 4 }}>✓</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {evalDR && (() => {
+            const dr = DIRECT_REPORTS.find(d => d.id === evalDR);
+            const goals = drGoals[evalDR] || [];
+            const drComps = COMP_FRAMEWORKS[dr.level] || COMP_FRAMEWORKS.default;
+            return (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Avatar name={dr.name} size={32} />
+                    <div><div style={{ fontWeight: 700 }}>{dr.name}</div><div style={{ fontSize: 11, color: B.textMuted }}>{dr.title}</div></div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {["goals","competencies"].map(s => (
+                      <button key={s} onClick={() => setEvalSection(s)}
+                        style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid ${evalSection === s ? B.orange : B.border}`, background: evalSection === s ? `${B.orange}14` : "transparent", fontWeight: evalSection === s ? 700 : 400, fontSize: 12, cursor: "pointer", textTransform: "capitalize", fontFamily: "Arial,sans-serif" }}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {evalSubmitted[evalDR] && (
+                  <div style={{ background: B.successBg, border: `1px solid ${B.success}`, borderRadius: 10, padding: "10px 14px", marginBottom: 12, fontSize: 13 }}>
+                    ✓ <strong>Evaluation submitted</strong> for {dr.name}.
+                  </div>
+                )}
+                {evalSection === "goals" && goals.map(g => (
+                  <Card key={g.id} style={{ marginBottom: 10 }}>
+                    <div style={{ marginBottom: 6 }}>
+                      <Badge color={goalTypeColors[g.type]} bg={`${goalTypeColors[g.type]}14`} style={{ marginBottom: 4 }}>{g.type}</Badge>
+                      <div style={{ fontWeight: 700, fontSize: 13 }}>{g.title}</div>
+                      <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>Progress: {g.progress}% · {g.status}</div>
+                    </div>
+                    <FL>Manager Rating</FL>
+                    <RatingPicker value={evalGoalRatings[`${evalDR}-${g.id}`] || 0} onChange={v => setEvalGoalRatings(p => ({...p, [`${evalDR}-${g.id}`]: v}))} />
+                    <div style={{ marginTop: 8 }}>
+                      <FL>Feedback</FL>
+                      <textarea style={{ ...inp, minHeight: 55, resize: "vertical" }} value={evalGoalComments[`${evalDR}-${g.id}`] || ""} onChange={e => setEvalGoalComments(p => ({...p, [`${evalDR}-${g.id}`]: e.target.value}))} placeholder="Provide specific feedback on this goal..." />
+                    </div>
+                  </Card>
+                ))}
+                {evalSection === "competencies" && drComps.map(c => (
+                  <Card key={c.id} style={{ marginBottom: 10 }}>
+                    <div style={{ marginBottom: 6 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13 }}>{c.name} <span style={{ fontSize: 10, color: B.textMuted }}>({c.weight}%)</span></div>
+                      <div style={{ fontSize: 11, color: B.textSecondary }}>{c.desc}</div>
+                    </div>
+                    <FL>Rating</FL>
+                    <RatingPicker value={evalCompRatings[`${evalDR}-${c.id}`] || 0} onChange={v => setEvalCompRatings(p => ({...p, [`${evalDR}-${c.id}`]: v}))} />
+                    <div style={{ marginTop: 8 }}>
+                      <FL>Comments</FL>
+                      <textarea style={{ ...inp, minHeight: 55, resize: "vertical" }} value={evalCompComments[`${evalDR}-${c.id}`] || ""} onChange={e => setEvalCompComments(p => ({...p, [`${evalDR}-${c.id}`]: e.target.value}))} placeholder="Provide specific examples..." />
+                    </div>
+                  </Card>
+                ))}
+                {!evalSubmitted[evalDR] && (
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                    <Btn onClick={() => setEvalSubmitted(p => ({...p, [evalDR]: true}))}>Submit Evaluation</Btn>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* ════════ MANAGER FEEDBACK TAB ════════ */}
+      {tab === "feedback" && isMgr && (
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14 }}>Team Feedback</div>
+          {FEEDBACK_WALL.map((f, i) => (
+            <Card key={i} style={{ marginBottom: 10, borderLeft: `3px solid ${feedbackColors[f.type] || B.textMuted}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <Avatar name={f.from} size={24} /><strong style={{ fontSize: 13 }}>{f.from}</strong>
+                <span style={{ color: B.textMuted, fontSize: 12 }}>→</span>
+                <Avatar name={f.to} size={24} /><strong style={{ fontSize: 13 }}>{f.to}</strong>
+                <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`} style={{ marginLeft: "auto" }}>{f.type}</Badge>
+              </div>
+              <div style={{ fontSize: 12, color: B.textSecondary, fontStyle: "italic", marginBottom: 4 }}>"{f.text}"</div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <Badge color={B.teal} bg={`${B.teal}14`}>{f.competency}</Badge>
+                <span style={{ fontSize: 10, color: B.textMuted, marginLeft: "auto" }}>{fmtDate(f.date)}</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* ════════ HR DASHBOARD ════════ */}
+      {tab === "dashboard" && isAdmin && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px,1fr))", gap: 10, marginBottom: 16 }}>
             <MetricCard label="Active Cycle" value={activeCycle.name.split(" ")[0] + " " + activeCycle.name.split(" ")[1]} sub={activeCycle.period} color={B.accent} />
             <MetricCard label="Self-Assessments" value={`${activeCycle.selfDone}/${activeCycle.total}`} sub={`${Math.round(activeCycle.selfDone / activeCycle.total * 100)}% submitted`} color={B.blue} />
             <MetricCard label="Manager Reviews" value={`${activeCycle.mgrDone}/${activeCycle.total}`} sub={`${Math.round(activeCycle.mgrDone / activeCycle.total * 100)}% complete`} color={B.teal} />
-            <MetricCard label="Goal Completion" value={`${Math.round(EMPLOYEE_GOALS.reduce((s, eg) => s + eg.goals.reduce((gs, g) => gs + g.progress, 0) / eg.goals.length, 0) / EMPLOYEE_GOALS.length)}%`} color={B.purple} />
-            <MetricCard label="Avg Rating" value={(EMPLOYEE_GOALS.reduce((s, eg) => s + eg.rating, 0) / EMPLOYEE_GOALS.length).toFixed(1)} color={B.orange} />
-            <MetricCard label="Feedback Given" value={FEEDBACK.length} sub="This quarter" color={B.success} />
+            <MetricCard label="Goal Completion" value={`${Math.round(EMPLOYEE_GOALS_HR.reduce((s, eg) => s + eg.goals.reduce((gs, g) => gs + g.progress, 0) / eg.goals.length, 0) / EMPLOYEE_GOALS_HR.length)}%`} color={B.purple} />
+            <MetricCard label="Avg Rating" value={(EMPLOYEE_GOALS_HR.reduce((s, eg) => s + eg.rating, 0) / EMPLOYEE_GOALS_HR.length).toFixed(1)} color={B.orange} />
+            <MetricCard label="Feedback Given" value={FEEDBACK_WALL.length} sub="This quarter" color={B.success} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card style={{ borderTop: `4px solid ${B.accent}` }}>
@@ -7963,391 +8635,335 @@ const PerformanceModule = ({ employee: empProp } = {}) => {
                 <div key={g.id} style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, fontSize: 12 }}>
                     <span style={{ fontWeight: 700, flex: 1 }}>{g.title}</span>
-                    <Badge color={goalTypeColors[g.type] || B.textMuted} bg={`${goalTypeColors[g.type] || B.textMuted}14`}>{g.type}</Badge>
+                    <Badge color={orgGoalColors[g.type] || B.textMuted} bg={`${orgGoalColors[g.type] || B.textMuted}14`}>{g.type}</Badge>
                   </div>
                   <ProgressBar value={g.progress} max={100} color={g.progress >= 80 ? B.success : g.progress >= 50 ? B.blue : B.warning} />
-                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{g.owner}  · {g.progress}% complete</div>
+                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{g.owner} · {g.progress}% complete</div>
                 </div>
               ))}
             </Card>
             <Card>
-              <SectionTitle>Recent Feedback & Recognition</SectionTitle>
-              {FEEDBACK.slice(0, 4).map((f, i) => (
+              <SectionTitle>Recent Feedback</SectionTitle>
+              {FEEDBACK_WALL.slice(0,4).map((f, i) => (
                 <div key={i} style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 6, borderLeft: `3px solid ${feedbackColors[f.type] || B.textMuted}` }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, fontSize: 12 }}>
                     <Avatar name={f.from} size={20} /><strong>{f.from}</strong><span style={{ color: B.textMuted }}>→</span><strong>{f.to}</strong>
                     <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`} style={{ marginLeft: "auto", fontSize: 8 }}>{f.type}</Badge>
                   </div>
                   <div style={{ fontSize: 11, color: B.textSecondary, lineHeight: 1.5 }}>"{f.text}"</div>
-                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{f.competency}  · {fmtDate(f.date)}</div>
+                  <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{f.competency} · {fmtDate(f.date)}</div>
                 </div>
               ))}
             </Card>
             <Card>
               <SectionTitle>Review Cycle Progress</SectionTitle>
               {CYCLES.map(c => (
-                <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: c.id === selectedCycle ? B.accentBg : B.bgHover, marginBottom: 4, cursor: "pointer", border: `1px solid ${c.id === selectedCycle ? B.accent : "transparent"}20` }} onClick={() => setSelectedCycle(c.id)}>
-                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{c.period}  · Due {fmtDate(c.due)}</div></div>
-                  <div style={{ width: 50 }}><ProgressBar value={c.completion} max={100} color={c.completion === 100 ? B.success : B.accent} /></div>
-                  <span style={{ fontSize: 11, fontWeight: 700, width: 32, textAlign: "right" }}>{c.completion}%</span>
-                  <StatusBadge status={c.status === "Active" ? "Active" : "Approved"} />
+                <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: c.id === selectedCycle ? B.accentBg : B.bgHover, marginBottom: 4, cursor: "pointer", border: `1px solid ${c.id === selectedCycle ? B.accent : "transparent"}` }} onClick={() => setSelectedCycle(c.id)}>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.name}</div><div style={{ fontSize: 10, color: B.textMuted }}>{c.period} · Due {fmtDate(c.due)}</div></div>
+                  <div style={{ width: 60 }}><ProgressBar value={c.completion} max={100} color={c.completion === 100 ? B.success : B.accent} /></div>
+                  <span style={{ fontSize: 11, fontWeight: 700, width: 36, textAlign: "right" }}>{c.completion}%</span>
                 </div>
               ))}
             </Card>
             <Card>
               <SectionTitle>Action Items</SectionTitle>
-              {[{ action: "Complete self-assessment", count: activeCycle.total - activeCycle.selfDone, urgency: "High", icon: "" },
-                { action: "Manager reviews pending", count: activeCycle.total - activeCycle.mgrDone, urgency: "Medium", icon: "\u{1F465}" },
-                { action: "Goals at risk (< 50% progress)", count: EMPLOYEE_GOALS.reduce((s, eg) => s + eg.goals.filter(g => g.progress < 50).length, 0), urgency: "High", icon: "" },
-                { action: "Development plans needing update", count: 6, urgency: "Low", icon: "" },
+              {[
+                { action: "Complete self-assessment", count: activeCycle.total - activeCycle.selfDone, urgency: "High" },
+                { action: "Manager reviews pending", count: activeCycle.total - activeCycle.mgrDone, urgency: "Medium" },
+                { action: "Goals at risk (< 50%)", count: EMPLOYEE_GOALS_HR.reduce((s, eg) => s + eg.goals.filter(g => g.progress < 50).length, 0), urgency: "High" },
               ].map((a, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: a.urgency === "High" ? B.dangerBg : a.urgency === "Medium" ? B.warningBg : B.bgHover, marginBottom: 4, border: `1px solid ${a.urgency === "High" ? B.danger : a.urgency === "Medium" ? B.warning : B.border}15` }}>
-                  <span style={{ fontSize: 16 }}>{a.icon}</span>
-                  <span style={{ flex: 1, fontSize: 12, fontWeight: 600 }}>{a.action}</span>
-                  <Badge color={a.urgency === "High" ? B.danger : a.urgency === "Medium" ? B.warning : B.textMuted} bg={a.urgency === "High" ? B.dangerBg : B.warningBg}>{a.count}</Badge>
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: `1px solid ${B.borderLight}`, fontSize: 12 }}>
+                  <span>{a.action}</span>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                    <Badge color={a.urgency === "High" ? B.danger : B.warning} bg={`${a.urgency === "High" ? B.danger : B.warning}14`}>{a.urgency}</Badge>
+                    <span style={{ fontWeight: 700 }}>{a.count}</span>
+                  </div>
                 </div>
               ))}
             </Card>
           </div>
-        </div>
-      )}
-
-      {/* ════════ GOALS & OKRs ════════ */}
-      {tab === "goals" && (
-        <div>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 14 }}>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Goal Title, Type, Aligned To, Target Date")}> Batch Upload Goals</Btn>
-            <Btn variant="primary" size="sm" onClick={() => setShowGoalModal(true)}>+ Create Goal</Btn>
-          </div>
-          {/* Org goals cascade */}
-          <Card style={{ marginBottom: 14, borderTop: `4px solid ${B.accent}` }}>
-            <SectionTitle>Goal Alignment Cascade (Organization → Team → Individual)</SectionTitle>
-            {ORG_GOALS.map(og => (
-              <div key={og.id} style={{ marginBottom: 14 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 6, background: B.accentBg, border: `1px solid ${B.accent}20` }}>
-                  <Badge color={goalTypeColors[og.type]} bg={`${goalTypeColors[og.type]}14`}>{og.type}</Badge>
-                  <span style={{ fontSize: 13, fontWeight: 700, flex: 1 }}>{og.title}</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: B.accent }}>{og.progress}%</span>
-                </div>
-                <div style={{ marginLeft: 24, borderLeft: `2px solid ${B.border}`, paddingLeft: 14, marginTop: 6 }}>
-                  {EMPLOYEE_GOALS.filter(eg => eg.goals.some(g => g.aligned === og.id)).slice(0, 4).map((eg, i) => {
-                    const g = eg.goals.find(g => g.aligned === og.id);
-                    return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 3, fontSize: 12 }}>
-                        <Avatar name={`${eg.emp.first} ${eg.emp.last}`} size={22} />
-                        <span style={{ fontWeight: 600, width: 100 }}>{eg.emp.first} {eg.emp.last}</span>
-                        <span style={{ flex: 1, color: B.textSecondary }}>{g.title}</span>
-                        <div style={{ width: 50 }}><ProgressBar value={g.progress} max={100} color={g.progress >= 70 ? B.success : g.progress >= 40 ? B.blue : B.warning} /></div>
-                        <span style={{ fontWeight: 700, width: 32, textAlign: "right" }}>{g.progress}%</span>
-                        <Badge color={g.status === "On Track" ? B.success : B.warning} bg={g.status === "On Track" ? B.successBg : B.warningBg} style={{ fontSize: 8 }}>{g.status}</Badge>
-                      </div>);
-                  })}
-                </div>
-              </div>
-            ))}
-          </Card>
-          {/* Goal creation modal */}
-          <Modal open={showGoalModal} onClose={() => setShowGoalModal(false)} title="Create Goal" width={520}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[{ l: "Goal Title", ph: "e.g. Achieve 95% grant reporting compliance" }, { l: "Description", ph: "Detailed description of expected outcomes" }].map((f, i) => (
-                <div key={i}><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>{f.l}</label>
-                {i === 1 ? <textarea placeholder={f.ph} rows={3} style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", resize: "vertical", boxSizing: "border-box" }} /> :
-                <input placeholder={f.ph} style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} />}</div>
-              ))}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Type</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...["Performance", "Development", "Project", "Competency"].map(t => ({ value: t, label: t }))]} /></div>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Aligned To</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select org goal..." }, ...ORG_GOALS.map(g => ({ value: g.id, label: g.title.slice(0, 40) + "..." }))]} /></div>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Assign To</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...EMPLOYEES.slice(0, 14).map(emp => ({ value: emp.id, label: `${emp.first} ${emp.last}` }))]} /></div>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Target Date</label><input type="date" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
-              </div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>
-                <Btn variant="secondary" onClick={() => setShowGoalModal(false)}>Cancel</Btn>
-                <Btn variant="primary" onClick={() => { alert("Goal created and linked to alignment cascade"); setShowGoalModal(false); }}>✓ Create Goal</Btn>
-              </div>
-            </div>
-          </Modal>
         </div>
       )}
 
       {/* ════════ REVIEW CYCLES ════════ */}
-      {tab === "reviews" && (
+      {tab === "cycles" && isAdmin && (
         <div>
-          <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
-            <Select value={selectedCycle} onChange={setSelectedCycle} options={CYCLES.map(c => ({ value: c.id, label: `${c.name} (${c.status})` }))} />
-            <Badge color={activeCycle.status === "Active" ? B.success : B.textMuted} bg={activeCycle.status === "Active" ? B.successBg : B.bgHover}>{activeCycle.status}</Badge>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>Review Cycles</div>
+            <Btn>+ New Cycle</Btn>
           </div>
-          <Card style={{ marginBottom: 14 }}>
-            <SectionTitle>Review Status — {activeCycle.name}</SectionTitle>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, fontFamily: "Arial, sans-serif" }}>
-                <thead><tr style={{ background: B.bg }}>
-                  {["Employee", "Country", "Dept", "Self-Assessment", "Manager Review", "Rating", "Goal Progress", "Status"].map(h => (
-                    <th key={h} style={{ padding: "8px 8px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>
-                  ))}
-                </tr></thead>
-                <tbody>{EMPLOYEE_GOALS.map((eg, i) => {
-                  const avgGoal = Math.round(eg.goals.reduce((s, g) => s + g.progress, 0) / eg.goals.length);
-                  return (
-                    <tr key={i} onMouseEnter={ev => ev.currentTarget.style.background = B.bgHover} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><Avatar name={`${eg.emp.first} ${eg.emp.last}`} size={22} /><span style={{ fontWeight: 700 }}>{eg.emp.first} {eg.emp.last}</span></div></td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}>{eg.emp.flag}</td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}>{eg.emp.department}</td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={eg.selfAssessment === "Submitted" ? B.success : B.warning} bg={eg.selfAssessment === "Submitted" ? B.successBg : B.warningBg}>{eg.selfAssessment}</Badge></td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={eg.mgrReview === "Complete" ? B.success : B.warning} bg={eg.mgrReview === "Complete" ? B.successBg : B.warningBg}>{eg.mgrReview}</Badge></td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700, color: eg.rating >= 4 ? B.success : eg.rating >= 3.5 ? B.blue : B.warning }}>{eg.rating.toFixed(1)}</td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", alignItems: "center", gap: 4 }}><ProgressBar value={avgGoal} max={100} color={avgGoal >= 70 ? B.success : B.warning} /><span style={{ fontSize: 10, fontWeight: 700, width: 28 }}>{avgGoal}%</span></div></td>
-                      <td style={{ padding: "7px 8px", borderBottom: `1px solid ${B.borderLight}` }}><StatusBadge status={eg.selfAssessment === "Submitted" && eg.mgrReview === "Complete" ? "Approved" : "In Progress"} /></td>
-                    </tr>);
-                })}</tbody>
-              </table>
-            </div>
-          </Card>
-        </div>
-      )}
-
-      {/* ════════ FEEDBACK & RECOGNITION ════════ */}
-      {tab === "feedback" && (
-        <div>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 14 }}>
-            <Btn variant="primary" size="sm" onClick={() => setShowFeedback(true)}>+ Give Feedback</Btn>
-            <Btn variant="secondary" size="sm" onClick={() => setShow360(true)}> Request 360┬░</Btn>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-            <Card style={{ borderTop: `4px solid ${B.success}` }}>
-              <SectionTitle>Feedback Wall</SectionTitle>
-              {FEEDBACK.map((f, i) => (
-                <div key={i} style={{ padding: "10px 12px", borderRadius: 8, background: B.bgHover, marginBottom: 8, borderLeft: `3px solid ${feedbackColors[f.type]}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <Avatar name={f.from} size={24} />
-                    <span style={{ fontSize: 12, fontWeight: 700 }}>{f.from}</span>
-                    <span style={{ color: B.textMuted, fontSize: 11 }}>→</span>
-                    <Avatar name={f.to} size={24} />
-                    <span style={{ fontSize: 12, fontWeight: 700 }}>{f.to}</span>
-                    <Badge color={feedbackColors[f.type]} bg={`${feedbackColors[f.type]}14`} style={{ marginLeft: "auto", fontSize: 8 }}>{f.type}</Badge>
+          {CYCLES.map(c => (
+            <Card key={c.id} style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontWeight: 700, fontSize: 14 }}>{c.name}</span>
+                    <Badge color={c.status === "Active" ? B.success : B.textMuted} bg={`${c.status === "Active" ? B.success : B.textMuted}14`}>{c.status}</Badge>
                   </div>
-                  <div style={{ fontSize: 12, color: B.textSecondary, lineHeight: 1.6, fontStyle: "italic" }}>"{f.text}"</div>
-                  <div style={{ display: "flex", gap: 6, marginTop: 4, fontSize: 10, color: B.textMuted }}>
-                    <Badge color={B.blue} bg={`${B.blue}10`} style={{ fontSize: 8 }}>{f.competency}</Badge>
-                    <span>{fmtDate(f.date)}</span>
+                  <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>{c.period} · Due: {fmtDate(c.due)}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+                    {[{ label: "Self-Assessments", v: c.selfDone, max: c.total, color: B.blue },
+                      { label: "Manager Reviews", v: c.mgrDone, max: c.total, color: B.teal },
+                      { label: "Overall Complete", v: c.completion, max: 100, color: c.completion === 100 ? B.success : B.accent }
+                    ].map((m, i) => (
+                      <div key={i} style={{ textAlign: "center", padding: 8, background: B.bgHover, borderRadius: 8 }}>
+                        <div style={{ fontSize: 18, fontWeight: 700 }}>{i < 2 ? `${m.v}/${m.max}` : `${m.v}%`}</div>
+                        <div style={{ fontSize: 10, color: B.textMuted }}>{m.label}</div>
+                        <ProgressBar value={m.v} max={m.max} color={m.color} />
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+                <div style={{ display: "flex", gap: 6, marginLeft: 14 }}>
+                  <Btn size="sm" variant="ghost">Edit</Btn>
+                  {c.status === "Active" && <Btn size="sm">Close Cycle</Btn>}
+                </div>
+              </div>
             </Card>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <Card>
-                <SectionTitle>Competency Framework</SectionTitle>
-                {NI_COMPETENCIES.map((c, i) => {
-                  const count = FEEDBACK.filter(f => f.competency === c).length;
-                  return (<div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, flex: 1, fontWeight: 600 }}>{c}</span>
-                    <div style={{ width: 40 }}><ProgressBar value={count} max={3} color={B.accent} /></div>
-                    <span style={{ fontSize: 11, color: B.textMuted, width: 20, textAlign: "right" }}>{count}</span>
-                  </div>);
-                })}
-              </Card>
-              <Card>
-                <SectionTitle>Recognition Stats</SectionTitle>
-                {[{ label: "Feedback given this quarter", value: FEEDBACK.length },
-                  { label: "Praise messages", value: FEEDBACK.filter(f => f.type === "Praise").length },
-                  { label: "Coaching notes", value: FEEDBACK.filter(f => f.type === "Coaching").length },
-                  { label: "Unique givers", value: new Set(FEEDBACK.map(f => f.from)).size },
-                  { label: "Unique receivers", value: new Set(FEEDBACK.map(f => f.to)).size },
-                ].map((s, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${B.borderLight}`, fontSize: 12 }}>
-                    <span style={{ color: B.textSecondary }}>{s.label}</span>
-                    <span style={{ fontWeight: 700 }}>{s.value}</span>
-                  </div>
-                ))}
-              </Card>
-            </div>
-          </div>
-          {/* Feedback modal */}
-          <Modal open={showFeedback} onClose={() => setShowFeedback(false)} title="Give Feedback" width={500}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>To</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select colleague..." }, ...EMPLOYEES.slice(0, 14).map(emp => ({ value: emp.id, label: `${emp.first} ${emp.last}` }))]} /></div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Type</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "Praise", label: "Praise / Recognition" }, { value: "Coaching", label: "Coaching / Suggestion" }]} /></div>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Competency</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={NI_COMPETENCIES.map(c => ({ value: c, label: c }))} /></div>
-              </div>
-              <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Message</label><textarea rows={4} placeholder="Share specific, actionable feedback..." style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", resize: "vertical", boxSizing: "border-box" }} /></div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}><Btn variant="secondary" onClick={() => setShowFeedback(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("Feedback submitted!"); setShowFeedback(false); }}>Send Feedback</Btn></div>
-            </div>
-          </Modal>
-          <Modal open={show360} onClose={() => setShow360(false)} title="Request 360┬░ Feedback" width={500}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>For Employee</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...EMPLOYEES.filter(e => e.isManager).map(emp => ({ value: emp.id, label: `${emp.first} ${emp.last}` }))]} /></div>
-              <div style={{ fontSize: 12, color: B.textMuted }}>Select reviewers (supervisor, peers, direct reports, stakeholders):</div>
-              {["Supervisor", "Peer 1", "Peer 2", "Direct Report 1", "External Stakeholder"].map((r, i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 8, alignItems: "center" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: B.textMuted }}>{r}</span>
-                  <Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...EMPLOYEES.slice(0, 14).map(emp => ({ value: emp.id, label: `${emp.first} ${emp.last}` }))]} />
-                </div>
-              ))}
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setShow360(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("360┬░ feedback requests sent!"); setShow360(false); }}> Launch 360┬░</Btn></div>
-            </div>
-          </Modal>
+          ))}
         </div>
       )}
 
-      {/* ════════ CHECK-INS & 1:1s ════════ */}
-      {tab === "checkins" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <Card style={{ borderTop: `4px solid ${B.blue}` }}>
-            <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => setShowCheckin(true)}>+ Schedule Check-In</Btn>}>Upcoming Check-Ins</SectionTitle>
-            {[{ mgr: "Sarah Chen", emp: "Carlos Rodriguez", date: "2026-04-25", type: "Weekly 1:1", topics: "Q2 deliverables, training plan" },
-              { mgr: "Marcus Johnson", emp: "Fatou Diop", date: "2026-04-28", type: "30-Day", topics: "Onboarding progress, role clarity" },
-              { mgr: "Priya Patel", emp: "Arun Mehta", date: "2026-04-30", type: "Monthly", topics: "Research publication, mentoring" },
-              { mgr: "Oliver Wright", emp: "Sophie Dubois", date: "2026-05-02", type: "Quarterly", topics: "Q1 review, H2 goal-setting" },
-            ].map((c, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
-                <Avatar name={c.mgr} size={28} />
-                <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 700 }}>{c.mgr} ↔ {c.emp}</div><div style={{ fontSize: 11, color: B.textMuted }}>{c.topics}</div></div>
-                <div style={{ textAlign: "right" }}><Badge color={B.blue} bg={`${B.blue}12`}>{c.type}</Badge><div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{fmtDate(c.date)}</div></div>
+      {/* ════════ GOAL CASCADE ════════ */}
+      {tab === "cascade" && isAdmin && (
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Goal Cascade</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 14 }}>Org goals flow down through Key Result Areas to individual employee goals</div>
+          {ORG_GOALS.map(og => (
+            <Card key={og.id} style={{ marginBottom: 14, borderTop: `4px solid ${orgGoalColors[og.type] || B.accent}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div>
+                  <Badge color={orgGoalColors[og.type] || B.accent} bg={`${orgGoalColors[og.type] || B.accent}14`} style={{ marginBottom: 4 }}>{og.type}</Badge>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{og.title}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>{og.owner}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 20, fontWeight: 700 }}>{og.progress}%</div>
+                  <ProgressBar value={og.progress} max={100} color={orgGoalColors[og.type]} />
+                </div>
+              </div>
+              <div style={{ marginLeft: 16, borderLeft: `2px solid ${B.border}`, paddingLeft: 14, marginTop: 8 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, marginBottom: 6 }}>LINKED EMPLOYEE GOALS</div>
+                {EMPLOYEE_GOALS_HR.filter(eg => eg.goals.some(g => g.aligned === og.id)).slice(0,4).map((eg, i) => {
+                  const g = eg.goals.find(g => g.aligned === og.id);
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, background: B.bgHover, marginBottom: 4, fontSize: 12 }}>
+                      <Avatar name={eg.emp.name} size={20} />
+                      <span style={{ flex: 1 }}>{eg.emp.name} — {g.title}</span>
+                      <div style={{ width: 60 }}><ProgressBar value={g.progress} max={100} color={statusColors[g.status]} /></div>
+                      <span style={{ fontWeight: 700, width: 30, textAlign: "right" }}>{g.progress}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          ))}
+          <Card style={{ borderTop: `4px solid ${B.purple}` }}>
+            <SectionTitle>Key Result Areas</SectionTitle>
+            {KRAs.map(k => (
+              <div key={k.id} style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <Badge color={B.purple} bg={`${B.purple}14`} style={{ marginBottom: 2 }}>{k.area}</Badge>
+                    <div style={{ fontSize: 12, fontWeight: 700 }}>{k.title}</div>
+                  </div>
+                  <span style={{ fontSize: 11, color: B.textMuted }}>{EMPLOYEE_GOALS_HR.reduce((s, eg) => s + eg.goals.filter(g => g.aligned === k.id).length, 0)} goals linked</span>
+                </div>
               </div>
             ))}
           </Card>
-          <Card>
-            <SectionTitle>1:1 Conversation Guide</SectionTitle>
-            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Suggested topics for productive check-ins:</div>
-            {[{ topic: "Progress on goals & deliverables", prompt: "What are you most proud of since we last met? What's blocking progress?" },
-              { topic: "Feedback & coaching", prompt: "What feedback do you need from me? Here's what I've observed..." },
-              { topic: "Development & growth", prompt: "What skills are you building? How can I support your career goals?" },
-              { topic: "Wellbeing & engagement", prompt: "How's your workload? Is there anything affecting your energy or focus?" },
-              { topic: "Looking ahead", prompt: "What are your priorities for the next period? What support do you need?" },
-            ].map((t, i) => (
-              <div key={i} style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 4 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary }}>{t.topic}</div>
-                <div style={{ fontSize: 11, color: B.textMuted, fontStyle: "italic" }}>"{t.prompt}"</div>
-              </div>
-            ))}
-          </Card>
-          <Modal open={showCheckin} onClose={() => setShowCheckin(false)} title="Schedule Check-In" width={450}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>With Employee</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...EMPLOYEES.slice(0, 14).map(e => ({ value: e.id, label: `${e.first} ${e.last}` }))]} /></div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Date</label><input type="date" style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", boxSizing: "border-box" }} /></div>
-                <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Type</label><Select value="" onChange={() => {}} style={{ width: "100%" }} options={[{ value: "weekly", label: "Weekly 1:1" }, { value: "monthly", label: "Monthly" }, { value: "quarterly", label: "Quarterly Review" }, { value: "probation", label: "Probation" }]} /></div>
-              </div>
-              <div><label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4, fontFamily: "Arial, sans-serif" }}>Topics / Agenda</label><textarea rows={3} placeholder="Key topics to discuss..." style={{ width: "100%", padding: 9, borderRadius: 8, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif", resize: "vertical", boxSizing: "border-box" }} /></div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}><Btn variant="secondary" onClick={() => setShowCheckin(false)}>Cancel</Btn><Btn variant="primary" onClick={() => { alert("Check-in scheduled! Calendar invite sent."); setShowCheckin(false); }}> Schedule</Btn></div>
+        </div>
+      )}
+
+      {/* ════════ COMPETENCY FRAMEWORK ════════ */}
+      {tab === "competencies" && isAdmin && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>Competency Framework</div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {["default","P4","M1"].map(g => (
+                <button key={g} onClick={() => setCompGrade(g)}
+                  style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid ${compGrade === g ? B.accent : B.border}`, background: compGrade === g ? B.accentBg : "transparent", fontWeight: compGrade === g ? 700 : 400, fontSize: 12, cursor: "pointer", fontFamily: "Arial,sans-serif" }}>
+                  {g === "default" ? "All Staff" : g}
+                </button>
+              ))}
             </div>
-          </Modal>
+          </div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>
+            {compGrade === "default" ? "Applied to all employees not in a specialized grade" : `Applied to ${compGrade}-grade employees`}
+          </div>
+          {(compFrameworks[compGrade] || []).map(c => (
+            <Card key={c.id} style={{ marginBottom: 10 }}>
+              {editingComp === c.id ? (
+                <div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, marginBottom: 8 }}>
+                    <div><FL>Competency Name</FL><input style={inp} value={compEditForm.name} onChange={e => setCompEditForm(p => ({...p, name: e.target.value}))} /></div>
+                    <div><FL>Weight (%)</FL><input type="number" min={0} max={100} style={{ ...inp, width: 70 }} value={compEditForm.weight} onChange={e => setCompEditForm(p => ({...p, weight: parseInt(e.target.value)||0}))} /></div>
+                  </div>
+                  <FL>Description</FL>
+                  <textarea style={{ ...inp, minHeight: 55, resize: "vertical" }} value={compEditForm.desc} onChange={e => setCompEditForm(p => ({...p, desc: e.target.value}))} />
+                  <div style={{ display: "flex", gap: 6, justifyContent: "flex-end", marginTop: 8 }}>
+                    <Btn variant="ghost" onClick={() => setEditingComp(null)}>Cancel</Btn>
+                    <Btn onClick={() => {
+                      setCompFrameworks(p => ({ ...p, [compGrade]: (p[compGrade] || []).map(x => x.id === c.id ? { ...x, ...compEditForm } : x) }));
+                      setEditingComp(null);
+                    }}>Save</Btn>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                      <span style={{ fontWeight: 700, fontSize: 13 }}>{c.name}</span>
+                      <Badge color={B.accent} bg={`${B.accent}14`}>{c.weight}%</Badge>
+                    </div>
+                    <div style={{ fontSize: 12, color: B.textSecondary }}>{c.desc}</div>
+                  </div>
+                  <Btn size="sm" onClick={() => { setEditingComp(c.id); setCompEditForm({ name: c.name, desc: c.desc, weight: c.weight }); }}>Edit</Btn>
+                </div>
+              )}
+            </Card>
+          ))}
+          <div style={{ fontSize: 11, color: B.textMuted, marginTop: 6, textAlign: "right" }}>
+            Total weight: {(compFrameworks[compGrade] || []).reduce((s, c) => s + c.weight, 0)}%
+            {(compFrameworks[compGrade] || []).reduce((s, c) => s + c.weight, 0) !== 100 && (
+              <span style={{ color: B.danger, marginLeft: 4 }}>Should total 100%</span>
+            )}
+          </div>
         </div>
       )}
 
       {/* ════════ TALENT & 9-BOX ════════ */}
-      {tab === "talent" && (
+      {tab === "talent" && isAdmin && (
         <div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Talent Review & 9-Box</div>
+          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 14 }}>Performance vs. Potential matrix — {EMPLOYEE_GOALS_HR.length} employees</div>
           <Card style={{ marginBottom: 14 }}>
-            <SectionTitle>9-Box Talent Grid (Performance ├ù Potential)</SectionTitle>
-            <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 1fr 1fr", gridTemplateRows: "auto 1fr 1fr 1fr", gap: 4, marginTop: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr", gap: 4 }}>
               <div />
-              {["Low Perf", "Solid Perf", "High Perf"].map((l, i) => <div key={i} style={{ textAlign: "center", fontSize: 9, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", padding: 4 }}>{l}</div>)}
-              {[2, 1, 0].map(pot => (<>
-                <div key={`l-${pot}`} style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontSize: 9, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center" }}>{["Low Pot", "Med Pot", "High Pot"][pot]}</div>
-                {[0, 1, 2].map(perf => {
-                  const emps = EMPLOYEE_GOALS.filter(eg => eg.nineBox.performance === perf && eg.nineBox.potential === pot);
-                  return (
-                    <div key={`${perf}-${pot}`} style={{ minHeight: 70, padding: 8, borderRadius: 6, background: `${nineBoxColors[pot][perf]}20`, border: `1px solid ${nineBoxColors[pot][perf]}30`, display: "flex", flexDirection: "column", gap: 4 }}>
-                      <div style={{ fontSize: 9, fontWeight: 700, color: nineBoxColors[pot][perf], textAlign: "center" }}>{nineBoxLabels[pot][perf]}</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
-                        {emps.map((eg, i) => <Avatar key={i} name={`${eg.emp.first} ${eg.emp.last}`} size={24} />)}
+              {["Low Perf","Mid Perf","High Perf"].map(l => (
+                <div key={l} style={{ fontSize: 9, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", textAlign: "center", paddingBottom: 4 }}>{l}</div>
+              ))}
+              {[2,1,0].map(pot => (
+                <React.Fragment key={pot}>
+                  <div style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontSize: 9, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {["Low Pot","Med Pot","High Pot"][pot]}
+                  </div>
+                  {[0,1,2].map(perf => {
+                    const nb_colors = [[B.danger,B.warning,B.blue],[B.orange,B.blue,B.teal],["#fee2e2","#fef9c3","#d1fae5"]];
+                    const nb_labels = [["Underperformer","Effective","Star"],["Inconsistent","Core Player","High Performer"],["Risk","Moderate","Emerging Talent"]];
+                    const emps = EMPLOYEE_GOALS_HR.filter(eg => eg.nineBox.performance === perf && eg.nineBox.potential === pot);
+                    return (
+                      <div key={perf} style={{ minHeight: 70, padding: 8, borderRadius: 6, background: `${nb_colors[pot][perf]}30`, border: `1px solid ${nb_colors[pot][perf]}50`, display: "flex", flexDirection: "column", gap: 4 }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: nb_colors[pot][perf] }}>{nb_labels[pot][perf]}</div>
+                        {emps.map((eg, i) => (
+                          <div key={i} style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
+                            <Avatar name={eg.emp.name} size={14} />
+                            <span>{eg.emp.name.split(" ")[0]}</span>
+                          </div>
+                        ))}
                       </div>
-                      {emps.length > 0 && <div style={{ fontSize: 9, color: B.textMuted, textAlign: "center" }}>{emps.length}</div>}
-                    </div>
-                  );
-                })}
-              </>))}
+                    );
+                  })}
+                </React.Fragment>
+              ))}
             </div>
           </Card>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Card>
               <SectionTitle>Rating Distribution</SectionTitle>
-              {[{ range: "4.5–5.0 (Exceptional)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 4.5).length, color: B.success },
-                { range: "4.0–4.4 (Exceeds)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 4.0 && eg.rating < 4.5).length, color: B.teal },
-                { range: "3.5–3.9 (Meets+)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 3.5 && eg.rating < 4.0).length, color: B.blue },
-                { range: "3.0–3.4 (Meets)", count: EMPLOYEE_GOALS.filter(eg => eg.rating >= 3.0 && eg.rating < 3.5).length, color: B.warning },
-                { range: "< 3.0 (Developing)", count: EMPLOYEE_GOALS.filter(eg => eg.rating < 3.0).length, color: B.danger },
+              {[
+                { range: "4.5–5.0 (Exceptional)", count: EMPLOYEE_GOALS_HR.filter(eg => eg.rating >= 4.5).length, color: B.success },
+                { range: "4.0–4.4 (Exceeds)", count: EMPLOYEE_GOALS_HR.filter(eg => eg.rating >= 4.0 && eg.rating < 4.5).length, color: B.teal },
+                { range: "3.5–3.9 (Meets+)", count: EMPLOYEE_GOALS_HR.filter(eg => eg.rating >= 3.5 && eg.rating < 4.0).length, color: B.blue },
+                { range: "3.0–3.4 (Meets)", count: EMPLOYEE_GOALS_HR.filter(eg => eg.rating >= 3.0 && eg.rating < 3.5).length, color: B.warning },
+                { range: "< 3.0 (Developing)", count: EMPLOYEE_GOALS_HR.filter(eg => eg.rating < 3.0).length, color: B.danger },
               ].map((r, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, width: 130 }}>{r.range}</span>
-                  <div style={{ flex: 1 }}><ProgressBar value={r.count} max={5} color={r.color} /></div>
-                  <span style={{ fontSize: 12, fontWeight: 700, width: 20, textAlign: "right" }}>{r.count}</span>
+                  <span style={{ fontSize: 11, width: 130, color: B.textSecondary }}>{r.range}</span>
+                  <div style={{ flex: 1, height: 12, borderRadius: 6, background: B.bgHover, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${(r.count / EMPLOYEE_GOALS_HR.length) * 100}%`, background: r.color, borderRadius: 6 }} />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, width: 20, textAlign: "right" }}>{r.count}</span>
                 </div>
               ))}
             </Card>
             <Card>
-              <SectionTitle>Succession Pipeline</SectionTitle>
-              {[{ role: "Country Director — Kenya", ready: "Joseph Mwangi", developing: "Grace Okafor" },
-                { role: "VP Programs", ready: "Sarah Chen", developing: "Priya Patel" },
-                { role: "Finance Director", ready: "Marcus Johnson", developing: "Fatou Diop" },
-              ].map((s, i) => (
-                <div key={i} style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>{s.role}</div>
-                  <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
-                    <span style={{ color: B.success }}>Ready Now: <strong>{s.ready}</strong></span>
-                    <span style={{ color: B.blue }}>Developing: <strong>{s.developing}</strong></span>
+              <SectionTitle>Performance by Department</SectionTitle>
+              {DEPARTMENTS.slice(0,7).map(d => {
+                const emps = EMPLOYEE_GOALS_HR.filter(eg => eg.emp.department === d);
+                const avg = emps.length ? (emps.reduce((s, eg) => s + eg.rating, 0) / emps.length).toFixed(1) : "—";
+                return (
+                  <div key={d} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, flex: 1, color: B.textSecondary }}>{d}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: parseFloat(avg) >= 4.0 ? B.success : parseFloat(avg) >= 3.5 ? B.teal : B.orange }}>{avg}</span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </Card>
           </div>
         </div>
       )}
 
       {/* ════════ ANALYTICS ════════ */}
-      {tab === "analytics" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <Card style={{ borderTop: `4px solid ${B.accent}` }}>
-            <SectionTitle>Performance by Department</SectionTitle>
-            {DEPARTMENTS.slice(0, 7).map(d => {
-              const emps = EMPLOYEE_GOALS.filter(eg => eg.emp.department === d);
-              const avg = emps.length ? (emps.reduce((s, eg) => s + eg.rating, 0) / emps.length).toFixed(1) : "—";
-              return (<div key={d} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 11, width: 110, fontWeight: 600 }}>{d}</span>
-                <div style={{ flex: 1 }}><ProgressBar value={avg !== "—" ? parseFloat(avg) : 0} max={5} color={avg >= 4 ? B.success : avg >= 3.5 ? B.blue : B.warning} /></div>
-                <span style={{ fontSize: 12, fontWeight: 700, width: 28, textAlign: "right" }}>{avg}</span>
-              </div>);
-            })}
-          </Card>
-          <Card>
-            <SectionTitle>Goal Completion by Type</SectionTitle>
-            {["Performance", "Development"].map(type => {
-              const goals = EMPLOYEE_GOALS.flatMap(eg => eg.goals.filter(g => g.type === type));
-              const avg = Math.round(goals.reduce((s, g) => s + g.progress, 0) / goals.length);
-              return (<div key={type} style={{ marginBottom: 10 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, fontSize: 12 }}>
-                  <span style={{ fontWeight: 700 }}>{type} Goals</span>
-                  <span style={{ fontWeight: 700, color: goalTypeColors[type] }}>{avg}%</span>
+      {tab === "analytics" && isAdmin && (
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14 }}>Performance Analytics</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <Card>
+              <SectionTitle>Cycle-over-Cycle Completion</SectionTitle>
+              {CYCLES.map((c, i) => (
+                <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: i === 0 ? B.accentBg : B.bgHover, marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, flex: 1 }}>{c.name}</span>
+                  <div style={{ width: 100 }}><ProgressBar value={c.completion} max={100} color={c.completion === 100 ? B.success : B.accent} /></div>
+                  <span style={{ fontSize: 12, fontWeight: 700, width: 35, textAlign: "right" }}>{c.completion}%</span>
                 </div>
-                <ProgressBar value={avg} max={100} color={goalTypeColors[type]} />
-                <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{goals.length} goals  · {goals.filter(g => g.status === "On Track").length} on track  · {goals.filter(g => g.status === "At Risk").length} at risk</div>
-              </div>);
-            })}
-          </Card>
-          <Card>
-            <SectionTitle>Cycle-over-Cycle Trend</SectionTitle>
-            {CYCLES.map((c, i) => (
-              <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 6, background: i === 0 ? B.accentBg : B.bgHover, marginBottom: 4 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, width: 140 }}>{c.name}</span>
-                <div style={{ flex: 1 }}><ProgressBar value={c.completion} max={100} color={c.completion === 100 ? B.success : B.accent} /></div>
-                <span style={{ fontSize: 12, fontWeight: 700, width: 35, textAlign: "right" }}>{c.completion}%</span>
-              </div>
-            ))}
-          </Card>
-          <Card>
-            <SectionTitle>Feedback Analytics</SectionTitle>
-            {[{ metric: "Feedback frequency (per employee/quarter)", value: (FEEDBACK.length / 12).toFixed(1), target: "2.0" },
-              { metric: "Praise-to-coaching ratio", value: `${FEEDBACK.filter(f => f.type === "Praise").length}:${FEEDBACK.filter(f => f.type === "Coaching").length}`, target: "3:1" },
-              { metric: "Manager participation rate", value: "71%", target: "90%" },
-              { metric: "Self-assessments on time", value: `${Math.round(activeCycle.selfDone / activeCycle.total * 100)}%`, target: "95%" },
-            ].map((m, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${B.borderLight}`, fontSize: 12 }}>
-                <span style={{ color: B.textSecondary }}>{m.metric}</span>
-                <div><span style={{ fontWeight: 700 }}>{m.value}</span><span style={{ color: B.textMuted, marginLeft: 6 }}>target: {m.target}</span></div>
-              </div>
-            ))}
-          </Card>
+              ))}
+            </Card>
+            <Card>
+              <SectionTitle>Goal Completion by Type</SectionTitle>
+              {["Performance","Development"].map(type => {
+                const goals = EMPLOYEE_GOALS_HR.flatMap(eg => eg.goals.filter(g => g.type === type));
+                const avg = goals.length ? Math.round(goals.reduce((s, g) => s + g.progress, 0) / goals.length) : 0;
+                return (
+                  <div key={type} style={{ marginBottom: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, fontSize: 12 }}>
+                      <span style={{ fontWeight: 700 }}>{type}</span><span>{avg}%</span>
+                    </div>
+                    <ProgressBar value={avg} max={100} color={goalTypeColors[type]} />
+                    <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{goals.length} goals · {goals.filter(g => g.status === "On Track").length} on track</div>
+                  </div>
+                );
+              })}
+            </Card>
+            <Card>
+              <SectionTitle>Feedback Analytics</SectionTitle>
+              {[
+                { metric: "Feedback frequency (per employee/quarter)", value: (FEEDBACK_WALL.length / 12).toFixed(1), target: "2.0" },
+                { metric: "Praise-to-coaching ratio", value: `${FEEDBACK_WALL.filter(f => f.type === "Praise").length}:${FEEDBACK_WALL.filter(f => f.type === "Coaching").length}`, target: "3:1" },
+                { metric: "Manager participation rate", value: "71%", target: "90%" },
+                { metric: "Self-assessments on time", value: `${Math.round(activeCycle.selfDone / activeCycle.total * 100)}%`, target: "95%" },
+              ].map((m, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${B.borderLight}`, fontSize: 12 }}>
+                  <span style={{ color: B.textSecondary }}>{m.metric}</span>
+                  <div><span style={{ fontWeight: 700 }}>{m.value}</span><span style={{ color: B.textMuted, marginLeft: 6 }}>target: {m.target}</span></div>
+                </div>
+              ))}
+            </Card>
+            <Card>
+              <SectionTitle>Performance by Department</SectionTitle>
+              {DEPARTMENTS.slice(0,7).map(d => {
+                const emps = EMPLOYEE_GOALS_HR.filter(eg => eg.emp.department === d);
+                const avg = emps.length ? (emps.reduce((s, eg) => s + eg.rating, 0) / emps.length).toFixed(1) : "—";
+                return (
+                  <div key={d} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, flex: 1, color: B.textSecondary }}>{d}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: parseFloat(avg) >= 4.0 ? B.success : B.orange }}>{avg}</span>
+                  </div>
+                );
+              })}
+            </Card>
+          </div>
         </div>
       )}
     </div>
