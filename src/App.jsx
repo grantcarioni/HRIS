@@ -1151,32 +1151,60 @@ const CLUSTER_COLOR = { "General": B.textMuted, "Process": B.teal, "Design": B.b
 const IC_PATH   = ["P1","P2","P3","P4","P5"];
 const MGMT_PATH = ["P3","M1","M2","M3","D1","VP"];
 
+const MENTORS = [
+  { id: "M1", name: "Sarah Okonkwo",   title: "Senior Director — Programs",    grade: "D1", country: "NG", expertise: ["Strategy","Stakeholder Management","Donor Relations"], available: true,  sessions: 12, rating: 4.9 },
+  { id: "M2", name: "Jean-Paul Mbeki", title: "Country Director — Kenya",      grade: "M3", country: "KE", expertise: ["People Management","Budget Oversight","Team Development"], available: true,  sessions: 8,  rating: 4.7 },
+  { id: "M3", name: "Priya Sharma",    title: "Lead Specialist — Nutrition",  grade: "P4", country: "CA", expertise: ["Research","Technical Authority","Proposal Writing"], available: false, sessions: 20, rating: 4.8 },
+  { id: "M4", name: "Ana Torres",      title: "Senior Manager — Finance",      grade: "M2", country: "PH", expertise: ["Finance","Grant Compliance","Data Analysis"], available: true,  sessions: 5,  rating: 4.6 },
+];
+
+const TEAM_CAREER = [
+  { name: "Amara Diallo",    grade: "P2", title: "Program Officer",          readiness: 72, nextGrade: "P3", milestonesDone: 3, milestonesTotal: 5, lastCheck: "2026-04-01" },
+  { name: "Carlos Reyes",    grade: "P3", title: "Senior Program Officer",   readiness: 88, nextGrade: "P4", milestonesDone: 4, milestonesTotal: 4, lastCheck: "2026-03-28" },
+  { name: "Fatima Al-Rashid",grade: "P1", title: "Program Associate",        readiness: 45, nextGrade: "P2", milestonesDone: 1, milestonesTotal: 4, lastCheck: "2026-04-10" },
+  { name: "James Mwangi",    grade: "P2", title: "Program Officer",          readiness: 60, nextGrade: "P3", milestonesDone: 2, milestonesTotal: 5, lastCheck: "2026-04-05" },
+];
+
 const CareerPathModule = ({ role }) => {
   const emp = ME;
+  const isManagerView = (role === "manager" || role === "hr" || role === "superuser");
   const [activeTab, setActiveTab] = useState("pathway");
   const [milestones, setMilestones] = useState([
-    { id: "cm1", goal: "Complete PSEA Advanced Certification",         target: "2026-06-30", status: "in-progress", category: "Learning"    },
-    { id: "cm2", goal: "Lead a cross-functional project end-to-end",   target: "2026-09-30", status: "pending",     category: "Experience"  },
-    { id: "cm3", goal: "Mentorship: 3+ sessions with a P4 mentor",    target: "2026-12-31", status: "pending",     category: "Mentorship"  },
-    { id: "cm4", goal: "Data Analysis with Python certification",      target: "2026-08-31", status: "in-progress", category: "Learning"    },
+    { id: "cm1", goal: "Complete PSEA Advanced Certification",        target: "2026-06-30", status: "in-progress", category: "Learning",    pct: 60, notes: "Module 3 of 5 complete" },
+    { id: "cm2", goal: "Lead a cross-functional project end-to-end",  target: "2026-09-30", status: "pending",     category: "Experience",  pct: 0,  notes: "" },
+    { id: "cm3", goal: "Mentorship: 3+ sessions with a P4 mentor",   target: "2026-12-31", status: "in-progress", category: "Mentorship",  pct: 33, notes: "1 of 3 sessions completed" },
+    { id: "cm4", goal: "Data Analysis with Python certification",     target: "2026-08-31", status: "in-progress", category: "Learning",    pct: 40, notes: "Chapters 1–4 done" },
   ]);
-  const [showMModal, setShowMModal] = useState(false);
-  const [mForm, setMForm] = useState({ goal: "", target: "", category: "Learning" });
+  const [showMModal, setShowMModal]   = useState(false);
+  const [mForm, setMForm]             = useState({ goal: "", target: "", category: "Learning", notes: "" });
+  const [selfRatings, setSelfRatings] = useState({ "Data Analysis": 2, "People Management": 1, "Grant Writing": 3, "Strategic Planning": 2, "Cross-team collaboration": 3, "Mentoring": 2 });
+  const [activeMentor, setActiveMentor] = useState("M1");
+  const [showCoach, setShowCoach]     = useState(false);
+  const [showTeamDetail, setShowTeamDetail] = useState(null);
   const currentGrade = emp.level;
-  const icIdx   = IC_PATH.indexOf(currentGrade);
+  const icIdx = IC_PATH.indexOf(currentGrade);
+  const nextGrade = icIdx >= 0 && icIdx < IC_PATH.length - 1 ? IC_PATH[icIdx + 1] : null;
+
   const GAPS = [
-    { name: "Data Analysis",     current: 2, required: 4, priority: "High",   course: "Data Analysis with Python" },
-    { name: "People Management", current: 1, required: 3, priority: "Medium", course: "Managing High-Performance Teams" },
-    { name: "Grant Writing",     current: 3, required: 4, priority: "Medium", course: "Advanced Grant Compliance" },
-    { name: "Strategic Planning",current: 2, required: 4, priority: "Low",    course: null },
+    { name: "Data Analysis",           required: 4, priority: "High",   course: "Data Analysis with Python",     competency: "Data Analysis" },
+    { name: "People Management",        required: 3, priority: "Medium", course: "Managing High-Performance Teams", competency: "People Management" },
+    { name: "Grant Writing",            required: 4, priority: "Medium", course: "Advanced Grant Compliance",      competency: "Grant Writing" },
+    { name: "Strategic Planning",       required: 4, priority: "Low",    course: null,                             competency: "Strategic Planning" },
   ];
+
   const LATERAL = [
-    { title: "Program Officer — Research & Evidence", dept: "Research & Evidence", grade: currentGrade, fit: 85 },
-    { title: "Policy Advisor",                        dept: "Policy & Advocacy",   grade: currentGrade, fit: 72 },
-    { title: "Regional Coordinator",                  dept: "Operations",          grade: currentGrade, fit: 68 },
+    { title: "Program Officer — Research & Evidence", dept: "Research & Evidence", grade: currentGrade, fit: 85, openings: 1 },
+    { title: "Policy Advisor",                        dept: "Policy & Advocacy",   grade: currentGrade, fit: 72, openings: 0 },
+    { title: "Regional Coordinator",                  dept: "Operations",          grade: currentGrade, fit: 68, openings: 2 },
   ];
-  const catColor = { Learning: B.teal, Experience: B.orange, Mentorship: B.purple, Networking: B.blue };
+
+  const catColor      = { Learning: B.teal, Experience: B.orange, Mentorship: B.purple, Networking: B.blue };
   const priorityColor = { High: B.danger, Medium: B.orange, Low: B.blue };
+
+  const completedMilestones = milestones.filter(m => m.status === "completed").length;
+  const avgGapCoverage = GAPS.reduce((acc, g) => acc + (selfRatings[g.competency] || 0) / g.required, 0) / GAPS.length;
+  const readinessScore = Math.round(((completedMilestones / Math.max(milestones.length, 1)) * 0.4 + avgGapCoverage * 0.6) * 100);
+
   const GradeNode = ({ grade, isCurrent, isPast, trackColor }) => {
     const meta = GRADE_META[grade] || {};
     const col  = isCurrent ? trackColor : isPast ? B.success : B.border;
@@ -1193,16 +1221,35 @@ const CareerPathModule = ({ role }) => {
       </div>
     );
   };
+
+  const tabs = isManagerView
+    ? ["pathway","competencies","lateral","plan","mentorship","team"]
+    : ["pathway","competencies","lateral","plan","mentorship"];
+  const labels = isManagerView
+    ? ["Career Pathway","Competency Map","Lateral Moves","Development Plan","Mentorship","Team Paths"]
+    : ["Career Pathway","Competency Map","Lateral Moves","Development Plan","Mentorship"];
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>My Career Path</div>
           <div style={{ fontSize: 13, color: B.textMuted }}>Current: <strong>{emp.title}</strong> &bull; Grade: <strong>{currentGrade}</strong> &bull; {GRADE_META[currentGrade]?.cluster || "—"} cluster</div>
         </div>
-        <Btn variant="primary" onClick={() => setShowMModal(true)}>+ Add Milestone</Btn>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ textAlign: "right", paddingRight: 12, borderRight: `1px solid ${B.border}` }}>
+            <div style={{ fontSize: 10, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5 }}>Promotion Readiness</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: readinessScore >= 70 ? B.success : readinessScore >= 45 ? B.orange : B.danger }}>{readinessScore}%</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <Btn variant="primary" size="sm" onClick={() => setShowMModal(true)}>+ Add Milestone</Btn>
+            <Btn variant="secondary" size="sm" onClick={() => setShowCoach(true)}>Career Coach</Btn>
+          </div>
+        </div>
       </div>
-      <Tabs tabs={["pathway","competencies","lateral","plan"]} labels={["Career Pathway","Competency Map","Lateral Moves","Development Plan"]} active={activeTab} onTabChange={setActiveTab} />
+
+      <Tabs tabs={tabs} labels={labels} active={activeTab} onTabChange={setActiveTab} />
+
       {activeTab === "pathway" && (
         <div style={{ marginTop: 16 }}>
           <Card style={{ marginBottom: 14 }}>
@@ -1211,7 +1258,7 @@ const CareerPathModule = ({ role }) => {
               {IC_PATH.map((g, i) => (
                 <div key={g} style={{ display: "flex", alignItems: "center" }}>
                   <GradeNode grade={g} isCurrent={g === currentGrade} isPast={icIdx > i} trackColor={B.blue} />
-                  {i < IC_PATH.length-1 && <div style={{ width: 28, height: 2, background: B.border, flexShrink: 0, margin: "0 2px" }}>→</div>}
+                  {i < IC_PATH.length - 1 && <div style={{ width: 28, height: 2, background: icIdx > i ? B.success : B.border, flexShrink: 0, margin: "0 2px", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", color: B.textMuted }}>›</div>}
                 </div>
               ))}
             </div>
@@ -1223,18 +1270,18 @@ const CareerPathModule = ({ role }) => {
               {MGMT_PATH.map((g, i) => (
                 <div key={g} style={{ display: "flex", alignItems: "center" }}>
                   <GradeNode grade={g} isCurrent={g === currentGrade} isPast={false} trackColor={B.accent} />
-                  {i < MGMT_PATH.length-1 && <div style={{ width: 28, height: 2, background: B.border, flexShrink: 0, margin: "0 2px" }}>→</div>}
+                  {i < MGMT_PATH.length - 1 && <div style={{ width: 28, height: 2, background: B.border, flexShrink: 0, margin: "0 2px", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", color: B.textMuted }}>›</div>}
                 </div>
               ))}
             </div>
           </Card>
-          {icIdx >= 0 && icIdx < IC_PATH.length - 1 && (
+          {nextGrade && (
             <Card style={{ borderLeft: `4px solid ${B.blue}` }}>
-              <SectionTitle>Next Step: {IC_PATH[icIdx + 1]} — {GRADE_META[IC_PATH[icIdx + 1]]?.title}</SectionTitle>
+              <SectionTitle>Next Step: {nextGrade} — {GRADE_META[nextGrade]?.title}</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
                   <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 6 }}>Key competencies required:</div>
-                  {(GRADE_META[IC_PATH[icIdx + 1]]?.comp || []).map(c => (
+                  {(GRADE_META[nextGrade]?.comp || []).map(c => (
                     <div key={c} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 5 }}>
                       <span style={{ width: 6, height: 6, borderRadius: "50%", background: B.blue, flexShrink: 0 }} />
                       <span style={{ fontSize: 12 }}>{c}</span>
@@ -1243,33 +1290,52 @@ const CareerPathModule = ({ role }) => {
                 </div>
                 <div>
                   <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 4 }}>Typical experience:</div>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>{GRADE_META[IC_PATH[icIdx + 1]]?.years} years</div>
-                  <div style={{ fontSize: 11, color: B.textMuted, marginTop: 10 }}>Milestone progress:</div>
-                  <ProgressBar value={milestones.filter(m => m.status === "completed").length} max={Math.max(milestones.length, 1)} color={B.blue} height={8} />
-                  <div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>{milestones.filter(m => m.status === "completed").length} of {milestones.length} milestones achieved</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>{GRADE_META[nextGrade]?.years} years</div>
+                  <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 4 }}>Promotion readiness:</div>
+                  <ProgressBar value={readinessScore} max={100} color={readinessScore >= 70 ? B.success : readinessScore >= 45 ? B.orange : B.danger} height={10} />
+                  <div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>{readinessScore}% — {readinessScore >= 70 ? "Ready for promotion discussion" : readinessScore >= 45 ? "On track — keep building" : "Early stage — focus on milestones"}</div>
                 </div>
               </div>
             </Card>
           )}
         </div>
       )}
+
       {activeTab === "competencies" && (
         <div style={{ marginTop: 16 }}>
           <Card style={{ marginBottom: 14 }}>
-            <SectionTitle>Competency Gaps — Toward {icIdx >= 0 && icIdx < IC_PATH.length-1 ? IC_PATH[icIdx+1] : "Next Grade"}</SectionTitle>
-            {GAPS.map((gap, i) => (
-              <div key={i} style={{ marginBottom: 12, padding: "12px 14px", borderRadius: 8, background: B.bgHover, borderLeft: `3px solid ${priorityColor[gap.priority]}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <div><span style={{ fontSize: 13, fontWeight: 700 }}>{gap.name}</span><Badge color={priorityColor[gap.priority]} bg={`${priorityColor[gap.priority]}12`} style={{ marginLeft: 8 }}>{gap.priority}</Badge></div>
-                  <span style={{ fontSize: 12, color: B.textMuted }}>Level {gap.current} / {gap.required}</span>
+            <SectionTitle>Self-Assessment — Competency Gaps toward {nextGrade || "Next Grade"}</SectionTitle>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>Rate your current level (1 = developing, 4 = proficient) against what is required at the next grade.</div>
+            {GAPS.map((gap, i) => {
+              const current = selfRatings[gap.competency] || 1;
+              return (
+                <div key={i} style={{ marginBottom: 14, padding: "12px 14px", borderRadius: 8, background: B.bgHover, borderLeft: `3px solid ${priorityColor[gap.priority]}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <div>
+                      <span style={{ fontSize: 13, fontWeight: 700 }}>{gap.name}</span>
+                      <Badge color={priorityColor[gap.priority]} bg={`${priorityColor[gap.priority]}12`} style={{ marginLeft: 8 }}>{gap.priority} priority</Badge>
+                    </div>
+                    <span style={{ fontSize: 12, color: B.textMuted }}>Self: {current} / Required: {gap.required}</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                    {[1,2,3,4].map(lvl => (
+                      <button key={lvl} onClick={() => setSelfRatings(p => ({ ...p, [gap.competency]: lvl }))}
+                        style={{ width: 36, height: 28, borderRadius: 6, border: `2px solid ${lvl <= current ? (lvl <= gap.required ? B.blue : B.danger) : B.border}`, background: lvl <= current ? (lvl <= gap.required ? `${B.blue}15` : `${B.danger}10`) : B.white, color: lvl <= current ? B.blue : B.textMuted, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        {lvl}
+                      </button>
+                    ))}
+                    <span style={{ fontSize: 11, color: B.textMuted, alignSelf: "center", marginLeft: 4 }}>
+                      {current >= gap.required ? "Met" : `Gap: ${gap.required - current}`}
+                    </span>
+                  </div>
+                  <ProgressBar value={current} max={gap.required} color={current >= gap.required ? B.success : priorityColor[gap.priority]} height={5} />
+                  {gap.course && <div style={{ marginTop: 7, fontSize: 12, color: B.blue, cursor: "pointer" }}>Recommended: <strong>{gap.course}</strong></div>}
                 </div>
-                <ProgressBar value={gap.current} max={gap.required} color={priorityColor[gap.priority]} height={6} />
-                {gap.course && <div style={{ marginTop: 7, fontSize: 12, color: B.blue, cursor: "pointer" }}>Related course: <strong>{gap.course}</strong></div>}
-              </div>
-            ))}
+              );
+            })}
           </Card>
           <Card>
-            <SectionTitle>Current Competencies — {currentGrade}</SectionTitle>
+            <SectionTitle>Current Strengths — {currentGrade}</SectionTitle>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {(GRADE_META[currentGrade]?.comp || []).map(c => (
                 <div key={c} style={{ padding: "6px 12px", borderRadius: 20, background: `${B.success}10`, border: `1px solid ${B.success}30`, fontSize: 12, color: B.success }}>✓ {c}</div>
@@ -1278,75 +1344,248 @@ const CareerPathModule = ({ role }) => {
           </Card>
         </div>
       )}
+
       {activeTab === "lateral" && (
         <div style={{ marginTop: 16 }}>
           <Card style={{ marginBottom: 14 }}>
             <SectionTitle>Lateral Opportunities at Grade {currentGrade}</SectionTitle>
-            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>Cross-functional roles matching your current grade.</div>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>Cross-functional roles matching your grade — lateral moves build breadth without requiring promotion.</div>
             {LATERAL.map((r, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", borderRadius: 8, background: B.bgHover, marginBottom: 8, borderLeft: `3px solid ${r.fit >= 80 ? B.success : r.fit >= 70 ? B.blue : B.orange}` }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{r.title}</div>
                   <div style={{ fontSize: 12, color: B.textMuted }}>{r.dept} &bull; Grade: {r.grade}</div>
+                  {r.openings > 0 && <Badge color={B.success} bg={B.successBg} style={{ marginTop: 4 }}>{r.openings} open position{r.openings !== 1 ? "s" : ""}</Badge>}
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 17, fontWeight: 700, color: r.fit >= 80 ? B.success : r.fit >= 70 ? B.blue : B.orange }}>{r.fit}%</div>
                   <div style={{ fontSize: 10, color: B.textMuted }}>match</div>
                 </div>
-                <Btn variant="secondary" size="sm" onClick={() => alert(`Interest registered: ${r.title}`)}>Express Interest</Btn>
+                <Btn variant={r.openings > 0 ? "primary" : "secondary"} size="sm" onClick={() => alert(`Interest registered: ${r.title}`)}>
+                  {r.openings > 0 ? "Apply" : "Express Interest"}
+                </Btn>
               </div>
             ))}
           </Card>
           <Card>
             <SectionTitle>Internal Job Alerts</SectionTitle>
-            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>No active internal postings for your grade. Enable alerts to be notified when openings appear.</div>
-            <Btn variant="secondary" size="sm" onClick={() => alert("Job alerts enabled for your grade")}>Enable Alerts</Btn>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Get notified when internal openings match your grade and interests.</div>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Job alerts enabled — you'll be notified when openings at P3 appear")}>Enable Alerts for {currentGrade}</Btn>
           </Card>
         </div>
       )}
+
       {activeTab === "plan" && (
         <div style={{ marginTop: 16 }}>
-          <Card>
-            <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => setShowMModal(true)}>+ Add</Btn>}>Development Plan — 2026</SectionTitle>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => setShowMModal(true)}>+ Add</Btn>}>Individual Development Plan — 2026</SectionTitle>
+            <div style={{ display: "flex", gap: 16, marginBottom: 14, padding: "10px 14px", borderRadius: 8, background: B.bgHover }}>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: B.success }}>{completedMilestones}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>Completed</div>
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: B.blue }}>{milestones.filter(m => m.status === "in-progress").length}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>In Progress</div>
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: B.textMuted }}>{milestones.filter(m => m.status === "pending").length}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>Pending</div>
+              </div>
+              <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}>
+                <ProgressBar value={completedMilestones} max={Math.max(milestones.length, 1)} color={B.success} height={8} />
+                <span style={{ fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{completedMilestones}/{milestones.length}</span>
+              </div>
+            </div>
             {milestones.length === 0 && <div style={{ fontSize: 12, color: B.textMuted, padding: "10px 0" }}>No milestones yet. Add your first development goal.</div>}
             {milestones.map(m => {
               const sc = m.status === "completed" ? B.success : m.status === "in-progress" ? B.blue : B.textMuted;
               return (
-                <div key={m.id} style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: `1px solid ${B.borderLight}`, alignItems: "flex-start" }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: sc, marginTop: 4, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{m.goal}</div>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <Badge color={catColor[m.category]||B.textMuted} bg={`${catColor[m.category]||B.textMuted}14`}>{m.category}</Badge>
-                      <span style={{ fontSize: 11, color: B.textMuted }}>Target: {fmtDate(m.target)}</span>
+                <div key={m.id} style={{ padding: "12px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: sc, marginTop: 4, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{m.goal}</div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: m.pct > 0 ? 8 : 0 }}>
+                        <Badge color={catColor[m.category]||B.textMuted} bg={`${catColor[m.category]||B.textMuted}14`}>{m.category}</Badge>
+                        <span style={{ fontSize: 11, color: B.textMuted }}>Target: {fmtDate(m.target)}</span>
+                        {m.notes && <span style={{ fontSize: 11, color: B.textSecondary, fontStyle: "italic" }}>{m.notes}</span>}
+                      </div>
+                      {m.pct > 0 && m.status !== "completed" && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <ProgressBar value={m.pct} max={100} color={B.blue} height={4} />
+                          <span style={{ fontSize: 11, color: B.textMuted, whiteSpace: "nowrap" }}>{m.pct}%</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
-                    <Badge color={sc} bg={`${sc}12`}>{m.status === "completed" ? "Done" : m.status === "in-progress" ? "In Progress" : "Pending"}</Badge>
-                    <Btn variant="ghost" size="sm" onClick={() => setMilestones(p => p.map(x => x.id === m.id ? { ...x, status: x.status === "completed" ? "pending" : "completed" } : x))}>{m.status === "completed" ? "Undo" : "Done"}</Btn>
-                    <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setMilestones(p => p.filter(x => x.id !== m.id))}>Del</Btn>
+                    <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+                      <Badge color={sc} bg={`${sc}12`}>{m.status === "completed" ? "Done" : m.status === "in-progress" ? "In Progress" : "Pending"}</Badge>
+                      <Btn variant="ghost" size="sm" onClick={() => setMilestones(p => p.map(x => x.id === m.id ? { ...x, status: x.status === "completed" ? "pending" : "completed", pct: x.status === "completed" ? x.pct : 100 } : x))}>
+                        {m.status === "completed" ? "Undo" : "Mark Done"}
+                      </Btn>
+                      <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setMilestones(p => p.filter(x => x.id !== m.id))}>Del</Btn>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </Card>
+          <Card style={{ padding: "12px 16px", background: `${B.blue}06`, border: `1px solid ${B.blue}20` }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: B.blue, marginBottom: 4 }}>Manager Review</div>
+            <div style={{ fontSize: 12, color: B.textSecondary }}>Your IDP is shared with your manager. Schedule a career conversation to discuss progress and next steps.</div>
+            <Btn variant="secondary" size="sm" style={{ marginTop: 8 }} onClick={() => alert("Career conversation request sent to manager")}>Request Career 1:1</Btn>
+          </Card>
         </div>
       )}
+
+      {activeTab === "mentorship" && (
+        <div style={{ marginTop: 16 }}>
+          <Card style={{ marginBottom: 14, borderLeft: `4px solid ${B.purple}` }}>
+            <SectionTitle>My Active Mentor</SectionTitle>
+            {(() => {
+              const m = MENTORS.find(x => x.id === activeMentor);
+              if (!m) return null;
+              return (
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                  <Avatar name={m.name} size={48} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{m.name}</div>
+                    <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 6 }}>{m.title} &bull; Grade {m.grade} &bull; {COUNTRIES.find(c => c.code === m.country)?.name}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {m.expertise.map(e => <Badge key={e} color={B.purple} bg={`${B.purple}10`}>{e}</Badge>)}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: B.purple }}>{m.rating}</div>
+                    <div style={{ fontSize: 10, color: B.textMuted }}>{m.sessions} sessions</div>
+                    <Btn variant="primary" size="sm" style={{ marginTop: 6 }} onClick={() => alert("Session request sent to mentor")}>Book Session</Btn>
+                  </div>
+                </div>
+              );
+            })()}
+          </Card>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Browse Mentors — Thrive Programme</div>
+          {MENTORS.map(m => (
+            <Card key={m.id} style={{ marginBottom: 10, opacity: m.available ? 1 : 0.7, borderLeft: m.id === activeMentor ? `4px solid ${B.purple}` : `4px solid transparent` }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <Avatar name={m.name} size={40} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{m.name}</div>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <Badge color={m.available ? B.success : B.textMuted} bg={m.available ? B.successBg : B.bgHover}>{m.available ? "Available" : "Unavailable"}</Badge>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: B.purple }}>{m.rating} ★</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 6 }}>{m.title} &bull; Grade {m.grade} &bull; {COUNTRIES.find(c => c.code === m.country)?.name} &bull; {m.sessions} sessions</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                    {m.expertise.map(e => <Badge key={e} color={B.purple} bg={`${B.purple}08`}>{e}</Badge>)}
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5, flexShrink: 0 }}>
+                  {m.available && m.id !== activeMentor && <Btn variant="secondary" size="sm" onClick={() => setActiveMentor(m.id)}>Select Mentor</Btn>}
+                  {m.id === activeMentor && <Badge color={B.purple} bg={`${B.purple}12`}>Active Mentor</Badge>}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {activeTab === "team" && isManagerView && (
+        <div style={{ marginTop: 16 }}>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Team Career Readiness</SectionTitle>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>Promotion readiness of your direct reports based on milestone completion and self-assessments.</div>
+            {TEAM_CAREER.map(tc => (
+              <div key={tc.name}>
+                <div onClick={() => setShowTeamDetail(showTeamDetail === tc.name ? null : tc.name)}
+                  style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: `1px solid ${B.borderLight}`, cursor: "pointer" }}>
+                  <Avatar name={tc.name} size={36} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{tc.name}</div>
+                    <div style={{ fontSize: 12, color: B.textMuted }}>{tc.title} &bull; Grade {tc.grade} &bull; Target: {tc.nextGrade}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                      <ProgressBar value={tc.readiness} max={100} color={tc.readiness >= 70 ? B.success : tc.readiness >= 45 ? B.orange : B.danger} height={5} />
+                      <span style={{ fontSize: 11, whiteSpace: "nowrap", color: tc.readiness >= 70 ? B.success : tc.readiness >= 45 ? B.orange : B.danger, fontWeight: 700 }}>{tc.readiness}%</span>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>IDP: {tc.milestonesDone}/{tc.milestonesTotal}</div>
+                    <div style={{ fontSize: 10, color: B.textMuted }}>Last review: {fmtDate(tc.lastCheck)}</div>
+                    <Badge color={tc.readiness >= 70 ? B.success : tc.readiness >= 45 ? B.orange : B.danger} bg={B.bgHover} style={{ marginTop: 4 }}>
+                      {tc.readiness >= 70 ? "Ready" : tc.readiness >= 45 ? "Developing" : "Early Stage"}
+                    </Badge>
+                  </div>
+                </div>
+                {showTeamDetail === tc.name && (
+                  <div style={{ padding: "10px 14px", background: B.bgHover, borderRadius: 8, margin: "6px 0 10px 0" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Actions for {tc.name.split(" ")[0]}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <Btn variant="secondary" size="sm" onClick={() => alert(`Scheduling career 1:1 with ${tc.name}`)}>Schedule Career 1:1</Btn>
+                      <Btn variant="secondary" size="sm" onClick={() => alert(`Viewing full IDP for ${tc.name}`)}>View Full IDP</Btn>
+                      <Btn variant="secondary" size="sm" onClick={() => alert(`Submitting promotion recommendation for ${tc.name}`)}>Recommend for Promotion</Btn>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </Card>
+          <Card>
+            <SectionTitle>Succession Snapshot</SectionTitle>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Staff ready for promotion to {emp.level} or above within 12 months.</div>
+            {TEAM_CAREER.filter(tc => tc.readiness >= 70).map(tc => (
+              <div key={tc.name} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                <div style={{ fontSize: 12 }}>{tc.name}</div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <span style={{ fontSize: 12, color: B.textMuted }}>{tc.grade} → {tc.nextGrade}</span>
+                  <Badge color={B.success} bg={B.successBg}>Succession Ready</Badge>
+                </div>
+              </div>
+            ))}
+            {TEAM_CAREER.filter(tc => tc.readiness >= 70).length === 0 && (
+              <div style={{ fontSize: 12, color: B.textMuted }}>No staff currently at 70%+ readiness threshold.</div>
+            )}
+          </Card>
+        </div>
+      )}
+
       <Modal open={showMModal} onClose={() => setShowMModal(false)} title="Add Development Milestone" width={440}>
         <div style={{ display: "grid", gap: 10 }}>
           <div><FL>Goal / Milestone</FL><input value={mForm.goal} onChange={e => setMForm(p => ({ ...p, goal: e.target.value }))} placeholder="e.g. Lead a cross-functional project" style={inp} /></div>
           <div><FL>Target Date</FL><input type="date" value={mForm.target} onChange={e => setMForm(p => ({ ...p, target: e.target.value }))} style={inp} /></div>
           <div><FL>Category</FL><Select value={mForm.category} onChange={v => setMForm(p => ({ ...p, category: v }))} style={{ width: "100%" }} options={["Learning","Experience","Mentorship","Networking"].map(c => ({ value: c, label: c }))} /></div>
+          <div><FL>Notes (optional)</FL><input value={mForm.notes} onChange={e => setMForm(p => ({ ...p, notes: e.target.value }))} placeholder="e.g. Module 2 of 5 complete" style={inp} /></div>
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
           <Btn variant="secondary" onClick={() => setShowMModal(false)}>Cancel</Btn>
           <Btn variant="primary" onClick={() => {
             if (mForm.goal && mForm.target) {
-              setMilestones(p => [...p, { ...mForm, id: `cm${Date.now()}`, status: "pending" }]);
-              setMForm({ goal: "", target: "", category: "Learning" });
+              setMilestones(p => [...p, { ...mForm, id: `cm${Date.now()}`, status: "pending", pct: 0 }]);
+              setMForm({ goal: "", target: "", category: "Learning", notes: "" });
               setShowMModal(false);
             }
           }}>Add Milestone</Btn>
+        </div>
+      </Modal>
+
+      <Modal open={showCoach} onClose={() => setShowCoach(false)} title="Career Coach — AI Suggestions" width={480}>
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ padding: "12px 14px", borderRadius: 8, background: `${B.blue}08`, border: `1px solid ${B.blue}15` }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: B.blue, marginBottom: 6 }}>Based on your profile ({currentGrade} → {nextGrade})</div>
+            <div style={{ fontSize: 12, color: B.textSecondary, lineHeight: 1.7 }}>Your self-assessment shows <strong>Data Analysis</strong> as your highest-priority gap. Completing the Python certification will close 2 competency levels. Consider scheduling a project that combines data work with stakeholder engagement — this addresses both "Analysis" and "Engagement" factors simultaneously.</div>
+          </div>
+          <div style={{ padding: "12px 14px", borderRadius: 8, background: `${B.teal}08`, border: `1px solid ${B.teal}15` }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: B.teal, marginBottom: 6 }}>Mentor Match Insight</div>
+            <div style={{ fontSize: 12, color: B.textSecondary, lineHeight: 1.7 }}>Ana Torres (Grade M2 — Finance) has expertise in Data Analysis that directly aligns with your top gap. Request a session focused on practical data skills for program management.</div>
+          </div>
+          <div style={{ padding: "12px 14px", borderRadius: 8, background: `${B.orange}08`, border: `1px solid ${B.orange}15` }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: B.orange, marginBottom: 6 }}>Timeline Insight</div>
+            <div style={{ fontSize: 12, color: B.textSecondary, lineHeight: 1.7 }}>At your current pace ({completedMilestones}/{milestones.length} milestones), promotion readiness at P4 is estimated at <strong>Q1 2027</strong>. Completing 2 more milestones by Sept 2026 would accelerate this to Q4 2026.</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
+          <Btn variant="primary" onClick={() => setShowCoach(false)}>Close</Btn>
         </div>
       </Modal>
     </div>
@@ -1354,6 +1593,12 @@ const CareerPathModule = ({ role }) => {
 };
 
 // ─── JOB EVALUATION TOOL (BIRCHES COMMUNITY) ────────────────────────────────
+const TRANSLATIONS = {
+  fr: { name: "Français", flag: "🇫🇷", terms: [["Job Description","Description de poste"],["Responsibilities","Responsabilités"],["Purpose","Objet"],["Qualifications","Qualifications requis"],["Experience","Expérience"],["Skills","Compétences"],["Education","Formation"],["Requirements","Exigences"],["Reporting to","Relevant de"],["Objectives","Objectifs"],["Management","Gestion"],["Team","Équipe"],["Budget","Budget"],["Strategy","Stratégie"],["Policy","Politique"],["Stakeholder","Partie prenante"],["Coordination","Coordination"],["Implementation","Mise en oeuvre"],["Development","Développement"],["Communication","Communication"],["Analysis","Analyse"],["Research","Recherche"],["Support","Soutien"],["Program","Programme"],["Project","Projet"],["Donor","Bailleur de fonds"],["Partner","Partenaire"],["Government","Gouvernement"],["Officer","Agent"],["Director","Directeur"],["Manager","Responsable"],["Senior","Principal"],["Lead","Chef de file"],["Specialist","Spécialiste"],["Advisor","Conseiller"],["Coordinator","Coordinateur"]] },
+  id: { name: "Bahasa Indonesia", flag: "🇮🇩", terms: [["Job Description","Deskripsi Pekerjaan"],["Responsibilities","Tanggung Jawab"],["Purpose","Tujuan"],["Qualifications","Kualifikasi"],["Experience","Pengalaman"],["Skills","Keterampilan"],["Education","Pendidikan"],["Requirements","Persyaratan"],["Reporting to","Melapor kepada"],["Objectives","Tujuan Kerja"],["Management","Manajemen"],["Team","Tim"],["Budget","Anggaran"],["Strategy","Strategi"],["Policy","Kebijakan"],["Stakeholder","Pemangku Kepentingan"],["Coordination","Koordinasi"],["Implementation","Pelaksanaan"],["Development","Pengembangan"],["Communication","Komunikasi"],["Analysis","Analisis"],["Research","Penelitian"],["Support","Dukungan"],["Program","Program"],["Project","Proyek"],["Donor","Donor"],["Partner","Mitra"],["Government","Pemerintah"],["Officer","Petugas"],["Director","Direktur"],["Manager","Manajer"],["Senior","Senior"],["Lead","Pemimpin Tim"],["Specialist","Spesialis"],["Advisor","Penasehat"],["Coordinator","Koordinator"]] },
+  sw: { name: "Kiswahili", flag: "🇹🇿", terms: [["Job Description","Maelezo ya Kazi"],["Responsibilities","Majukumu"],["Purpose","Madhumuni"],["Qualifications","Sifa Zinazohitajika"],["Experience","Uzoefu"],["Skills","Ujuzi"],["Education","Elimu"],["Requirements","Mahitaji"],["Reporting to","Kuripoti kwa"],["Objectives","Malengo"],["Management","Usimamizi"],["Team","Timu"],["Budget","Bajeti"],["Strategy","Mkakati"],["Policy","Sera"],["Stakeholder","Wadau"],["Coordination","Uratibu"],["Implementation","Utekelezaji"],["Development","Maendeleo"],["Communication","Mawasiliano"],["Analysis","Uchambuzi"],["Research","Utafiti"],["Support","Msaada"],["Program","Programu"],["Project","Mradi"],["Donor","Mfadhili"],["Partner","Mshirika"],["Government","Serikali"],["Officer","Afisa"],["Director","Mkurugenzi"],["Manager","Msimamizi"],["Senior","Mkuu"],["Lead","Kiongozi"],["Specialist","Mtaalamu"],["Advisor","Mshauri"],["Coordinator","Mratibu"]] },
+};
+
 const BIRCHES_CLUSTERS = [
   { id: "General",    label: "General",    grades: ["BG-1","BG-2","BG-3"],            color: B.textMuted, desc: "Physical, mechanical, general office support",
     kw: ["clean","drive","guard","transport","reception","filing","maintenance","security","dispatch","canteen","messenger","porter","photocopy"] },
@@ -1366,17 +1611,46 @@ const BIRCHES_CLUSTERS = [
 ];
 
 const JobEvaluationTool = () => {
-  const [jdText, setJdText]         = useState("");
-  const [dragOver, setDragOver]     = useState(false);
-  const [result, setResult]         = useState(null);
-  const [analyzing, setAnalyzing]   = useState(false);
-  const [resTab, setResTab]         = useState("summary");
-  const [savedEvals, setSavedEvals] = useState([
-    { id: "JE-001", title: "Senior Program Officer — Malawi", date: "2026-04-15", grade: "BG-9",  cluster: "Design",    confidence: 84 },
-    { id: "JE-002", title: "Finance Analyst",                 date: "2026-04-20", grade: "BG-7",  cluster: "Process",   confidence: 91 },
-    { id: "JE-003", title: "Country Director — Nigeria",      date: "2026-04-22", grade: "BG-13", cluster: "Leadership",confidence: 78 },
+  const [mainTab, setMainTab]               = useState("evaluate");
+  const [jdText, setJdText]                 = useState("");
+  const [dragOver, setDragOver]             = useState(false);
+  const [result, setResult]                 = useState(null);
+  const [analyzing, setAnalyzing]           = useState(false);
+  const [resTab, setResTab]                 = useState("summary");
+  const [evalTitle, setEvalTitle]           = useState("");
+  const [salaryRec, setSalaryRec]           = useState("");
+  const [evalNotes, setEvalNotes]           = useState("");
+  const [fileName, setFileName]             = useState(null);
+  const [translatedText, setTranslatedText] = useState(null);
+  const [transLang, setTransLang]           = useState(null);
+  const [translating, setTranslating]       = useState(false);
+  const [repoFilter, setRepoFilter]         = useState("");
+  const [selectedJDR, setSelectedJDR]       = useState(null);
+  const fileInputRef                        = useRef(null);
+
+  const [jdRepo, setJdRepo] = useState([
+    { id: "JDR-001", title: "Senior Program Officer — Malawi", dept: "Programs", country: "MW", currentV: 3, lastModified: "2026-04-20",
+      versions: [
+        { v: 1, date: "2026-02-10", author: "Grant Carioni", notes: "Initial job description",              grade: null,   content: "Senior Program Officer responsible for managing nutrition programs in Malawi. Reporting to the Country Director. Minimum 5 years experience in public health or nutrition programming. Master's degree required. Manages a team of 4 program staff. Responsible for donor reporting, stakeholder coordination, and capacity building of local partners." },
+        { v: 2, date: "2026-03-15", author: "Grant Carioni", notes: "Updated qualifications section",        grade: "BG-9", content: "Senior Program Officer responsible for designing and managing nutrition programs in Malawi. Reporting to the Country Director. Minimum 7 years experience. Master's degree in nutrition or public health. Manages a team of 6 program staff. Budget management up to USD 2M. Responsible for donor reporting, stakeholder coordination, and capacity building of local partners." },
+        { v: 3, date: "2026-04-20", author: "Admin User",    notes: "Revised reporting line and team size", grade: "BG-9", content: "Senior Program Officer responsible for designing, implementing and managing nutrition programs in Malawi. Reports directly to the Country Director with dotted line to Regional Program Lead. Minimum 7 years experience. Master's degree in nutrition or public health. Manages a team of 8 program staff. Budget management up to USD 3M. Coordinates with government stakeholders and donor representatives." },
+      ]},
+    { id: "JDR-002", title: "Finance Analyst", dept: "Finance", country: "CA", currentV: 2, lastModified: "2026-04-18",
+      versions: [
+        { v: 1, date: "2026-03-01", author: "Admin User",    notes: "Initial JD",            grade: null,   content: "Finance Analyst responsible for financial reporting, budget tracking, and accounting processes. Bachelor's degree in accounting or finance required. 3+ years experience in financial analysis. Coordinates with program teams on budget utilization." },
+        { v: 2, date: "2026-04-18", author: "Grant Carioni", notes: "Added donor reporting",  grade: "BG-7", content: "Finance Analyst responsible for financial reporting, budget tracking, accounting processes and donor financial compliance. Bachelor's degree in accounting or finance. CPA an asset. 3+ years experience in financial analysis in an INGO context. Coordinates with program teams on budget utilization and variance analysis. Prepares donor financial reports." },
+      ]},
+    { id: "JDR-003", title: "Country Director — Nigeria", dept: "Leadership", country: "NG", currentV: 1, lastModified: "2026-04-22",
+      versions: [
+        { v: 1, date: "2026-04-22", author: "Grant Carioni", notes: "New position", grade: "BG-13", content: "Country Director for Nigeria responsible for overall country strategy, operations, and program delivery. Leads a team of 25+ staff across 3 offices. Minimum 15 years of international development experience. Master's degree required. Accountable for a portfolio exceeding USD 10M. Represents the organization with government, donors, and partners at the highest levels." },
+      ]},
   ]);
-  const [evalTitle, setEvalTitle] = useState("");
+
+  const [evalHistory, setEvalHistory] = useState([
+    { id: "EH-001", title: "Senior Program Officer — Malawi", date: "2026-04-15", grade: "BG-9",  cluster: "Design",    confidence: 84, salaryRec: "MWK 4,200,000 – 5,800,000 / month",  evaluatedBy: "Grant Carioni", jdVersion: "v2", notes: "Aligned with Step 3 market data from Birches Group survey." },
+    { id: "EH-002", title: "Finance Analyst",                 date: "2026-04-20", grade: "BG-7",  cluster: "Process",   confidence: 91, salaryRec: "CAD 68,000 – 85,000 / year",          evaluatedBy: "Grant Carioni", jdVersion: "v1", notes: "Benchmarked against sector median for non-profit finance roles." },
+    { id: "EH-003", title: "Country Director — Nigeria",      date: "2026-04-22", grade: "BG-13", cluster: "Leadership",confidence: 78, salaryRec: "NGN 28,000,000 – 38,000,000 / year", evaluatedBy: "Admin User",    jdVersion: "v1", notes: "Confirmed leadership cluster. Recommend peer review before grading." },
+  ]);
 
   const analyzeJD = () => {
     if (!jdText.trim()) return;
@@ -1388,236 +1662,341 @@ const JobEvaluationTool = () => {
         return { ...c, score: matched.length, matched };
       }).sort((a, b) => b.score - a.score);
       const primary = scored[0];
-
-      // Contextual indicators
-      const expMatch  = t.match(/(\d+)\+?\s*year/i);
-      const yrs       = expMatch ? parseInt(expMatch[1]) : 0;
-      const teamMgmt  = /manag(e|ing)\s+(a\s+)?team|supervise|direct report|line manag/i.test(t);
-      const budget    = /budget|financial oversight|fund/i.test(t);
-      const strategy  = /strateg|policy direction|vision|transform/i.test(t);
-      const research  = /research|evidence|data analysis|evaluation/i.test(t);
-      const edLvl     = t.includes("phd")||t.includes("doctorate") ? 3 : t.includes("master")||t.includes("postgraduate") ? 2 : t.includes("degree")||t.includes("bachelor") ? 1 : 0;
-      const teamSzM   = t.match(/team\s+of\s+(\d+)/i);
-      const teamSz    = teamSzM ? parseInt(teamSzM[1]) : 0;
-
-      // Grade index within cluster
+      const expMatch = t.match(/(\d+)\+?\s*year/i);
+      const yrs      = expMatch ? parseInt(expMatch[1]) : 0;
+      const teamMgmt = /manag(e|ing)\s+(a\s+)?team|supervise|direct report|line manag/i.test(t);
+      const budget   = /budget|financial oversight|fund/i.test(t);
+      const strategy = /strateg|policy direction|vision|transform/i.test(t);
+      const research = /research|evidence|data analysis|evaluation/i.test(t);
+      const edLvl    = t.includes("phd")||t.includes("doctorate") ? 3 : t.includes("master")||t.includes("postgraduate") ? 2 : t.includes("degree")||t.includes("bachelor") ? 1 : 0;
+      const teamSzM  = t.match(/team\s+of\s+(\d+)/i);
+      const teamSz   = teamSzM ? parseInt(teamSzM[1]) : 0;
       let gi = 0;
-      if (primary.id === "General")    { gi = Math.min(2, Math.floor(primary.score / 3)); }
-      else if (primary.id === "Process") {
-        let pts = Math.floor(primary.score / 2) + (yrs > 3 ? 1 : 0) + (edLvl > 0 ? 1 : 0);
-        gi = Math.min(3, pts);
-      } else if (primary.id === "Design") {
-        let pts = Math.floor(primary.score / 2);
-        if (yrs >= 8) pts += 2; else if (yrs >= 5) pts += 1;
-        if (research) pts++; if (teamMgmt) pts++; if (budget) pts++; if (edLvl >= 2) pts++;
-        gi = Math.min(3, pts);
-      } else {
-        let pts = 0;
-        if (yrs >= 15) pts += 2; else if (yrs >= 10) pts++;
-        if (teamSz >= 20) pts += 2; else if (teamSz >= 10) pts++;
-        if (strategy) pts++; if (budget) pts++;
-        gi = Math.min(2, pts);
-      }
-
+      if (primary.id === "General") { gi = Math.min(2, Math.floor(primary.score / 3)); }
+      else if (primary.id === "Process") { let pts = Math.floor(primary.score / 2) + (yrs > 3 ? 1 : 0) + (edLvl > 0 ? 1 : 0); gi = Math.min(3, pts); }
+      else if (primary.id === "Design") { let pts = Math.floor(primary.score / 2); if (yrs >= 8) pts += 2; else if (yrs >= 5) pts += 1; if (research) pts++; if (teamMgmt) pts++; if (budget) pts++; if (edLvl >= 2) pts++; gi = Math.min(3, pts); }
+      else { let pts = 0; if (yrs >= 15) pts += 2; else if (yrs >= 10) pts++; if (teamSz >= 20) pts += 2; else if (teamSz >= 10) pts++; if (strategy) pts++; if (budget) pts++; gi = Math.min(2, pts); }
       const grade      = primary.grades[gi];
       const confidence = Math.min(95, 50 + primary.score * 5 + (scored[0].score - scored[1].score) * 4);
       const purpose    = Math.min(4, 1 + (strategy ? 2 : 0) + (primary.id === "Leadership" ? 1 : 0));
       const engagement = Math.min(4, 1 + (t.includes("external")||t.includes("donor")||t.includes("partner") ? 1 : 0) + (t.includes("government")||t.includes("board") ? 1 : 0) + (teamMgmt ? 1 : 0));
       const delivery   = Math.min(4, 1 + (strategy ? 1 : 0) + (research ? 1 : 0) + (primary.id === "Leadership" ? 1 : 0) + (budget ? 1 : 0));
-
-      setResult({ grade, primary, scored, confidence: Math.round(confidence),
-        factors: { purpose, engagement, delivery },
-        indicators: { yrs, teamMgmt, budget, strategy, research, edLvl, teamSz },
-        topKw: primary.matched.slice(0, 8) });
-      setAnalyzing(false);
-      setResTab("summary");
+      setResult({ grade, primary, scored, confidence: Math.round(confidence), factors: { purpose, engagement, delivery }, indicators: { yrs, teamMgmt, budget, strategy, research, edLvl, teamSz }, topKw: primary.matched.slice(0, 8) });
+      setAnalyzing(false); setResTab("summary");
     }, 1500);
   };
 
-  const purposeLabels     = ["Administrative support","Coordinated service delivery","Technical program delivery","Strategic organizational direction"];
-  const engagementLabels  = ["Internal contacts only","Internal + limited external","Multiple external stakeholders","Government / board / donor decision-makers"];
-  const deliveryLabels    = ["Routine execution","Structured project management","Adaptive program design","Org strategy & transformation"];
+  const handleFile = (file) => {
+    if (!file) return;
+    const ext = file.name.split(".").pop().toLowerCase();
+    setFileName(file.name); setTranslatedText(null); setTransLang(null);
+    if (ext === "txt") {
+      const r = new FileReader(); r.onload = ev => setJdText(ev.target.result); r.readAsText(file);
+    } else if (["doc","docx"].includes(ext)) {
+      setJdText(`[Extracted from ${file.name}]\n\nSenior Program Officer\n\nResponsibilities:\n- Lead program design and implementation\n- Manage a team of 6 staff\n- Coordinate with donors and government stakeholders\n- Budget management: USD 2M\n\nQualifications:\n- Master's degree in public health or related field\n- 7+ years experience in international development\n- Proven track record in capacity building and research`);
+    } else if (["xls","xlsx"].includes(ext)) {
+      setJdText(`[Extracted from ${file.name}]\n\nPosition: Program Officer\nDepartment: Programs\nGrade Band: Mid-level\nReporting to: Senior Program Manager\n\nKey Responsibilities:\n- Coordinate and administer program activities\n- Process data and maintain databases\n- Schedule meetings and track deliverables\n- Support donor reporting\n\nMinimum Qualifications:\n- Bachelor's degree\n- 3 years experience`);
+    } else if (ext === "pdf") {
+      setJdText(`[Extracted from ${file.name}]\n\nPosition: Finance Analyst\nDepartment: Finance & Administration\nReports to: Finance Manager\n\nPurpose:\nResponsible for financial reporting, budget tracking and accounting processes.\n\nKey Responsibilities:\n- Prepare monthly financial reports and budget variance analysis\n- Coordinate with program teams on budget utilization\n- Process payments and maintain accounting records\n- Support annual audit\n\nQualifications:\n- Bachelor's degree in Accounting or Finance\n- 3+ years experience`);
+    } else {
+      setJdText(`[Unsupported format: .${ext}] — Please use .txt, .doc, .docx, .xls, .xlsx, or .pdf`);
+    }
+  };
+
+  const translateJD = (langCode) => {
+    setTranslating(true); setTransLang(langCode);
+    setTimeout(() => {
+      let translated = jdText;
+      TRANSLATIONS[langCode].terms.forEach(([en, loc]) => {
+        translated = translated.replace(new RegExp(`\\b${en}\\b`, "gi"), loc);
+      });
+      setTranslatedText(translated); setTranslating(false);
+    }, 1200);
+  };
+
+  const saveEvaluation = () => {
+    if (!result) return;
+    setEvalHistory(p => [{ id: `EH-${Date.now()}`, title: evalTitle || "Untitled Evaluation", date: new Date().toISOString().slice(0,10), grade: result.grade, cluster: result.primary.label, confidence: result.confidence, salaryRec: salaryRec || "Not specified", evaluatedBy: "Grant Carioni", jdVersion: "v1", notes: evalNotes || "" }, ...p]);
+    setEvalTitle(""); setSalaryRec(""); setEvalNotes(""); alert("Evaluation saved to history!");
+  };
+
+  const loadJDVersion = (jdr, version) => {
+    setJdText(version.content); setFileName(`${jdr.title} — v${version.v}`);
+    setTranslatedText(null); setTransLang(null); setResult(null); setEvalTitle(jdr.title); setMainTab("evaluate");
+  };
+
+  const purposeLabels    = ["Administrative support","Coordinated service delivery","Technical program delivery","Strategic organizational direction"];
+  const engagementLabels = ["Internal contacts only","Internal + limited external","Multiple external stakeholders","Government / board / donor decision-makers"];
+  const deliveryLabels   = ["Routine execution","Structured project management","Adaptive program design","Org strategy & transformation"];
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Birches Community Job Evaluation</div>
-        <div style={{ fontSize: 12, color: B.textMuted }}>Drag & drop a job description file (.txt) or paste text below. The tool classifies roles against the Birches Community framework (BG-1 to BG-14) across three factors: Purpose, Engagement, and Delivery.</div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        {/* ── Input panel ── */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <Card style={{ marginBottom: 14 }}>
-            <SectionTitle>Job Description</SectionTitle>
-            <div
-              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={e => {
-                e.preventDefault(); setDragOver(false);
-                const file = e.dataTransfer.files[0];
-                if (file) { const r = new FileReader(); r.onload = ev => setJdText(ev.target.result); r.readAsText(file); }
-              }}
-              style={{ border: `2px dashed ${dragOver ? B.blue : B.border}`, borderRadius: 8, background: dragOver ? `${B.blue}06` : B.bgHover, padding: "14px 16px", marginBottom: 10, textAlign: "center", transition: "all 0.2s" }}
-            >
-              <div style={{ fontSize: 26 }}>📄</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: B.textSecondary }}>Drop a .txt file here</div>
-              <div style={{ fontSize: 11, color: B.textMuted }}>or paste the JD below</div>
-            </div>
-            <textarea value={jdText} onChange={e => setJdText(e.target.value)}
-              placeholder={"Paste job description here...\n\nInclude: purpose of the role, reporting line, key responsibilities, qualifications, years of experience, team/budget management scope."}
-              style={{ width: "100%", height: 200, padding: 12, border: `1px solid ${B.border}`, borderRadius: 8, fontSize: 12, fontFamily: "Arial,sans-serif", resize: "vertical", color: B.textPrimary, background: B.white, boxSizing: "border-box" }}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-              <span style={{ fontSize: 11, color: B.textMuted }}>{jdText.trim().split(/\s+/).filter(Boolean).length} words</span>
-              <div style={{ display: "flex", gap: 8 }}>
-                <Btn variant="secondary" size="sm" onClick={() => { setJdText(""); setResult(null); }}>Clear</Btn>
-                <Btn variant="primary" onClick={analyzeJD} style={{ minWidth: 120 }}>{analyzing ? "Analyzing..." : "Evaluate JD"}</Btn>
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <SectionTitle>Birches Community Grade Scale</SectionTitle>
-            {BIRCHES_CLUSTERS.map(c => (
-              <div key={c.id} style={{ marginBottom: 10 }}>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
-                  <Badge color={c.color} bg={`${c.color}12`}>{c.label}</Badge>
-                  <span style={{ fontSize: 11, color: B.textMuted }}>{c.grades[0]}–{c.grades[c.grades.length-1]}</span>
-                </div>
-                <div style={{ fontSize: 11, color: B.textSecondary, paddingLeft: 4 }}>{c.desc}</div>
-              </div>
-            ))}
-          </Card>
+          <div style={{ fontSize: 20, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Birches Community Job Evaluation</div>
+          <div style={{ fontSize: 12, color: B.textMuted }}>Classify roles against the Birches Community framework (BG-1 to BG-14) across Purpose, Engagement, and Delivery factors.</div>
         </div>
+      </div>
+      <Tabs tabs={["evaluate","repository","history"]} labels={["Evaluate JD","JD Repository","Evaluation History"]} active={mainTab} onTabChange={setMainTab} />
 
-        {/* ── Results panel ── */}
-        <div>
-          {!result && !analyzing && (
-            <Card>
-              <div style={{ padding: "40px 20px", textAlign: "center" }}>
-                <div style={{ fontSize: 40, marginBottom: 10 }}>🧠</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: B.textSecondary, marginBottom: 8 }}>Ready to Evaluate</div>
-                <div style={{ fontSize: 12, color: B.textMuted, lineHeight: 1.8 }}>Paste a job description and click <strong>Evaluate JD</strong>.<br/>The tool scores it across the three Birches factors and recommends a grade.</div>
+      {mainTab === "evaluate" && (
+        <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <Card style={{ marginBottom: 14 }}>
+              <SectionTitle>Job Description Input</SectionTitle>
+              <div
+                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+                onClick={() => fileInputRef.current?.click()}
+                style={{ border: `2px dashed ${dragOver ? B.blue : B.border}`, borderRadius: 8, background: dragOver ? `${B.blue}06` : B.bgHover, padding: "16px", marginBottom: 10, textAlign: "center", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                <input ref={fileInputRef} type="file" accept=".txt,.doc,.docx,.xls,.xlsx,.pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
+                <div style={{ fontSize: 26 }}>📁</div>
+                {fileName
+                  ? <div><div style={{ fontSize: 12, fontWeight: 700, color: B.blue }}>{fileName}</div><div style={{ fontSize: 11, color: B.textMuted }}>Click to replace</div></div>
+                  : <div><div style={{ fontSize: 12, fontWeight: 700, color: B.textSecondary }}>Drop or click to upload</div><div style={{ fontSize: 11, color: B.textMuted }}>.txt · .doc · .docx · .xls · .xlsx · .pdf</div></div>
+                }
+              </div>
+              {jdText.trim() && (
+                <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap", alignItems: "center" }}>
+                  <span style={{ fontSize: 11, color: B.textMuted }}>Translate:</span>
+                  {Object.entries(TRANSLATIONS).map(([code, lang]) => (
+                    <Btn key={code} variant="secondary" size="sm" style={{ fontSize: 11 }} onClick={() => translateJD(code)}>{lang.flag} {lang.name}</Btn>
+                  ))}
+                  {translatedText && <Btn variant="ghost" size="sm" style={{ fontSize: 11, color: B.danger }} onClick={() => { setTranslatedText(null); setTransLang(null); }}>Show Original</Btn>}
+                </div>
+              )}
+              {translating && <div style={{ fontSize: 11, color: B.blue, marginBottom: 8 }}>Translating... {TRANSLATIONS[transLang]?.flag}</div>}
+              {translatedText && <div style={{ marginBottom: 8, padding: "6px 10px", borderRadius: 6, background: `${B.teal}08`, border: `1px solid ${B.teal}20`, fontSize: 11, color: B.teal }}>Showing: <strong>{TRANSLATIONS[transLang]?.name}</strong> translation &bull; Evaluation uses original text</div>}
+              <textarea
+                value={translatedText !== null ? translatedText : jdText}
+                onChange={e => { if (translatedText !== null) setTranslatedText(e.target.value); else setJdText(e.target.value); }}
+                placeholder={"Paste job description here...\n\nInclude: purpose, reporting line, key responsibilities, qualifications, years of experience, team/budget scope."}
+                style={{ width: "100%", height: 200, padding: 12, border: `1px solid ${B.border}`, borderRadius: 8, fontSize: 12, fontFamily: "Arial,sans-serif", resize: "vertical", color: B.textPrimary, background: B.white, boxSizing: "border-box" }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <span style={{ fontSize: 11, color: B.textMuted }}>{jdText.trim().split(/\s+/).filter(Boolean).length} words</span>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Btn variant="secondary" size="sm" onClick={() => { setJdText(""); setResult(null); setFileName(null); setTranslatedText(null); setTransLang(null); }}>Clear</Btn>
+                  <Btn variant="primary" onClick={analyzeJD} style={{ minWidth: 120 }}>{analyzing ? "Analyzing..." : "Evaluate JD"}</Btn>
+                </div>
               </div>
             </Card>
-          )}
-          {analyzing && (
             <Card>
-              <div style={{ padding: "40px 20px", textAlign: "center" }}>
+              <SectionTitle>Birches Grade Scale</SectionTitle>
+              {BIRCHES_CLUSTERS.map(c => (
+                <div key={c.id} style={{ marginBottom: 10 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
+                    <Badge color={c.color} bg={`${c.color}12`}>{c.label}</Badge>
+                    <span style={{ fontSize: 11, color: B.textMuted }}>{c.grades[0]}–{c.grades[c.grades.length-1]}</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: B.textSecondary, paddingLeft: 4 }}>{c.desc}</div>
+                </div>
+              ))}
+            </Card>
+          </div>
+          <div>
+            {!result && !analyzing && (
+              <Card><div style={{ padding: "40px 20px", textAlign: "center" }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>🧠</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: B.textSecondary, marginBottom: 8 }}>Ready to Evaluate</div>
+                <div style={{ fontSize: 12, color: B.textMuted, lineHeight: 1.8 }}>Upload or paste a JD and click <strong>Evaluate JD</strong>.</div>
+              </div></Card>
+            )}
+            {analyzing && (
+              <Card><div style={{ padding: "40px 20px", textAlign: "center" }}>
                 <div style={{ fontSize: 36, marginBottom: 10 }}>⏳</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: B.textSecondary, marginBottom: 10 }}>Analyzing Job Description...</div>
                 <ProgressBar value={70} max={100} color={B.blue} height={6} />
                 <div style={{ fontSize: 11, color: B.textMuted, marginTop: 8 }}>Matching against Birches Community criteria</div>
-              </div>
-            </Card>
-          )}
-          {result && !analyzing && (
-            <>
-              <Card style={{ marginBottom: 14, borderTop: `4px solid ${result.primary.color}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 11, color: B.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Recommended Grade</div>
-                    <div style={{ fontSize: 40, fontWeight: 900, color: result.primary.color, fontFamily: "Georgia,serif" }}>{result.grade}</div>
-                    <Badge color={result.primary.color} bg={`${result.primary.color}12`} style={{ marginTop: 4 }}>{result.primary.label} Cluster</Badge>
+              </div></Card>
+            )}
+            {result && !analyzing && (
+              <>
+                <Card style={{ marginBottom: 14, borderTop: `4px solid ${result.primary.color}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: B.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Recommended Grade</div>
+                      <div style={{ fontSize: 40, fontWeight: 900, color: result.primary.color, fontFamily: "Georgia,serif" }}>{result.grade}</div>
+                      <Badge color={result.primary.color} bg={`${result.primary.color}12`} style={{ marginTop: 4 }}>{result.primary.label} Cluster</Badge>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 4 }}>Confidence</div>
+                      <div style={{ fontSize: 30, fontWeight: 700, color: result.confidence >= 80 ? B.success : result.confidence >= 65 ? B.orange : B.danger }}>{result.confidence}%</div>
+                      <div style={{ fontSize: 10, color: B.textMuted }}>{result.confidence >= 80 ? "High" : result.confidence >= 65 ? "Moderate" : "Low"}</div>
+                    </div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 4 }}>Confidence</div>
-                    <div style={{ fontSize: 30, fontWeight: 700, color: result.confidence >= 80 ? B.success : result.confidence >= 65 ? B.orange : B.danger }}>{result.confidence}%</div>
-                    <div style={{ fontSize: 10, color: B.textMuted }}>{result.confidence >= 80 ? "High" : result.confidence >= 65 ? "Moderate" : "Low"}</div>
+                  <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>{result.primary.desc}</div>
+                  <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
+                    <input value={evalTitle} onChange={e => setEvalTitle(e.target.value)} placeholder="Evaluation label (e.g. Senior Program Officer — Kenya)" style={inp} />
+                    <input value={salaryRec} onChange={e => setSalaryRec(e.target.value)} placeholder="Salary recommendation (e.g. KES 280,000–380,000/mo)" style={inp} />
+                    <input value={evalNotes} onChange={e => setEvalNotes(e.target.value)} placeholder="Notes (optional)" style={inp} />
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <Btn variant="primary" size="sm" onClick={saveEvaluation}>Save to History</Btn>
+                    <Btn variant="secondary" size="sm" onClick={() => alert("Exporting PDF evaluation report...")}>Export PDF</Btn>
+                  </div>
+                </Card>
+                <Tabs tabs={["summary","factors","indicators"]} labels={["Cluster Analysis","Factor Scores","JD Indicators"]} active={resTab} onTabChange={setResTab} />
+                {resTab === "summary" && (
+                  <Card style={{ marginTop: 10 }}>
+                    {result.scored.map(c => (
+                      <div key={c.id} style={{ marginBottom: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                            <Badge color={c.color} bg={`${c.color}12`}>{c.label}</Badge>
+                            <span style={{ fontSize: 11, color: B.textMuted }}>{c.matched.length} keyword{c.matched.length !== 1 ? "s" : ""}</span>
+                          </div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: c.color }}>{c.score}</span>
+                        </div>
+                        <ProgressBar value={c.score} max={Math.max(...result.scored.map(x => x.score), 1)} color={c.color} height={5} />
+                      </div>
+                    ))}
+                    {result.topKw.length > 0 && (
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>Matched keywords:</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                          {result.topKw.map(kw => <span key={kw} style={{ padding: "3px 8px", borderRadius: 4, background: `${result.primary.color}10`, border: `1px solid ${result.primary.color}25`, fontSize: 11, color: result.primary.color }}>{kw}</span>)}
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                )}
+                {resTab === "factors" && (
+                  <Card style={{ marginTop: 10 }}>
+                    {[
+                      { name: "Purpose",    score: result.factors.purpose,    labels: purposeLabels,    desc: "Why this job exists — mission contribution and scope of impact" },
+                      { name: "Engagement", score: result.factors.engagement, labels: engagementLabels, desc: "Stakeholder complexity — who the role interacts with" },
+                      { name: "Delivery",   score: result.factors.delivery,   labels: deliveryLabels,   desc: "How work is done — execution through to organizational direction" },
+                    ].map(f => (
+                      <div key={f.name} style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: B.bgHover }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                          <div style={{ fontSize: 14, fontWeight: 700 }}>{f.name}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: B.blue }}>Level {f.score} / 4</div>
+                        </div>
+                        <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 7 }}>{f.desc}</div>
+                        <ProgressBar value={f.score} max={4} color={B.blue} height={7} />
+                        <div style={{ fontSize: 11, color: B.textSecondary, marginTop: 5 }}>{f.labels[Math.min(f.score - 1, 3)]}</div>
+                      </div>
+                    ))}
+                  </Card>
+                )}
+                {resTab === "indicators" && (
+                  <Card style={{ marginTop: 10 }}>
+                    <SectionTitle>Detected JD Indicators</SectionTitle>
+                    {[
+                      { label: "Years of experience",    val: result.indicators.yrs > 0 ? `${result.indicators.yrs}+ years` : "Not specified",                                               flag: result.indicators.yrs > 0    },
+                      { label: "Team management",        val: result.indicators.teamMgmt ? "Detected" : "Not detected",                                                                        flag: result.indicators.teamMgmt   },
+                      { label: "Team size",              val: result.indicators.teamSz > 0 ? `~${result.indicators.teamSz} reports` : "Not specified",                                        flag: result.indicators.teamSz > 0 },
+                      { label: "Budget responsibility",  val: result.indicators.budget ? "Detected" : "Not detected",                                                                          flag: result.indicators.budget     },
+                      { label: "Strategic/policy scope", val: result.indicators.strategy ? "Detected" : "Not detected",                                                                       flag: result.indicators.strategy   },
+                      { label: "Research/analysis",      val: result.indicators.research ? "Detected" : "Not detected",                                                                       flag: result.indicators.research   },
+                      { label: "Education level",        val: ["Not specified","Bachelor degree","Master / Postgraduate","PhD / Doctorate"][result.indicators.edLvl]||"Not specified",        flag: result.indicators.edLvl > 0  },
+                    ].map((ind, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                        <span style={{ fontSize: 12, color: B.textSecondary }}>{ind.label}</span>
+                        <Badge color={ind.flag ? B.success : B.textMuted} bg={ind.flag ? B.successBg : B.bgHover}>{ind.val}</Badge>
+                      </div>
+                    ))}
+                  </Card>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {mainTab === "repository" && (
+        <div style={{ marginTop: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>JD Version Repository</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <SearchBar value={repoFilter} onChange={setRepoFilter} placeholder="Search JDs..." style={{ width: 220 }} />
+              <Btn variant="primary" size="sm" onClick={() => alert("Upload new JD to repository")}>+ Add JD</Btn>
+            </div>
+          </div>
+          {jdRepo.filter(j => !repoFilter || j.title.toLowerCase().includes(repoFilter.toLowerCase()) || j.dept.toLowerCase().includes(repoFilter.toLowerCase())).map(jdr => {
+            const gradedV = jdr.versions.filter(v => v.grade).pop();
+            return (
+              <Card key={jdr.id} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: selectedJDR?.id === jdr.id ? 10 : 0 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{jdr.title}</div>
+                    <div style={{ fontSize: 12, color: B.textMuted }}>{jdr.dept} &bull; {COUNTRIES.find(c => c.code === jdr.country)?.name || jdr.country} &bull; {jdr.versions.length} version{jdr.versions.length !== 1 ? "s" : ""} &bull; Last updated {fmtDate(jdr.lastModified)}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                    {gradedV?.grade && (() => { const cl = BIRCHES_CLUSTERS.find(c => c.grades.includes(gradedV.grade)); return <Badge color={cl?.color || B.textMuted} bg={`${cl?.color || B.textMuted}12`}>{gradedV.grade}</Badge>; })()}
+                    <Btn variant="secondary" size="sm" onClick={() => setSelectedJDR(selectedJDR?.id === jdr.id ? null : jdr)}>{selectedJDR?.id === jdr.id ? "Collapse" : "View Versions"}</Btn>
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>{result.primary.desc}</div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <input value={evalTitle} onChange={e => setEvalTitle(e.target.value)} placeholder="Label this evaluation (optional)" style={{ ...inp, flex: 1 }} />
-                  <Btn variant="primary" size="sm" onClick={() => {
-                    setSavedEvals(p => [{ id: `JE-${Date.now()}`, title: evalTitle || "Untitled Evaluation", date: new Date().toISOString().slice(0,10), grade: result.grade, cluster: result.primary.label, confidence: result.confidence }, ...p]);
-                    setEvalTitle(""); alert("Evaluation saved!");
-                  }}>Save</Btn>
-                  <Btn variant="secondary" size="sm" onClick={() => alert("Exporting PDF report...")}>Export</Btn>
+                {selectedJDR?.id === jdr.id && (
+                  <div style={{ borderTop: `1px solid ${B.borderLight}`, paddingTop: 10 }}>
+                    {jdr.versions.slice().reverse().map(v => (
+                      <div key={v.v} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 12px", borderRadius: 8, background: v.v === jdr.currentV ? `${B.blue}06` : B.bgHover, marginBottom: 6, border: `1px solid ${v.v === jdr.currentV ? B.blue+"20" : B.borderLight}` }}>
+                        <div style={{ minWidth: 36, textAlign: "center" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: v.v === jdr.currentV ? B.blue : B.textMuted }}>v{v.v}</div>
+                          {v.v === jdr.currentV && <Badge color={B.blue} bg={`${B.blue}12`} style={{ fontSize: 9 }}>Latest</Badge>}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600 }}>{v.notes}</div>
+                          <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{fmtDate(v.date)} &bull; {v.author}{v.grade ? ` &bull; Graded: ${v.grade}` : ""}</div>
+                          <div style={{ fontSize: 11, color: B.textSecondary, marginTop: 4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{v.content}</div>
+                        </div>
+                        <Btn variant="primary" size="sm" onClick={() => loadJDVersion(jdr, v)}>Load &amp; Evaluate</Btn>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {mainTab === "history" && (
+        <div style={{ marginTop: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>Evaluation History ({evalHistory.length})</div>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Exporting evaluation log to CSV...")}>Export CSV</Btn>
+          </div>
+          {evalHistory.map(ev => {
+            const cl = BIRCHES_CLUSTERS.find(c => c.label === ev.cluster);
+            return (
+              <Card key={ev.id} style={{ marginBottom: 10, borderLeft: `4px solid ${cl?.color || B.border}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{ev.title}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                      <Badge color={cl?.color || B.textMuted} bg={`${cl?.color || B.textMuted}12`}>{ev.grade}</Badge>
+                      <Badge color={ev.confidence >= 80 ? B.success : ev.confidence >= 65 ? B.orange : B.danger} bg={B.bgHover}>{ev.confidence}% confidence</Badge>
+                      <span style={{ fontSize: 12, color: B.textMuted }}>JD {ev.jdVersion}</span>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <div style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover }}>
+                        <div style={{ fontSize: 10, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>Salary Recommendation</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: B.textPrimary }}>{ev.salaryRec}</div>
+                      </div>
+                      <div style={{ padding: "8px 10px", borderRadius: 6, background: B.bgHover }}>
+                        <div style={{ fontSize: 10, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>Evaluated By</div>
+                        <div style={{ fontSize: 12, color: B.textPrimary }}>{ev.evaluatedBy} &bull; {fmtDate(ev.date)}</div>
+                      </div>
+                    </div>
+                    {ev.notes && <div style={{ marginTop: 8, fontSize: 11, color: B.textSecondary, fontStyle: "italic" }}>{ev.notes}</div>}
+                  </div>
+                  <div style={{ display: "flex", gap: 6, marginLeft: 12, flexShrink: 0 }}>
+                    <Btn variant="secondary" size="sm" onClick={() => alert(`Viewing full report for: ${ev.title}`)}>View</Btn>
+                    <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setEvalHistory(p => p.filter(e => e.id !== ev.id))}>Delete</Btn>
+                  </div>
                 </div>
               </Card>
-              <Tabs tabs={["summary","factors","indicators"]} labels={["Cluster Analysis","Factor Scores","JD Indicators"]} active={resTab} onTabChange={setResTab} />
-              {resTab === "summary" && (
-                <Card style={{ marginTop: 10 }}>
-                  {result.scored.map(c => (
-                    <div key={c.id} style={{ marginBottom: 10 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <Badge color={c.color} bg={`${c.color}12`}>{c.label}</Badge>
-                          <span style={{ fontSize: 11, color: B.textMuted }}>{c.matched.length} keyword{c.matched.length !== 1 ? "s" : ""}</span>
-                        </div>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: c.color }}>{c.score}</span>
-                      </div>
-                      <ProgressBar value={c.score} max={Math.max(...result.scored.map(x => x.score), 1)} color={c.color} height={5} />
-                    </div>
-                  ))}
-                  {result.topKw.length > 0 && (
-                    <div style={{ marginTop: 10 }}>
-                      <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>Matched keywords:</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                        {result.topKw.map(kw => <span key={kw} style={{ padding: "3px 8px", borderRadius: 4, background: `${result.primary.color}10`, border: `1px solid ${result.primary.color}25`, fontSize: 11, color: result.primary.color }}>{kw}</span>)}
-                      </div>
-                    </div>
-                  )}
-                </Card>
-              )}
-              {resTab === "factors" && (
-                <Card style={{ marginTop: 10 }}>
-                  {[
-                    { name: "Purpose",    score: result.factors.purpose,    labels: purposeLabels,    desc: "Why this job exists — mission contribution and scope of impact" },
-                    { name: "Engagement", score: result.factors.engagement, labels: engagementLabels, desc: "Stakeholder complexity — who the role interacts with" },
-                    { name: "Delivery",   score: result.factors.delivery,   labels: deliveryLabels,   desc: "How work is done — execution through to organizational direction" },
-                  ].map(f => (
-                    <div key={f.name} style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: B.bgHover }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700 }}>{f.name}</div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: B.blue }}>Level {f.score} / 4</div>
-                      </div>
-                      <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 7 }}>{f.desc}</div>
-                      <ProgressBar value={f.score} max={4} color={B.blue} height={7} />
-                      <div style={{ fontSize: 11, color: B.textSecondary, marginTop: 5 }}>{f.labels[Math.min(f.score - 1, 3)]}</div>
-                    </div>
-                  ))}
-                </Card>
-              )}
-              {resTab === "indicators" && (
-                <Card style={{ marginTop: 10 }}>
-                  <SectionTitle>Detected JD Indicators</SectionTitle>
-                  {[
-                    { label: "Years of experience",   val: result.indicators.yrs > 0 ? `${result.indicators.yrs}+ years` : "Not specified",                                                       flag: result.indicators.yrs > 0       },
-                    { label: "Team management",       val: result.indicators.teamMgmt ? "Detected" : "Not detected",                                                                                flag: result.indicators.teamMgmt       },
-                    { label: "Team size",             val: result.indicators.teamSz > 0 ? `~${result.indicators.teamSz} reports` : "Not specified",                                                flag: result.indicators.teamSz > 0     },
-                    { label: "Budget responsibility", val: result.indicators.budget ? "Detected" : "Not detected",                                                                                  flag: result.indicators.budget         },
-                    { label: "Strategic/policy scope",val: result.indicators.strategy ? "Detected" : "Not detected",                                                                               flag: result.indicators.strategy       },
-                    { label: "Research/analysis",     val: result.indicators.research ? "Detected" : "Not detected",                                                                               flag: result.indicators.research       },
-                    { label: "Education level",       val: ["Not specified","Bachelor degree","Master / Postgraduate","PhD / Doctorate"][result.indicators.edLvl]||"Not specified",                flag: result.indicators.edLvl > 0      },
-                  ].map((ind, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
-                      <span style={{ fontSize: 12, color: B.textSecondary }}>{ind.label}</span>
-                      <Badge color={ind.flag ? B.success : B.textMuted} bg={ind.flag ? B.successBg : B.bgHover}>{ind.val}</Badge>
-                    </div>
-                  ))}
-                </Card>
-              )}
-            </>
+            );
+          })}
+          {evalHistory.length === 0 && (
+            <Card><div style={{ padding: "30px", textAlign: "center", color: B.textMuted, fontSize: 13 }}>No evaluations saved yet. Complete an evaluation and click Save to History.</div></Card>
           )}
-          <Card style={{ marginTop: 14 }}>
-            <SectionTitle>Saved Evaluations</SectionTitle>
-            {savedEvals.map(ev => {
-              const cl = BIRCHES_CLUSTERS.find(c => c.label === ev.cluster);
-              return (
-                <div key={ev.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700 }}>{ev.title}</div>
-                    <div style={{ fontSize: 11, color: B.textMuted }}>{fmtDate(ev.date)} &bull; {ev.cluster}</div>
-                  </div>
-                  <Badge color={cl?.color || B.textMuted} bg={`${cl?.color || B.textMuted}12`}>{ev.grade}</Badge>
-                  <span style={{ fontSize: 11, color: B.textMuted }}>{ev.confidence}%</span>
-                </div>
-              );
-            })}
-          </Card>
         </div>
-      </div>
+      )}
     </div>
   );
 };
