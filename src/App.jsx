@@ -3185,13 +3185,23 @@ const SettingsSuperCenter = ({ role }) => {
   const [showRoleModal, setShowRoleModal] = useState(null);
   const [editRole, setEditRole] = useState({ name: "", desc: "", level: "Team", permissions: {} });
 
-  // ── Salary Structures ────────────────────────────────────────────────────
-  const [salaryStructures, setSalaryStructures] = useState(JOB_LEVELS.map((l, i) => ({ id: `SS-${i}`, level: l, band: `Band ${Math.ceil((i + 1) / 2)}`, min: 35000 + i * 12000, mid: 50000 + i * 14000, max: 65000 + i * 16000, currency: "CAD", spread: Math.round(((65000 + i * 16000) - (35000 + i * 12000)) / (35000 + i * 12000) * 100) })));
+  // ── Salary Structures (per-country) ─────────────────────────────────────
+  const SALARY_SCALE = { CAD: 1, GBP: 0.58, EUR: 0.68, CHF: 0.72, MWK: 420, KES: 85, NGN: 650, XOF: 400, TZS: 1800, BDT: 72, INR: 55, PKR: 180, IDR: 10500, PHP: 38 };
+  const [salaryCty, setSalaryCty] = useState("CA");
+  const [salaryStructures, setSalaryStructures] = useState(() => {
+    const base = {};
+    COUNTRIES.forEach(c => {
+      const f = SALARY_SCALE[c.currency] || 1;
+      base[c.code] = JOB_LEVELS.map((l, i) => ({ id: `SS-${c.code}-${i}`, level: l, band: `Band ${Math.ceil((i+1)/2)}`, min: Math.round((35000+i*12000)*f), mid: Math.round((50000+i*14000)*f), max: Math.round((65000+i*16000)*f), currency: c.currency, spread: Math.round(((65000+i*16000)-(35000+i*12000))/(35000+i*12000)*100) }));
+    });
+    return base;
+  });
   const [showSalaryEdit, setShowSalaryEdit] = useState(null);
   const [salaryForm, setSalaryForm] = useState({ level: "", band: "", min: 0, mid: 0, max: 0, currency: "CAD" });
   const [dragIdx, setDragIdx] = useState(null);
 
-  // ── Job Grades ───────────────────────────────────────────────────────────
+  // ── Job Grades (global framework + per-country salary context) ───────────
+  const [gradeCty, setGradeCty] = useState("CA");
   const [jobGrades, setJobGrades] = useState([
     { id: "JG-01", grade: "P1", title: "Associate / Entry", category: "Professional", minExp: 0, maxExp: 2, benchmarks: "Market P25-P40", factor: "Individual contributor, learning role", points: 100 },
     { id: "JG-02", grade: "P2", title: "Officer", category: "Professional", minExp: 1, maxExp: 4, benchmarks: "Market P40-P50", factor: "Independent contributor, applied expertise", points: 200 },
@@ -3204,6 +3214,7 @@ const SettingsSuperCenter = ({ role }) => {
     { id: "JG-09", grade: "D1", title: "Senior Director", category: "Executive", minExp: 12, maxExp: 25, benchmarks: "Market P75-P90", factor: "Function or regional leadership", points: 800 },
     { id: "JG-10", grade: "VP", title: "Vice President", category: "Executive", minExp: 15, maxExp: 30, benchmarks: "Market P80-P95", factor: "Organizational strategy, board-level", points: 950 },
   ]);
+  const [gradeOverrides, setGradeOverrides] = useState(() => { const b = {}; COUNTRIES.forEach(c => { b[c.code] = {}; }); return b; });
   const [showGradeEdit, setShowGradeEdit] = useState(null);
   const [gradeForm, setGradeForm] = useState({ grade: "", title: "", category: "Professional", minExp: 0, maxExp: 0, benchmarks: "", factor: "", points: 0 });
 
@@ -3242,19 +3253,25 @@ const SettingsSuperCenter = ({ role }) => {
     { id: "KEY-003", name: "Payroll Integration", scope: "Comp Read", created: "2025-11-10", lastUsed: "2026-03-31", status: "active" },
   ]);
 
-  // ── Leave Types ──────────────────────────────────────────────────────────
-  const [leaveTypes, setLeaveTypes] = useState([
-    { id: "LT-001", name: "Annual Leave", accrual: "1.67 days/month", cap: 20, carryover: 5, paid: true, countries: "All", requiresApproval: true },
-    { id: "LT-002", name: "Sick Leave", accrual: "Per policy", cap: 10, carryover: 0, paid: true, countries: "All", requiresApproval: false },
-    { id: "LT-003", name: "Parental Leave (Maternity)", accrual: "Statutory", cap: 17, carryover: 0, paid: true, countries: "CA, GB, IT, CH", requiresApproval: true },
-    { id: "LT-004", name: "Parental Leave (Paternity)", accrual: "Statutory", cap: 5, carryover: 0, paid: true, countries: "CA, GB, IT, CH", requiresApproval: true },
-    { id: "LT-005", name: "Bereavement", accrual: "On request", cap: 5, carryover: 0, paid: true, countries: "All", requiresApproval: false },
-    { id: "LT-006", name: "Unpaid Leave", accrual: "On request", cap: 90, carryover: 0, paid: false, countries: "All", requiresApproval: true },
-    { id: "LT-007", name: "Study / Exam Leave", accrual: "On request", cap: 5, carryover: 0, paid: true, countries: "All", requiresApproval: true },
-    { id: "LT-008", name: "Compensatory Off", accrual: "Earned", cap: 10, carryover: 3, paid: true, countries: "IN, BD, PK, PH, ID", requiresApproval: true },
-  ]);
+  // ── Leave Types (per-country) ────────────────────────────────────────────
+  const [leaveCty, setLeaveCty] = useState("CA");
+  const [leaveTypes, setLeaveTypes] = useState(() => {
+    const base = {};
+    COUNTRIES.forEach(c => {
+      const names = LEAVE_TYPES[c.code] || ["Annual Leave", "Sick Leave", "Bereavement"];
+      base[c.code] = names.map((name, i) => {
+        const n = name.toLowerCase();
+        const isAnnual = n.includes("annual")||n.includes("vacation")||n.includes("earned")||n.includes("privilege")||n.includes("cuti tahunan")||n.includes("ferie")||n.includes("ferien")||n.includes("congé annuel");
+        const isSick = n.includes("sick")||n.includes("malattia")||n.includes("krankheit")||n.includes("sakit")||n.includes("maladie");
+        const isParental = n.includes("matern")||n.includes("patern")||n.includes("parental")||n.includes("melahirkan")||n.includes("congedo parentale")||n.includes("mutterschaft");
+        const isHoliday = n.includes("holiday")||n.includes("bank")||n.includes("statutory")||n.includes("festività")||n.includes("feiertage")||n.includes("hari libur")||n.includes("jours fériés")||n.includes("public holiday")||n.includes("service incentive");
+        return { id: `LT-${c.code}-${i}`, name, accrual: isAnnual ? "1.67 days/month" : isSick ? "Per policy" : isParental ? "Statutory" : "On request", cap: isAnnual ? 20 : isSick ? 10 : isParental ? 17 : isHoliday ? 0 : 5, carryover: isAnnual ? 5 : 0, paid: !n.includes("unpaid"), requiresApproval: !(isSick || n.includes("casual") || isHoliday), statutory: isHoliday || isParental };
+      });
+    });
+    return base;
+  });
   const [showLeaveEdit, setShowLeaveEdit] = useState(null);
-  const [leaveForm, setLeaveForm] = useState({ name: "", accrual: "", cap: 0, carryover: 0, paid: true, countries: "All", requiresApproval: true });
+  const [leaveForm, setLeaveForm] = useState({ name: "", accrual: "", cap: 0, carryover: 0, paid: true, requiresApproval: true, statutory: false });
 
   // ── Data Retention ───────────────────────────────────────────────────────
   const [retention, setRetention] = useState({ employeeRecords: "7y", auditLogs: "5y", payrollData: "7y", leaveRecords: "5y", performanceReviews: "3y", documentScans: "5y", sessionLogs: "1y", surveyResponses: "3y" });
@@ -3602,37 +3619,55 @@ const SettingsSuperCenter = ({ role }) => {
       // ── SALARY STRUCTURES ──────────────────────────────────────────────
       case "salary-structures": return (
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Salary Structures</div><div style={{ fontSize: 12, color: B.textMuted }}>Define salary bands by job level. Drag rows to reorder.</div></div>
-            <Btn variant="primary" size="sm" onClick={() => { setSalaryForm({ level: "", band: "", min: 0, mid: 0, max: 0, currency: "CAD" }); setShowSalaryEdit("new"); }}>+ Add Band</Btn>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Salary Structures</div><div style={{ fontSize: 12, color: B.textMuted }}>Define salary bands by job level for each country. Bands use local currency.</div></div>
+            <Btn variant="primary" size="sm" onClick={() => { const cty = COUNTRIES.find(c => c.code === salaryCty); setSalaryForm({ level: "", band: "", min: 0, mid: 0, max: 0, currency: cty?.currency || "CAD" }); setShowSalaryEdit("new"); }}>+ Add Band</Btn>
           </div>
-          <Card>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
-                <thead><tr style={{ background: B.bg }}>{["", "Level", "Band", "Minimum", "Midpoint", "Maximum", "Spread", "Currency", "Staff", "Actions"].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
-                <tbody>
-                  {salaryStructures.map((ss, i) => {
-                    const emp = EMPLOYEES.filter(e => e.level === ss.level).length;
-                    return (
-                      <tr key={ss.id} draggable onDragStart={() => setDragIdx(i)} onDragOver={e => e.preventDefault()} onDrop={() => { if (dragIdx !== null && dragIdx !== i) { setSalaryStructures(prev => { const n = [...prev]; const [m] = n.splice(dragIdx, 1); n.splice(i, 0, m); return n; }); setDragIdx(null); } }} style={{ background: dragIdx === i ? B.accentBg : "transparent" }} onMouseEnter={e => { if (dragIdx === null) e.currentTarget.style.background = B.bgHover; }} onMouseLeave={e => { if (dragIdx === null) e.currentTarget.style.background = "transparent"; }}>
-                        <td style={{ padding: "8px 6px", borderBottom: `1px solid ${B.borderLight}`, color: B.textMuted, cursor: "grab" }}>⋮⋮</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{ss.level}</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={B.blue} bg={`${B.blue}12`}>{ss.band}</Badge></td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.min, ss.currency)}</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{fmt(ss.mid, ss.currency)}</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.max, ss.currency)}</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{ss.spread}%</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{ss.currency}</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{emp}</td>
-                        <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => { setSalaryForm({ ...ss }); setShowSalaryEdit(ss.id); }}>Edit</Btn>{emp === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => prev.filter(s => s.id !== ss.id))}>Del</Btn>}</div></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-          <Modal open={!!showSalaryEdit} onClose={() => setShowSalaryEdit(null)} title={showSalaryEdit === "new" ? "Add Salary Band" : `Edit: ${salaryForm.level}`} width={500}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+            {COUNTRIES.map(c => (
+              <button key={c.code} onClick={() => setSalaryCty(c.code)} style={{ padding: "5px 11px", borderRadius: 20, border: `1px solid ${salaryCty === c.code ? B.blue : B.border}`, background: salaryCty === c.code ? B.blue : B.white, color: salaryCty === c.code ? B.white : B.textSecondary, fontSize: 12, cursor: "pointer", fontWeight: salaryCty === c.code ? 700 : 400 }}>{c.flag} {c.code}</button>
+            ))}
+          </div>
+          {(() => {
+            const cty = COUNTRIES.find(c => c.code === salaryCty);
+            const bands = salaryStructures[salaryCty] || [];
+            return (
+              <>
+                <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>{cty?.name} — {cty?.entity} — Currency: <strong>{cty?.currency}</strong></div>
+                <Card>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                      <thead><tr style={{ background: B.bg }}>{["","Level","Band","Minimum","Midpoint","Maximum","Spread","Staff","Actions"].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
+                      <tbody>
+                        {bands.map((ss, i) => {
+                          const emp = EMPLOYEES.filter(e => e.level === ss.level && e.country === salaryCty).length;
+                          return (
+                            <tr key={ss.id} draggable onDragStart={() => setDragIdx(i)} onDragOver={e => e.preventDefault()} onDrop={() => { if (dragIdx !== null && dragIdx !== i) { setSalaryStructures(prev => { const n = { ...prev }; const arr = [...n[salaryCty]]; const [m] = arr.splice(dragIdx, 1); arr.splice(i, 0, m); n[salaryCty] = arr; return n; }); setDragIdx(null); } }} style={{ background: dragIdx === i ? B.accentBg : "transparent" }} onMouseEnter={e => { if (dragIdx === null) e.currentTarget.style.background = B.bgHover; }} onMouseLeave={e => { if (dragIdx === null) e.currentTarget.style.background = "transparent"; }}>
+                              <td style={{ padding: "8px 6px", borderBottom: `1px solid ${B.borderLight}`, color: B.textMuted, cursor: "grab" }}>⋮⋮</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{ss.level}</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={B.blue} bg={`${B.blue}12`}>{ss.band}</Badge></td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.min, ss.currency)}</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{fmt(ss.mid, ss.currency)}</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{fmt(ss.max, ss.currency)}</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{ss.spread}%</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{emp}</td>
+                              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
+                                <div style={{ display: "flex", gap: 4 }}>
+                                  <Btn variant="ghost" size="sm" onClick={() => { setSalaryForm({ ...ss }); setShowSalaryEdit(ss.id); }}>Edit</Btn>
+                                  <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setSalaryStructures(prev => { const n = { ...prev }; n[salaryCty] = n[salaryCty].filter(s => s.id !== ss.id); return n; })}>Del</Btn>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              </>
+            );
+          })()}
+          <Modal open={!!showSalaryEdit} onClose={() => setShowSalaryEdit(null)} title={showSalaryEdit === "new" ? `Add Salary Band — ${COUNTRIES.find(c => c.code === salaryCty)?.name}` : `Edit: ${salaryForm.level}`} width={500}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div><FL>Job Level</FL><Select value={salaryForm.level} onChange={v => setSalaryForm(p => ({ ...p, level: v }))} style={{ width: "100%" }} options={[{ value: "", label: "Select..." }, ...JOB_LEVELS.map(l => ({ value: l, label: l }))]} /></div>
               <div><FL>Band Name</FL><input value={salaryForm.band} onChange={e => setSalaryForm(p => ({ ...p, band: e.target.value }))} placeholder="e.g. Band 4" style={inp} /></div>
@@ -3645,8 +3680,8 @@ const SettingsSuperCenter = ({ role }) => {
               <Btn variant="secondary" onClick={() => setShowSalaryEdit(null)}>Cancel</Btn>
               <Btn variant="primary" onClick={() => {
                 const spread = salaryForm.min > 0 ? Math.round((salaryForm.max - salaryForm.min) / salaryForm.min * 100) : 0;
-                if (showSalaryEdit === "new") setSalaryStructures(prev => [...prev, { ...salaryForm, id: `SS-${Date.now()}`, spread }]);
-                else setSalaryStructures(prev => prev.map(s => s.id === showSalaryEdit ? { ...s, ...salaryForm, spread } : s));
+                if (showSalaryEdit === "new") setSalaryStructures(prev => { const n = { ...prev }; n[salaryCty] = [...(n[salaryCty] || []), { ...salaryForm, id: `SS-${Date.now()}`, spread }]; return n; });
+                else setSalaryStructures(prev => { const n = { ...prev }; n[salaryCty] = n[salaryCty].map(s => s.id === showSalaryEdit ? { ...s, ...salaryForm, spread } : s); return n; });
                 setShowSalaryEdit(null);
               }}>{showSalaryEdit === "new" ? "Create" : "Save"}</Btn>
             </div>
@@ -3657,28 +3692,45 @@ const SettingsSuperCenter = ({ role }) => {
       // ── JOB GRADES ─────────────────────────────────────────────────────
       case "job-grades": return (
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Job Evaluation Grades</div><div style={{ fontSize: 12, color: B.textMuted }}>Define the job evaluation framework: grades, categories, experience bands, market benchmarks.</div></div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Job Evaluation Grades</div><div style={{ fontSize: 12, color: B.textMuted }}>Global grade framework with local salary ranges shown per country context.</div></div>
             <Btn variant="primary" size="sm" onClick={() => { setGradeForm({ grade: "", title: "", category: "Professional", minExp: 0, maxExp: 0, benchmarks: "", factor: "", points: 0 }); setShowGradeEdit("new"); }}>+ Add Grade</Btn>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, padding: "10px 14px", background: B.bgHover, borderRadius: 8 }}>
+            <span style={{ fontSize: 12, color: B.textMuted, fontWeight: 600, whiteSpace: "nowrap" }}>Country context:</span>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {COUNTRIES.map(c => (
+                <button key={c.code} onClick={() => setGradeCty(c.code)} style={{ padding: "4px 10px", borderRadius: 16, border: `1px solid ${gradeCty === c.code ? B.blue : B.border}`, background: gradeCty === c.code ? B.blue : B.white, color: gradeCty === c.code ? B.white : B.textSecondary, fontSize: 11, cursor: "pointer", fontWeight: gradeCty === c.code ? 700 : 400 }}>{c.flag} {c.code}</button>
+              ))}
+            </div>
           </div>
           <Card>
             <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
-                <thead><tr style={{ background: B.bg }}>{["Grade","Title","Category","Experience","Market Bench","Factor","Points","Staff",""].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                <thead><tr style={{ background: B.bg }}>{["Grade","Title","Category","Experience","Benchmark","Local Min","Local Max","Points","Staff",""].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
                 <tbody>{jobGrades.map(jg => {
                   const cc = { Professional: B.blue, Management: B.purple, Executive: B.accent };
                   const emp = EMPLOYEES.filter(e => e.level === jg.grade).length;
+                  const ovr = gradeOverrides[gradeCty]?.[jg.grade] || {};
+                  const band = (salaryStructures[gradeCty] || []).find(s => s.level === jg.grade);
+                  const ctyCurr = COUNTRIES.find(c => c.code === gradeCty)?.currency || "CAD";
                   return (
                     <tr key={jg.id} onMouseEnter={e => e.currentTarget.style.background = B.bgHover} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{jg.grade}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.title}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Badge color={cc[jg.category] || B.textMuted} bg={`${cc[jg.category] || B.textMuted}14`}>{jg.category}</Badge></td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{jg.minExp}-{jg.maxExp} yrs</td>
-                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{jg.benchmarks}</td>
-                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11, color: B.textSecondary, maxWidth: 160 }}>{jg.factor}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{ovr.benchmarks || jg.benchmarks}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{band ? fmt(band.min, ctyCurr) : <span style={{ color: B.textMuted }}>—</span>}</td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{band ? fmt(band.max, ctyCurr) : <span style={{ color: B.textMuted }}>—</span>}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{jg.points}</td>
                       <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{emp}</td>
-                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}><div style={{ display: "flex", gap: 4 }}><Btn variant="ghost" size="sm" onClick={() => { setGradeForm({ ...jg }); setShowGradeEdit(jg.id); }}>Edit</Btn>{emp === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}>Del</Btn>}</div></td>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <Btn variant="ghost" size="sm" onClick={() => { setGradeForm({ ...jg }); setShowGradeEdit(jg.id); }}>Edit</Btn>
+                          {emp === 0 && <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setJobGrades(prev => prev.filter(g => g.id !== jg.id))}>Del</Btn>}
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}</tbody>
@@ -3711,44 +3763,63 @@ const SettingsSuperCenter = ({ role }) => {
       // ── LEAVE TYPES ────────────────────────────────────────────────────
       case "leave-types": return (
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Leave Types & Policies</div><div style={{ fontSize: 12, color: B.textMuted }}>Configure leave types, accrual rules, caps, and carryover per policy.</div></div>
-            <Btn variant="primary" size="sm" onClick={() => { setLeaveForm({ name: "", accrual: "", cap: 0, carryover: 0, paid: true, countries: "All", requiresApproval: true }); setShowLeaveEdit("new"); }}>+ Add Leave Type</Btn>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div><div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Leave Types & Policies</div><div style={{ fontSize: 12, color: B.textMuted }}>Configure leave types, accrual rules, caps, and carryover per country.</div></div>
+            <Btn variant="primary" size="sm" onClick={() => { setLeaveForm({ name: "", accrual: "", cap: 0, carryover: 0, paid: true, requiresApproval: true, statutory: false }); setShowLeaveEdit("new"); }}>+ Add Leave Type</Btn>
           </div>
-          <Card>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: "Arial, sans-serif" }}>
-              <thead><tr style={{ background: B.bg }}>{["Leave Type","Accrual","Cap (days)","Carryover","Paid","Approval","Countries",""].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
-              <tbody>{leaveTypes.map(lt => (
-                <tr key={lt.id} onMouseEnter={e => e.currentTarget.style.background = B.bgHover} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{lt.name}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{lt.accrual}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 600 }}>{lt.cap}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.carryover > 0 ? `${lt.carryover} days` : "None"}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.paid ? <Badge color={B.success} bg={B.successBg}>Paid</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Unpaid</Badge>}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.requiresApproval ? <Badge color={B.blue} bg={`${B.blue}12`}>Required</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Auto</Badge>}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11, color: B.textMuted }}>{lt.countries}</td>
-                  <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}><Btn variant="ghost" size="sm" onClick={() => { setLeaveForm({ ...lt }); setShowLeaveEdit(lt.id); }}>Edit</Btn></td>
-                </tr>
-              ))}</tbody>
-            </table>
-          </Card>
-          <Modal open={!!showLeaveEdit} onClose={() => setShowLeaveEdit(null)} title={showLeaveEdit === "new" ? "Add Leave Type" : `Edit: ${leaveForm.name}`} width={500}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+            {COUNTRIES.map(c => (
+              <button key={c.code} onClick={() => setLeaveCty(c.code)} style={{ padding: "5px 11px", borderRadius: 20, border: `1px solid ${leaveCty === c.code ? B.blue : B.border}`, background: leaveCty === c.code ? B.blue : B.white, color: leaveCty === c.code ? B.white : B.textSecondary, fontSize: 12, cursor: "pointer", fontWeight: leaveCty === c.code ? 700 : 400 }}>{c.flag} {c.code}</button>
+            ))}
+          </div>
+          {(() => {
+            const cty = COUNTRIES.find(c => c.code === leaveCty);
+            const types = leaveTypes[leaveCty] || [];
+            return (
+              <>
+                <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>{cty?.flag} <strong>{cty?.name}</strong> — {types.length} leave type{types.length !== 1 ? "s" : ""} configured</div>
+                <Card>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                    <thead><tr style={{ background: B.bg }}>{["Leave Type","Accrual","Cap (days)","Carryover","Paid","Approval","Type",""].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `2px solid ${B.border}`, fontWeight: 700, fontSize: 9, letterSpacing: 0.6, textTransform: "uppercase", color: B.textMuted }}>{h}</th>)}</tr></thead>
+                    <tbody>{types.map(lt => (
+                      <tr key={lt.id} onMouseEnter={e => e.currentTarget.style.background = B.bgHover} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 700 }}>{lt.name}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontSize: 11 }}>{lt.accrual}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}`, fontWeight: 600 }}>{lt.cap > 0 ? lt.cap : <span style={{ color: B.textMuted }}>—</span>}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.carryover > 0 ? `${lt.carryover} days` : "None"}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.paid ? <Badge color={B.success} bg={B.successBg}>Paid</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Unpaid</Badge>}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.requiresApproval ? <Badge color={B.blue} bg={`${B.blue}12`}>Required</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Auto</Badge>}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>{lt.statutory ? <Badge color={B.orange} bg={`${B.orange}14`}>Statutory</Badge> : <Badge color={B.textMuted} bg={B.bgHover}>Custom</Badge>}</td>
+                        <td style={{ padding: "9px 10px", borderBottom: `1px solid ${B.borderLight}` }}>
+                          <div style={{ display: "flex", gap: 4 }}>
+                            <Btn variant="ghost" size="sm" onClick={() => { setLeaveForm({ ...lt }); setShowLeaveEdit(lt.id); }}>Edit</Btn>
+                            <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setLeaveTypes(prev => { const n = { ...prev }; n[leaveCty] = n[leaveCty].filter(l => l.id !== lt.id); return n; })}>Del</Btn>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
+                </Card>
+              </>
+            );
+          })()}
+          <Modal open={!!showLeaveEdit} onClose={() => setShowLeaveEdit(null)} title={showLeaveEdit === "new" ? `Add Leave Type — ${COUNTRIES.find(c => c.code === leaveCty)?.name}` : `Edit: ${leaveForm.name}`} width={500}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div style={{ gridColumn: "1 / -1" }}><FL>Leave Type Name</FL><input value={leaveForm.name} onChange={e => setLeaveForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Study Leave" style={inp} /></div>
               <div style={{ gridColumn: "1 / -1" }}><FL>Accrual Rule</FL><input value={leaveForm.accrual} onChange={e => setLeaveForm(p => ({ ...p, accrual: e.target.value }))} placeholder="e.g. 1.67 days/month" style={inp} /></div>
               <div><FL>Annual Cap (days)</FL><input type="number" value={leaveForm.cap} onChange={e => setLeaveForm(p => ({ ...p, cap: parseInt(e.target.value) || 0 }))} style={inp} /></div>
               <div><FL>Carryover (days)</FL><input type="number" value={leaveForm.carryover} onChange={e => setLeaveForm(p => ({ ...p, carryover: parseInt(e.target.value) || 0 }))} style={inp} /></div>
-              <div style={{ gridColumn: "1 / -1" }}><FL>Applicable Countries</FL><input value={leaveForm.countries} onChange={e => setLeaveForm(p => ({ ...p, countries: e.target.value }))} placeholder="e.g. All or CA, GB, IT" style={inp} /></div>
-              <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ gridColumn: "1 / -1", display: "flex", gap: 18 }}>
                 <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer" }}><input type="checkbox" checked={leaveForm.paid} onChange={e => setLeaveForm(p => ({ ...p, paid: e.target.checked }))} /> Paid Leave</label>
                 <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer" }}><input type="checkbox" checked={leaveForm.requiresApproval} onChange={e => setLeaveForm(p => ({ ...p, requiresApproval: e.target.checked }))} /> Requires Approval</label>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer" }}><input type="checkbox" checked={leaveForm.statutory} onChange={e => setLeaveForm(p => ({ ...p, statutory: e.target.checked }))} /> Statutory</label>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
               <Btn variant="secondary" onClick={() => setShowLeaveEdit(null)}>Cancel</Btn>
               <Btn variant="primary" onClick={() => {
-                if (showLeaveEdit === "new") setLeaveTypes(prev => [...prev, { ...leaveForm, id: `LT-${Date.now()}` }]);
-                else setLeaveTypes(prev => prev.map(l => l.id === showLeaveEdit ? { ...l, ...leaveForm } : l));
+                if (showLeaveEdit === "new") setLeaveTypes(prev => { const n = { ...prev }; n[leaveCty] = [...(n[leaveCty] || []), { ...leaveForm, id: `LT-${Date.now()}` }]; return n; });
+                else setLeaveTypes(prev => { const n = { ...prev }; n[leaveCty] = n[leaveCty].map(l => l.id === showLeaveEdit ? { ...l, ...leaveForm } : l); return n; });
                 setShowLeaveEdit(null);
               }}>{showLeaveEdit === "new" ? "Add Leave Type" : "Save"}</Btn>
             </div>
