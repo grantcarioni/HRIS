@@ -3377,60 +3377,256 @@ const TimeModule = ({ employee: empProp, role } = {}) => {
 
       {/* ════════════════════ WEEKLY TIMESHEET ════════════════════════════════ */}
       {tab === "attendance" && isEmp && (() => {
-        const myRow = generateTimesheetRow(emp, 1);
-        const [myHours, setMyHours] = useState(myRow.days.map(d => String(d)));
-        const myTotal = myHours.reduce((s, h) => s + (parseFloat(h) || 0), 0);
-        const submitted = useState(false);
-        const setSubmitted = submitted[1];
-        const wasSubmitted = submitted[0];
-        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+        // Work schedule: Bangladesh = Sun–Thu; everyone else = Mon–Fri
+        const isBD = emp.country === "BD";
+        const ALL_DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        const ALL_DAYS_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+        // indices of standard work days (0=Sun … 6=Sat)
+        const workDayIdx = isBD ? [0,1,2,3,4] : [1,2,3,4,5];
+        const STD_HOURS = 7.5;
+        const STD_WEEK = STD_HOURS * 5; // 37.5
+
+        // Employee's assigned grants, seeded from emp.grants
+        const empGrantPool = emp.grants?.length
+          ? emp.grants.map(g => ({ id: g.code || g.name, name: g.name }))
+          : GRANTS_PROJECTS.slice(0,2).map(g => ({ id: g.id, name: g.name }));
+
+        const blankHours = () => Object.fromEntries(ALL_DAYS.map(d => [d, ""]));
+
+        const tsRows = useState(() =>
+          empGrantPool.map(g => ({ grantId: g.id, grantName: g.name, hours: blankHours() }))
+        );
+        const [rows, setRows] = [tsRows[0], tsRows[1]];
+
+        const tsSubmitted = useState(false);
+        const [wasSubmitted, setSubmitted] = [tsSubmitted[0], tsSubmitted[1]];
+
+        const tsHistory = useState([
+          { week: isBD ? "Apr 13–17, 2026" : "Apr 14–18, 2026", total: "37.5h", status: "Approved", splits: empGrantPool.map((g,i) => ({ name: g.name, hours: i === 0 ? "22.5h" : "15.0h" })) },
+          { week: isBD ? "Apr 6–10, 2026"  : "Apr 7–11, 2026",  total: "40.0h", status: "Approved", splits: empGrantPool.map((g,i) => ({ name: g.name, hours: i === 0 ? "24.0h" : "16.0h" })) },
+          { week: isBD ? "Mar 30–Apr 3, 2026" : "Mar 31–Apr 4, 2026", total: "35.0h", status: "Approved", splits: empGrantPool.map((g,i) => ({ name: g.name, hours: i === 0 ? "21.0h" : "14.0h" })) },
+        ]);
+        const [history, setHistory] = [tsHistory[0], tsHistory[1]];
+
+        // Computed totals
+        const dailyTotals = ALL_DAYS.map(d => rows.reduce((s,r) => s + (parseFloat(r.hours[d]) || 0), 0));
+        const rowTotals   = rows.map(r => Object.values(r.hours).reduce((s,h) => s + (parseFloat(h)||0), 0));
+        const grandTotal  = rowTotals.reduce((s,t) => s+t, 0);
+
+        // Grants not yet in use (for adding new rows)
+        const usedIds = rows.map(r => r.grantId);
+        const availableGrants = GRANTS_PROJECTS.filter(g => !usedIds.includes(g.id));
+
+        const updateHours = (ri, day, val) =>
+          setRows(p => p.map((r,i) => i === ri ? { ...r, hours: { ...r.hours, [day]: val } } : r));
+
+        const fillStandardDay = (ri) =>
+          setRows(p => p.map((r,i) => {
+            if (i !== ri) return r;
+            const newHours = { ...r.hours };
+            // Distribute 7.5h across work days for this row; if multiple rows split evenly
+            const perDay = (STD_HOURS / rows.length).toFixed(1);
+            workDayIdx.forEach(wi => { newHours[ALL_DAYS[wi]] = perDay; });
+            return { ...r, hours: newHours };
+          }));
+
+        const handleSubmit = () => {
+          if (grandTotal === 0) { alert("Please enter hours before submitting."); return; }
+          const weekLabel = timesheetWeek || "Current week";
+          setHistory(p => [{ week: weekLabel, total: `${grandTotal.toFixed(1)}h`, status: "Pending", splits: rows.map((r,i) => ({ name: r.grantName, hours: `${rowTotals[i].toFixed(1)}h` })) }, ...p]);
+          setRows(p => p.map(r => ({ ...r, hours: blankHours() })));
+          setSubmitted(true);
+          setTimeout(() => setSubmitted(false), 4000);
+        };
+
+        const cellStyle = (dayIdx, val) => {
+          const isWorkDay = workDayIdx.includes(dayIdx);
+          const v = parseFloat(val) || 0;
+          return {
+            width: 56, textAlign: "center", padding: "7px 2px",
+            border: `1px solid ${v > STD_HOURS ? B.warning : v > 0 ? B.accent : B.border}`,
+            borderRadius: 6, fontSize: 15, fontWeight: 700, fontFamily: "Georgia,serif",
+            color: v > STD_HOURS ? B.orange : v > 0 ? B.textPrimary : B.textMuted,
+            background: isWorkDay ? "#fff" : "#f5f5f5",
+            boxSizing: "border-box",
+          };
+        };
+
+        const thStyle = (dayIdx) => ({
+          padding: "8px 4px", textAlign: "center", fontSize: 10, fontWeight: 700,
+          textTransform: "uppercase", letterSpacing: 0.6, color: workDayIdx.includes(dayIdx) ? B.textSecondary : B.textMuted,
+          background: workDayIdx.includes(dayIdx) ? B.bgHover : "#f0f0f0",
+          borderBottom: `2px solid ${workDayIdx.includes(dayIdx) ? B.accent : B.border}`,
+          whiteSpace: "nowrap",
+        });
+
         return (
           <div>
-            <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
-              <FieldLabel>Week of</FieldLabel>
-              <input type="week" value={timesheetWeek} onChange={e => setTimesheetWeek(e.target.value)} style={{ padding: "6px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif" }} />
-              <span style={{ fontSize: 12, color: B.textMuted, marginLeft: "auto" }}>Logged: <strong>{myTotal}h</strong> / 37.5h standard week</span>
-            </div>
-            <Card style={{ marginBottom: 14 }}>
-              <SectionTitle>My Hours — {emp.first} {emp.last}</SectionTitle>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 10, marginBottom: 14 }}>
-                {days.map((day, i) => (
-                  <div key={day} style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", marginBottom: 6 }}>{day.slice(0,3)}</div>
-                    <input
-                      type="number" min="0" max="16" step="0.5"
-                      value={myHours[i]}
-                      onChange={e => setMyHours(h => h.map((v, j) => j === i ? e.target.value : v))}
-                      style={{ width: "100%", textAlign: "center", padding: "10px 4px", border: `1px solid ${parseFloat(myHours[i]) > 9 ? B.warning : B.border}`, borderRadius: 8, fontSize: 18, fontWeight: 700, fontFamily: "Georgia,serif", color: parseFloat(myHours[i]) > 9 ? B.orange : B.textPrimary, boxSizing: "border-box" }}
-                    />
-                    <div style={{ fontSize: 10, color: B.textMuted, marginTop: 4 }}>hours</div>
-                  </div>
-                ))}
+            {/* Header row */}
+            <div style={{ display: "flex", gap: 12, marginBottom: 14, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <FieldLabel>Week of</FieldLabel>
+                <input type="week" value={timesheetWeek} onChange={e => setTimesheetWeek(e.target.value)}
+                  style={{ padding: "7px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif" }} />
               </div>
-              <div style={{ display: "flex", gap: 12, alignItems: "center", padding: "10px 14px", borderRadius: 8, background: B.bgHover, marginBottom: 14 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 2 }}>Charge to project</div>
-                  <Select value={selectedGrant} onChange={setSelectedGrant} style={{ width: "100%" }} options={emp.grants?.map(g => ({ value: g.name, label: g.name })) || GRANTS_PROJECTS.slice(0,3).map(g => ({ value: g.id, label: g.name }))} />
+              <div style={{ marginLeft: "auto", display: "flex", gap: 16, alignItems: "center" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Logged this week</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "Georgia,serif", color: grandTotal > STD_WEEK + 2 ? B.orange : grandTotal >= STD_WEEK ? B.success : B.textPrimary }}>{grandTotal.toFixed(1)}h</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 11, color: B.textMuted }}>Total hours</div>
-                  <div style={{ fontSize: 28, fontWeight: 700, color: myTotal > 40 ? B.orange : B.success, fontFamily: "Georgia,serif" }}>{myTotal}h</div>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Standard week</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "Georgia,serif", color: B.textMuted }}>{STD_WEEK}h</div>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                <Btn variant="secondary" size="sm" onClick={() => setMyHours(["","","","",""])}>Clear</Btn>
-                <Btn variant="primary" onClick={() => { setSubmitted(true); setTimeout(() => setSubmitted(false), 3000); }}>{wasSubmitted ? "✓ Submitted!" : "Submit Timesheet"}</Btn>
+            </div>
+
+            {/* Progress bar */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ height: 8, borderRadius: 4, background: B.borderLight, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${Math.min(grandTotal / STD_WEEK * 100, 100)}%`, background: grandTotal > STD_WEEK ? B.orange : B.success, borderRadius: 4, transition: "width 0.3s" }} />
               </div>
-              {wasSubmitted && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 6, background: B.successBg, color: B.success, fontWeight: 700, fontSize: 13 }}>Timesheet submitted — routed to your manager for approval.</div>}
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3, fontSize: 10, color: B.textMuted }}>
+                <span>{Math.round(grandTotal / STD_WEEK * 100)}% of standard week</span>
+                <span>{isBD ? "Bangladesh work week: Sun–Thu" : "Work week: Mon–Fri"} · 7.5h standard day</span>
+              </div>
+            </div>
+
+            {/* Timesheet grid */}
+            <Card style={{ marginBottom: 14 }}>
+              <SectionTitle>My Timesheet — {emp.first} {emp.last}</SectionTitle>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, fontFamily: "Arial, sans-serif" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, color: B.textSecondary, background: B.bgHover, borderBottom: `2px solid ${B.accent}`, minWidth: 180 }}>Grant / Project</th>
+                      {ALL_DAYS.map((d, di) => (
+                        <th key={d} style={thStyle(di)}>
+                          <div>{d}</div>
+                          {workDayIdx.includes(di) ? <div style={{ fontSize: 8, color: B.accent, fontWeight: 600 }}>WORK</div> : <div style={{ fontSize: 8, color: B.textMuted }}>WKD</div>}
+                        </th>
+                      ))}
+                      <th style={{ padding: "8px 6px", textAlign: "center", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, color: B.textSecondary, background: B.bgHover, borderBottom: `2px solid ${B.accent}`, whiteSpace: "nowrap" }}>Total</th>
+                      <th style={{ background: B.bgHover, borderBottom: `2px solid ${B.accent}`, width: 60 }} />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row, ri) => (
+                      <tr key={ri} style={{ borderBottom: `1px solid ${B.borderLight}` }}>
+                        <td style={{ padding: "8px 10px", verticalAlign: "middle" }}>
+                          <Select
+                            value={row.grantId}
+                            onChange={v => {
+                              const g = GRANTS_PROJECTS.find(x => x.id === v);
+                              setRows(p => p.map((r,i) => i === ri ? { ...r, grantId: v, grantName: g?.name || v } : r));
+                            }}
+                            style={{ width: "100%", fontSize: 12 }}
+                            options={[
+                              { value: row.grantId, label: row.grantName },
+                              ...availableGrants.map(g => ({ value: g.id, label: g.name })),
+                            ]}
+                          />
+                        </td>
+                        {ALL_DAYS.map((d, di) => (
+                          <td key={d} style={{ padding: "6px 3px", textAlign: "center", background: workDayIdx.includes(di) ? "transparent" : "#f7f7f7" }}>
+                            <input
+                              type="number" min="0" max="24" step="0.5"
+                              value={row.hours[d]}
+                              onChange={e => updateHours(ri, d, e.target.value)}
+                              placeholder="—"
+                              style={cellStyle(di, row.hours[d])}
+                            />
+                          </td>
+                        ))}
+                        <td style={{ padding: "6px 8px", textAlign: "center", fontWeight: 700, fontSize: 14, fontFamily: "Georgia,serif", color: rowTotals[ri] > STD_WEEK ? B.orange : rowTotals[ri] > 0 ? B.textPrimary : B.textMuted }}>
+                          {rowTotals[ri] > 0 ? `${rowTotals[ri].toFixed(1)}h` : "—"}
+                        </td>
+                        <td style={{ padding: "6px 4px", textAlign: "center" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                            <button title="Auto-fill standard hours across work days" onClick={() => fillStandardDay(ri)}
+                              style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, border: `1px solid ${B.border}`, background: B.bgHover, cursor: "pointer", color: B.textSecondary, fontFamily: "Arial,sans-serif" }}>
+                              Fill
+                            </button>
+                            {rows.length > 1 && (
+                              <button title="Remove this row" onClick={() => setRows(p => p.filter((_,i) => i !== ri))}
+                                style={{ fontSize: 13, padding: "2px 6px", borderRadius: 4, border: `1px solid ${B.border}`, background: "none", cursor: "pointer", color: B.danger, fontFamily: "Arial,sans-serif" }}>
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ background: B.bgHover }}>
+                      <td style={{ padding: "8px 10px", fontSize: 11, fontWeight: 700, color: B.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Daily Total</td>
+                      {dailyTotals.map((t, di) => (
+                        <td key={di} style={{ padding: "8px 3px", textAlign: "center", fontWeight: 700, fontSize: 13, fontFamily: "Georgia,serif", background: workDayIdx.includes(di) ? "transparent" : "#f0f0f0" }}>
+                          {t > 0
+                            ? <span style={{ color: t > STD_HOURS + 0.5 ? B.orange : t < STD_HOURS - 0.5 && workDayIdx.includes(di) ? B.blue : B.success }}>{t.toFixed(1)}h</span>
+                            : <span style={{ color: B.textMuted }}>—</span>
+                          }
+                        </td>
+                      ))}
+                      <td style={{ padding: "8px 8px", textAlign: "center", fontWeight: 700, fontSize: 15, fontFamily: "Georgia,serif", color: grandTotal > STD_WEEK ? B.orange : B.success }}>
+                        {grandTotal.toFixed(1)}h
+                      </td>
+                      <td />
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              {/* Add grant row */}
+              {availableGrants.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <button onClick={() => { const g = availableGrants[0]; setRows(p => [...p, { grantId: g.id, grantName: g.name, hours: blankHours() }]); }}
+                    style={{ fontSize: 12, padding: "6px 14px", borderRadius: 6, border: `1px dashed ${B.accent}`, background: B.accentBg, color: B.accent, cursor: "pointer", fontFamily: "Arial,sans-serif", fontWeight: 600 }}>
+                    + Add Grant / Project Row
+                  </button>
+                </div>
+              )}
+
+              {/* Legend */}
+              <div style={{ marginTop: 12, display: "flex", gap: 16, fontSize: 11, color: B.textMuted }}>
+                <span>• Standard day: <strong>7.5h</strong></span>
+                <span>• <span style={{ color: B.orange }}>Orange</span> = over 7.5h in a day</span>
+                <span>• <span style={{ color: B.blue }}>Blue</span> = under 7.5h on a work day</span>
+                <span>• Weekends are grey but still enterable</span>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16, paddingTop: 14, borderTop: `1px solid ${B.borderLight}` }}>
+                <Btn variant="secondary" size="sm" onClick={() => setRows(p => p.map(r => ({ ...r, hours: blankHours() })))}>Clear All</Btn>
+                <Btn variant="primary" onClick={handleSubmit}>Submit Timesheet →</Btn>
+              </div>
+              {wasSubmitted && (
+                <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, color: B.success, fontWeight: 700, fontSize: 13 }}>
+                  ✓ Timesheet submitted — your manager will review and approve within 2 business days.
+                </div>
+              )}
             </Card>
+
+            {/* Previous submissions */}
             <Card>
               <SectionTitle>Previous Submissions</SectionTitle>
-              {[{ week: "Apr 14–18, 2026", total: "37.5h", status: "Approved", grant: emp.grants?.[0]?.name || "GC – Vitamin A" }, { week: "Apr 7–11, 2026", total: "40h", status: "Approved", grant: emp.grants?.[0]?.name || "GC – Vitamin A" }, { week: "Mar 31–Apr 4, 2026", total: "35h", status: "Approved", grant: emp.grants?.[0]?.name || "GC – Vitamin A" }].map((row, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
-                  <div><div style={{ fontSize: 13, fontWeight: 600 }}>{row.week}</div><div style={{ fontSize: 11, color: B.textMuted }}>{row.grant}</div></div>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700 }}>{row.total}</span>
-                    <Badge color={B.success} bg={B.successBg}>{row.status}</Badge>
+              {history.length === 0 && <div style={{ textAlign: "center", padding: 20, color: B.textMuted, fontSize: 13 }}>No previous submissions.</div>}
+              {history.map((row, i) => (
+                <div key={i} style={{ padding: "10px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{row.week}</div>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, fontFamily: "Georgia,serif" }}>{row.total}</span>
+                      <StatusBadge status={row.status} />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {row.splits.map((s, j) => (
+                      <span key={j} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: B.accentBg, color: B.accent, fontWeight: 600 }}>
+                        {s.name.split(" – ")[0]} · {s.hours}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}
