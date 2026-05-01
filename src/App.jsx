@@ -4988,7 +4988,7 @@ const SettingsSuperCenter = ({ role }) => {
                 )}
               </div>
               {on && (
-                <Btn variant="ghost" size="sm" onClick={() => setShowAccessModal(fkey)}>Access Rules</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => { setShowAccessModal(fkey); setRuleForm({ type: "role", value: "", label: "" }); }}>Access Rules</Btn>
               )}
             </div>
           );
@@ -5032,7 +5032,7 @@ const SettingsSuperCenter = ({ role }) => {
                   <div>
                     <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
                       {[{ v: "all", l: "All Users" }, { v: "custom", l: "Custom Rules" }].map(opt => (
-                        <button key={opt.v} onClick={() => setFeatureAccess(p => ({ ...p, [showAccessModal]: { ...acc, scope: opt.v } }))}
+                        <button key={opt.v} onClick={() => setFeatureAccess(p => { const cur = p[showAccessModal] || { scope: "all", rules: [] }; return { ...p, [showAccessModal]: { ...cur, scope: opt.v } }; })}
                           style={{ flex: 1, padding: "9px 0", borderRadius: 8, border: `2px solid ${acc.scope === opt.v ? B.blue : B.border}`, background: acc.scope === opt.v ? `${B.blue}10` : B.white, cursor: "pointer", fontSize: 13, fontWeight: acc.scope === opt.v ? 700 : 400, color: acc.scope === opt.v ? B.blue : B.textSecondary }}>
                           {opt.l}
                         </button>
@@ -5050,14 +5050,14 @@ const SettingsSuperCenter = ({ role }) => {
                               <div style={{ fontSize: 12, fontWeight: 700 }}>{r.label || r.value}</div>
                               <div style={{ fontSize: 11, color: B.textMuted }}>{r.value}</div>
                             </div>
-                            <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setFeatureAccess(p => ({ ...p, [showAccessModal]: { ...acc, rules: acc.rules.filter(x => x.id !== r.id) } }))}>Remove</Btn>
+                            <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setFeatureAccess(p => { const cur = p[showAccessModal] || { scope: "custom", rules: [] }; return { ...p, [showAccessModal]: { ...cur, rules: cur.rules.filter(x => x.id !== r.id) } }; })}>Remove</Btn>
                           </div>
                         ))}
                         <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${B.border}` }}>
                           <div style={{ fontSize: 12, fontWeight: 700, color: B.textSecondary, marginBottom: 8 }}>Add Rule</div>
                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
                             <div><FL>Rule Type</FL>
-                              <Select value={ruleForm.type} onChange={v => setRuleForm(p => ({ ...p, type: v }))} style={{ width: "100%" }}
+                              <Select value={ruleForm.type} onChange={v => setRuleForm(p => ({ ...p, type: v, value: "" }))} style={{ width: "100%" }}
                                 options={Object.entries(ruleTypeLabel).map(([v, l]) => ({ value: v, label: l }))} />
                             </div>
                             <div><FL>Value</FL>
@@ -5071,7 +5071,7 @@ const SettingsSuperCenter = ({ role }) => {
                           <Btn variant="primary" size="sm" onClick={() => {
                             if (!ruleForm.value) return;
                             const newRule = { id: `r${Date.now()}`, ...ruleForm };
-                            setFeatureAccess(p => ({ ...p, [showAccessModal]: { ...acc, rules: [...acc.rules, newRule] } }));
+                            setFeatureAccess(p => { const cur = p[showAccessModal] || { scope: "custom", rules: [] }; return { ...p, [showAccessModal]: { ...cur, rules: [...cur.rules, newRule] } }; });
                             setRuleForm({ type: "role", value: "", label: "" });
                           }}>+ Add Rule</Btn>
                         </div>
