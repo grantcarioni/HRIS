@@ -922,6 +922,7 @@ const EmployeeDashboard = ({ setModule }) => {
           <QuickAction icon={<NIcon name="learning"    size={20} color={B.orange} />} label="My Learning"       desc="Continue courses"          color={B.orange}  onClick={()=>setModule("lms")}/>
           <QuickAction icon={<NIcon name="surveys"     size={20} color={B.pink}   />} label="Take a Survey"     desc="Share your feedback"       color={B.pink}    onClick={()=>setModule("surveys")}/>
           <QuickAction icon={<NIcon name="employee"    size={20} color={B.teal}   />} label="My Profile"        desc="Personal info & documents" color={B.teal}    onClick={()=>setModule("myprofile")}/>
+          <QuickAction icon={<NIcon name="analytics"   size={20} color={B.accent} />} label="Career Path"       desc="Plan my career journey"    color={B.accent}  onClick={()=>setModule("career")}/>
           <QuickAction icon={<NIcon name="people"      size={20} color={B.charcoal}/>}label="Directory"         desc="Find a colleague"          color={B.charcoal}onClick={()=>setModule("directory")}/>
         </div>
       </div>
@@ -1010,53 +1011,122 @@ const EmployeeDashboard = ({ setModule }) => {
 };
 const ManagerDashboard = ({ setModule }) => {
   const mgr = EMPLOYEES[0];
-  const team = EMPLOYEES.filter(e=>e.managerId===mgr.id);
+  const team = EMPLOYEES.filter(e => e.managerId === mgr.id);
   const now = new Date(); const hour = now.getHours();
-  const greeting = hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const [approvalState, setApprovalState] = useState(PENDING_APPROVALS.map(a => ({ ...a, acted: null })));
+  const teamLeave = [
+    { emp: EMPLOYEES[1], type: "Annual Leave",  start: "2026-05-05", end: "2026-05-09", days: 5, status: "Approved" },
+    { emp: EMPLOYEES[3], type: "Sick Leave",    start: "2026-04-30", end: "2026-04-30", days: 1, status: "Approved" },
+    { emp: EMPLOYEES[5], type: "Personal Day",  start: "2026-05-12", end: "2026-05-12", days: 1, status: "Pending"  },
+    { emp: EMPLOYEES[2], type: "Annual Leave",  start: "2026-05-19", end: "2026-05-22", days: 4, status: "Pending"  },
+  ];
+  const reviewPcts = [100, 65, 0, 100, 30];
+  const reviewColors = [B.success, B.blue, B.textMuted, B.success, B.orange];
+  const pendingTs = team.slice(0, 3).map((e, i) => ({ emp: e, week: "Apr 21–25", hours: [38, 40, 35][i] }));
+  const approvedLeave = teamLeave.filter(l => l.status === "Approved").length;
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div style={{ borderRadius:16, background:`linear-gradient(135deg,${B.dkBlue} 0%,${B.blue} 100%)`, padding:"24px 28px", boxShadow:"0 4px 24px rgba(48,127,226,0.2)" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          <Avatar name={`${mgr.first} ${mgr.last}`} size={58}/>
-          <div>
-            <div style={{ fontSize:22, fontWeight:700, color:"#fff", fontFamily:"Georgia,serif", marginBottom:3 }}>{greeting}, {mgr.first}!</div>
-            <div style={{ fontSize:13, color:"rgba(255,255,255,0.75)" }}>{mgr.title} &bull; {team.length} direct reports &bull; {PENDING_APPROVALS.length} pending approvals</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Hero */}
+      <div style={{ borderRadius: 16, background: `linear-gradient(135deg,${B.dkBlue} 0%,${B.blue} 100%)`, padding: "24px 28px", boxShadow: "0 4px 24px rgba(48,127,226,0.2)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <Avatar name={`${mgr.first} ${mgr.last}`} size={58} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", fontFamily: "Georgia,serif", marginBottom: 3 }}>{greeting}, {mgr.first}!</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>{mgr.title} &bull; {team.length} direct reports &bull; {approvalState.filter(a => !a.acted).length} pending approvals</div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Btn variant="secondary" onClick={() => setModule("approvals")} style={{ color: "#fff", borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)" }}>Approvals Inbox</Btn>
+            <Btn variant="secondary" onClick={() => setModule("people")}    style={{ color: "#fff", borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)" }}>Team Profiles</Btn>
           </div>
         </div>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:12 }}>
-        <MetricCard label="My Team" value={team.length} sub="direct reports" color={B.blue}/>
-        <MetricCard label="Pending Approvals" value={PENDING_APPROVALS.length} sub="require action" color={B.orange}/>
-        <MetricCard label="Team On Leave" value={2} sub="this week" color={B.teal}/>
-        <MetricCard label="Avg Performance" value={(team.reduce((a,e)=>a+e.performanceRating,0)/Math.max(team.length,1)).toFixed(1)} sub="team rating" color={B.purple}/>
+      {/* Metrics */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(155px,1fr))", gap: 12 }}>
+        <MetricCard label="My Team"           value={team.length}                  sub="direct reports"             color={B.blue}   />
+        <MetricCard label="Pending Approvals" value={approvalState.filter(a=>!a.acted).length} sub="require action" color={B.orange}  />
+        <MetricCard label="Team On Leave"     value={approvedLeave}                sub="this week"                  color={B.teal}   />
+        <MetricCard label="Avg Performance"   value={(team.reduce((a,e)=>a+e.performanceRating,0)/Math.max(team.length,1)).toFixed(1)} sub="team rating" color={B.purple} />
+        <MetricCard label="Reviews Done"      value={reviewPcts.filter(p=>p===100).length} sub={`of ${team.length} members`} color={B.success} />
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+      {/* Approvals + Team */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <Card>
-          <SectionTitle action={<Btn variant="ghost" size="sm" onClick={()=>setModule("approvals")}>View All</Btn>}>Pending Approvals</SectionTitle>
-          {PENDING_APPROVALS.slice(0,3).map(a=>(
-            <div key={a.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:8, background:B.bgHover, marginBottom:6 }}>
-              <Avatar name={a.employee} size={30}/>
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:13, fontWeight:700 }}>{a.type}</div>
-                <div style={{ fontSize:11, color:B.textMuted }}>{a.employee}</div>
+          <SectionTitle action={<Btn variant="ghost" size="sm" onClick={() => setModule("approvals")}>View All</Btn>}>Pending Approvals</SectionTitle>
+          {approvalState.filter(a => !a.acted).slice(0, 4).map(a => (
+            <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, background: B.bgHover, marginBottom: 6 }}>
+              <Avatar name={a.employee} size={30} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{a.type}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>{a.employee} &bull; {a.detail || "Awaiting review"}</div>
               </div>
-              <div style={{ display:"flex", gap:6 }}>
-                <Btn variant="success" size="sm">Approve</Btn>
-                <Btn variant="danger" size="sm">Deny</Btn>
+              <div style={{ display: "flex", gap: 5 }}>
+                <Btn variant="success" size="sm" onClick={() => setApprovalState(p => p.map(x => x.id === a.id ? { ...x, acted: "approved" } : x))}>Approve</Btn>
+                <Btn variant="danger"  size="sm" onClick={() => setApprovalState(p => p.map(x => x.id === a.id ? { ...x, acted: "denied"   } : x))}>Deny</Btn>
+              </div>
+            </div>
+          ))}
+          {approvalState.filter(a => !a.acted).length === 0 && <div style={{ fontSize: 12, color: B.textMuted, padding: "10px 0" }}>All caught up — no pending approvals.</div>}
+        </Card>
+        <Card>
+          <SectionTitle action={<Btn variant="ghost" size="sm" onClick={() => setModule("people")}>View All</Btn>}>My Team</SectionTitle>
+          {team.slice(0, 5).map((e, i) => (
+            <div key={e.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+              <Avatar name={`${e.first} ${e.last}`} size={30} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>{e.first} {e.last}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>{e.title} &bull; {e.flag}</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: reviewColors[i] }}>{reviewPcts[i] === 100 ? "Complete" : reviewPcts[i] > 0 ? `${reviewPcts[i]}%` : "Not started"}</div>
+                <div style={{ fontSize: 10, color: B.textMuted }}>Q2 review</div>
               </div>
             </div>
           ))}
         </Card>
+      </div>
+      {/* Team Leave Calendar */}
+      <Card>
+        <SectionTitle action={<Btn variant="ghost" size="sm" onClick={() => setModule("time")}>Leave Planner</Btn>}>Team Leave — Next 30 Days</SectionTitle>
+        {teamLeave.map((lv, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 8, background: B.bgHover, marginBottom: 8, borderLeft: `3px solid ${lv.status === "Approved" ? B.success : B.orange}` }}>
+            <Avatar name={`${lv.emp.first} ${lv.emp.last}`} size={32} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>{lv.emp.first} {lv.emp.last}</div>
+              <div style={{ fontSize: 11, color: B.textMuted }}>{lv.type} &bull; {fmtDate(lv.start)} — {fmtDate(lv.end)} &bull; {lv.days} day{lv.days !== 1 ? "s" : ""}</div>
+            </div>
+            <Badge color={lv.status === "Approved" ? B.success : B.orange} bg={lv.status === "Approved" ? B.successBg : B.warningBg}>{lv.status}</Badge>
+          </div>
+        ))}
+        <div style={{ marginTop: 8, padding: "9px 12px", borderRadius: 8, background: `${B.teal}08`, border: `1px dashed ${B.teal}40`, fontSize: 12, color: B.textMuted }}>
+          <strong style={{ color: B.teal }}>Coverage next week:</strong> {team.length - approvedLeave} of {team.length} team members available
+        </div>
+      </Card>
+      {/* Timesheets + Performance Progress */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <Card>
-          <SectionTitle>My Team</SectionTitle>
-          {team.slice(0,5).map(e=>(
-            <div key={e.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 0", borderBottom:`1px solid ${B.borderLight}` }}>
-              <Avatar name={`${e.first} ${e.last}`} size={28}/>
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:13, fontWeight:600 }}>{e.first} {e.last}</div>
-                <div style={{ fontSize:11, color:B.textMuted }}>{e.title}</div>
+          <SectionTitle>Pending Timesheets</SectionTitle>
+          {pendingTs.map((ts, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+              <Avatar name={`${ts.emp.first} ${ts.emp.last}`} size={28} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 600 }}>{ts.emp.first} {ts.emp.last}</div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>Week of {ts.week} &bull; {ts.hours}h logged</div>
               </div>
-              <StatusBadge status={e.status}/>
+              <Btn variant="success" size="sm" onClick={() => alert(`Timesheet approved for ${ts.emp.first}`)}>Approve</Btn>
+            </div>
+          ))}
+          <Btn variant="ghost" size="sm" style={{ marginTop: 10 }} onClick={() => setModule("time")}>View All Timesheets</Btn>
+        </Card>
+        <Card>
+          <SectionTitle action={<Btn variant="ghost" size="sm" onClick={() => setModule("performance")}>View All</Btn>}>Q2 2026 Review Progress</SectionTitle>
+          {team.slice(0, 5).map((e, i) => (
+            <div key={e.id} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                <span style={{ fontSize: 12, fontWeight: 600 }}>{e.first} {e.last}</span>
+                <span style={{ fontSize: 11, color: reviewColors[i] }}>{reviewPcts[i] === 100 ? "Complete" : reviewPcts[i] > 0 ? `${reviewPcts[i]}%` : "Not started"}</span>
+              </div>
+              <ProgressBar value={reviewPcts[i]} max={100} color={reviewColors[i]} height={5} />
             </div>
           ))}
         </Card>
@@ -1064,72 +1134,624 @@ const ManagerDashboard = ({ setModule }) => {
     </div>
   );
 };
-const DashboardModule = ({ setModule, role }) => {
-  if (role==="employee") return <EmployeeDashboard setModule={setModule}/>;
-  if (role==="manager") return <ManagerDashboard setModule={setModule}/>;
-  const activeCount = EMPLOYEES.filter(e=>e.status==="Active").length;
-  const countryCounts = COUNTRIES.map(c=>({ ...c, count:EMPLOYEES.filter(e=>e.country===c.code).length })).sort((a,b)=>b.count-a.count);
+// ─── CAREER PATH MODULE ──────────────────────────────────────────────────────
+const GRADE_META = {
+  P1:  { title: "Associate / Entry",   cluster: "Process",          years: "0–2",   comp: ["Learning agility","Basic technical skills","Task completion","Collaboration"] },
+  P2:  { title: "Officer",             cluster: "Process",          years: "1–4",   comp: ["Applied expertise","Independent delivery","Stakeholder communication","Reporting"] },
+  P3:  { title: "Senior Officer",      cluster: "Design",           years: "3–7",   comp: ["Specialist knowledge","Project leadership","Cross-team collaboration","Mentoring"] },
+  P4:  { title: "Lead / Specialist",   cluster: "Design",           years: "5–10",  comp: ["Technical authority","Cross-functional influence","Proposal writing","Budget basics"] },
+  P5:  { title: "Principal / Expert",  cluster: "Design",           years: "8–15",  comp: ["Org-wide expertise","Innovation","Strategy input","External representation"] },
+  M1:  { title: "Manager",             cluster: "Design/Leadership", years: "5–10",  comp: ["People management","Budget accountability","Team development","Performance reviews"] },
+  M2:  { title: "Senior Manager",      cluster: "Leadership",       years: "8–15",  comp: ["Department strategy","Multi-team coordination","Stakeholder management","Capacity planning"] },
+  M3:  { title: "Director",            cluster: "Leadership",       years: "10–20", comp: ["Country/function leadership","Donor relations","Org-wide impact","Board reporting"] },
+  D1:  { title: "Senior Director",     cluster: "Leadership",       years: "12–25", comp: ["Regional authority","Strategic planning","Org development","Executive partnerships"] },
+  VP:  { title: "Vice President",      cluster: "Leadership",       years: "15+",   comp: ["Org strategy","Board engagement","Global leadership","Transformation"] },
+};
+const CLUSTER_COLOR = { "General": B.textMuted, "Process": B.teal, "Design": B.blue, "Design/Leadership": B.purple, "Leadership": B.accent };
+const IC_PATH   = ["P1","P2","P3","P4","P5"];
+const MGMT_PATH = ["P3","M1","M2","M3","D1","VP"];
+
+const CareerPathModule = ({ role }) => {
+  const emp = ME;
+  const [activeTab, setActiveTab] = useState("pathway");
+  const [milestones, setMilestones] = useState([
+    { id: "cm1", goal: "Complete PSEA Advanced Certification",         target: "2026-06-30", status: "in-progress", category: "Learning"    },
+    { id: "cm2", goal: "Lead a cross-functional project end-to-end",   target: "2026-09-30", status: "pending",     category: "Experience"  },
+    { id: "cm3", goal: "Mentorship: 3+ sessions with a P4 mentor",    target: "2026-12-31", status: "pending",     category: "Mentorship"  },
+    { id: "cm4", goal: "Data Analysis with Python certification",      target: "2026-08-31", status: "in-progress", category: "Learning"    },
+  ]);
+  const [showMModal, setShowMModal] = useState(false);
+  const [mForm, setMForm] = useState({ goal: "", target: "", category: "Learning" });
+  const currentGrade = emp.level;
+  const icIdx   = IC_PATH.indexOf(currentGrade);
+  const GAPS = [
+    { name: "Data Analysis",     current: 2, required: 4, priority: "High",   course: "Data Analysis with Python" },
+    { name: "People Management", current: 1, required: 3, priority: "Medium", course: "Managing High-Performance Teams" },
+    { name: "Grant Writing",     current: 3, required: 4, priority: "Medium", course: "Advanced Grant Compliance" },
+    { name: "Strategic Planning",current: 2, required: 4, priority: "Low",    course: null },
+  ];
+  const LATERAL = [
+    { title: "Program Officer — Research & Evidence", dept: "Research & Evidence", grade: currentGrade, fit: 85 },
+    { title: "Policy Advisor",                        dept: "Policy & Advocacy",   grade: currentGrade, fit: 72 },
+    { title: "Regional Coordinator",                  dept: "Operations",          grade: currentGrade, fit: 68 },
+  ];
+  const catColor = { Learning: B.teal, Experience: B.orange, Mentorship: B.purple, Networking: B.blue };
+  const priorityColor = { High: B.danger, Medium: B.orange, Low: B.blue };
+  const GradeNode = ({ grade, isCurrent, isPast, trackColor }) => {
+    const meta = GRADE_META[grade] || {};
+    const col  = isCurrent ? trackColor : isPast ? B.success : B.border;
+    const bg   = isCurrent ? `${trackColor}12` : isPast ? B.successBg : B.bgHover;
+    return (
+      <div style={{ position: "relative" }}>
+        {isCurrent && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", fontSize: 9, fontWeight: 700, color: "#fff", background: trackColor, padding: "2px 8px", borderRadius: 8, whiteSpace: "nowrap", zIndex: 1 }}>You are here</div>}
+        <div style={{ padding: "12px 14px", borderRadius: 10, border: `2px solid ${col}`, background: bg, minWidth: 120, textAlign: "center" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: isCurrent ? trackColor : isPast ? B.success : B.textMuted }}>{grade}</div>
+          <div style={{ fontSize: 11, color: B.textSecondary, marginTop: 2 }}>{meta.title}</div>
+          <div style={{ fontSize: 10, color: B.textMuted }}>{meta.years} yrs</div>
+          <Badge color={CLUSTER_COLOR[meta.cluster]||B.textMuted} bg={`${CLUSTER_COLOR[meta.cluster]||B.textMuted}12`} style={{ marginTop: 4 }}>{meta.cluster}</Badge>
+        </div>
+      </div>
+    );
+  };
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:12 }}>
-        <MetricCard label="Total Workforce" value={EMPLOYEES.length} sub={`${activeCount} active`} color={B.accent} trend={2.8}/>
-        <MetricCard label="Countries" value={COUNTRIES.length} sub="14 legal entities" color={B.teal}/>
-        <MetricCard label="Open Cases" value={CASES.filter(c=>c.status!=="Resolved").length} color={B.orange} trend={-5}/>
-        <MetricCard label="Pending Approvals" value={PENDING_APPROVALS.length} color={B.blue}/>
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>My Career Path</div>
+          <div style={{ fontSize: 13, color: B.textMuted }}>Current: <strong>{emp.title}</strong> &bull; Grade: <strong>{currentGrade}</strong> &bull; {GRADE_META[currentGrade]?.cluster || "—"} cluster</div>
+        </div>
+        <Btn variant="primary" onClick={() => setShowMModal(true)}>+ Add Milestone</Btn>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-        <Card>
-          <SectionTitle>Headcount by Country</SectionTitle>
-          {countryCounts.slice(0,8).map(c=>(
-            <div key={c.code} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
-              <span style={{ fontSize:16, width:24 }}>{c.flag}</span>
-              <span style={{ fontSize:13, color:B.textPrimary, width:90, flexShrink:0, fontFamily:"Arial,sans-serif" }}>{c.name}</span>
-              <div style={{ flex:1 }}><ProgressBar value={c.count} max={4} color={B.accent}/></div>
-              <span style={{ fontSize:13, fontWeight:700, color:B.textPrimary, width:20, textAlign:"right" }}>{c.count}</span>
+      <Tabs tabs={["pathway","competencies","lateral","plan"]} labels={["Career Pathway","Competency Map","Lateral Moves","Development Plan"]} active={activeTab} onTabChange={setActiveTab} />
+      {activeTab === "pathway" && (
+        <div style={{ marginTop: 16 }}>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Individual Contributor Track</SectionTitle>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, overflowX: "auto", paddingBottom: 8 }}>
+              {IC_PATH.map((g, i) => (
+                <div key={g} style={{ display: "flex", alignItems: "center" }}>
+                  <GradeNode grade={g} isCurrent={g === currentGrade} isPast={icIdx > i} trackColor={B.blue} />
+                  {i < IC_PATH.length-1 && <div style={{ width: 28, height: 2, background: B.border, flexShrink: 0, margin: "0 2px" }}>→</div>}
+                </div>
+              ))}
             </div>
-          ))}
-        </Card>
-        <Card>
-          <SectionTitle action={<Btn variant="ghost" onClick={()=>setModule("approvals")} size="sm">View All</Btn>}>Pending Approvals</SectionTitle>
-          {PENDING_APPROVALS.slice(0,4).map(a=>(
-            <div key={a.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:6, background:B.bgHover, marginBottom:6 }}>
-              <Avatar name={a.employee} size={30}/>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:B.textPrimary }}>{a.type}</div>
-                <div style={{ fontSize:11, color:B.textMuted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a.employee} -- {a.detail}</div>
+          </Card>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Management Track</SectionTitle>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>Transition from P3+ into people management</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, overflowX: "auto", paddingBottom: 8 }}>
+              {MGMT_PATH.map((g, i) => (
+                <div key={g} style={{ display: "flex", alignItems: "center" }}>
+                  <GradeNode grade={g} isCurrent={g === currentGrade} isPast={false} trackColor={B.accent} />
+                  {i < MGMT_PATH.length-1 && <div style={{ width: 28, height: 2, background: B.border, flexShrink: 0, margin: "0 2px" }}>→</div>}
+                </div>
+              ))}
+            </div>
+          </Card>
+          {icIdx >= 0 && icIdx < IC_PATH.length - 1 && (
+            <Card style={{ borderLeft: `4px solid ${B.blue}` }}>
+              <SectionTitle>Next Step: {IC_PATH[icIdx + 1]} — {GRADE_META[IC_PATH[icIdx + 1]]?.title}</SectionTitle>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div>
+                  <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 6 }}>Key competencies required:</div>
+                  {(GRADE_META[IC_PATH[icIdx + 1]]?.comp || []).map(c => (
+                    <div key={c} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 5 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: B.blue, flexShrink: 0 }} />
+                      <span style={{ fontSize: 12 }}>{c}</span>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 4 }}>Typical experience:</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{GRADE_META[IC_PATH[icIdx + 1]]?.years} years</div>
+                  <div style={{ fontSize: 11, color: B.textMuted, marginTop: 10 }}>Milestone progress:</div>
+                  <ProgressBar value={milestones.filter(m => m.status === "completed").length} max={Math.max(milestones.length, 1)} color={B.blue} height={8} />
+                  <div style={{ fontSize: 11, color: B.textMuted, marginTop: 4 }}>{milestones.filter(m => m.status === "completed").length} of {milestones.length} milestones achieved</div>
+                </div>
               </div>
-              <StatusBadge status={a.urgency}/>
+            </Card>
+          )}
+        </div>
+      )}
+      {activeTab === "competencies" && (
+        <div style={{ marginTop: 16 }}>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Competency Gaps — Toward {icIdx >= 0 && icIdx < IC_PATH.length-1 ? IC_PATH[icIdx+1] : "Next Grade"}</SectionTitle>
+            {GAPS.map((gap, i) => (
+              <div key={i} style={{ marginBottom: 12, padding: "12px 14px", borderRadius: 8, background: B.bgHover, borderLeft: `3px solid ${priorityColor[gap.priority]}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <div><span style={{ fontSize: 13, fontWeight: 700 }}>{gap.name}</span><Badge color={priorityColor[gap.priority]} bg={`${priorityColor[gap.priority]}12`} style={{ marginLeft: 8 }}>{gap.priority}</Badge></div>
+                  <span style={{ fontSize: 12, color: B.textMuted }}>Level {gap.current} / {gap.required}</span>
+                </div>
+                <ProgressBar value={gap.current} max={gap.required} color={priorityColor[gap.priority]} height={6} />
+                {gap.course && <div style={{ marginTop: 7, fontSize: 12, color: B.blue, cursor: "pointer" }}>Related course: <strong>{gap.course}</strong></div>}
+              </div>
+            ))}
+          </Card>
+          <Card>
+            <SectionTitle>Current Competencies — {currentGrade}</SectionTitle>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {(GRADE_META[currentGrade]?.comp || []).map(c => (
+                <div key={c} style={{ padding: "6px 12px", borderRadius: 20, background: `${B.success}10`, border: `1px solid ${B.success}30`, fontSize: 12, color: B.success }}>✓ {c}</div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+      {activeTab === "lateral" && (
+        <div style={{ marginTop: 16 }}>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Lateral Opportunities at Grade {currentGrade}</SectionTitle>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>Cross-functional roles matching your current grade.</div>
+            {LATERAL.map((r, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", borderRadius: 8, background: B.bgHover, marginBottom: 8, borderLeft: `3px solid ${r.fit >= 80 ? B.success : r.fit >= 70 ? B.blue : B.orange}` }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{r.title}</div>
+                  <div style={{ fontSize: 12, color: B.textMuted }}>{r.dept} &bull; Grade: {r.grade}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: r.fit >= 80 ? B.success : r.fit >= 70 ? B.blue : B.orange }}>{r.fit}%</div>
+                  <div style={{ fontSize: 10, color: B.textMuted }}>match</div>
+                </div>
+                <Btn variant="secondary" size="sm" onClick={() => alert(`Interest registered: ${r.title}`)}>Express Interest</Btn>
+              </div>
+            ))}
+          </Card>
+          <Card>
+            <SectionTitle>Internal Job Alerts</SectionTitle>
+            <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 10 }}>No active internal postings for your grade. Enable alerts to be notified when openings appear.</div>
+            <Btn variant="secondary" size="sm" onClick={() => alert("Job alerts enabled for your grade")}>Enable Alerts</Btn>
+          </Card>
+        </div>
+      )}
+      {activeTab === "plan" && (
+        <div style={{ marginTop: 16 }}>
+          <Card>
+            <SectionTitle action={<Btn variant="primary" size="sm" onClick={() => setShowMModal(true)}>+ Add</Btn>}>Development Plan — 2026</SectionTitle>
+            {milestones.length === 0 && <div style={{ fontSize: 12, color: B.textMuted, padding: "10px 0" }}>No milestones yet. Add your first development goal.</div>}
+            {milestones.map(m => {
+              const sc = m.status === "completed" ? B.success : m.status === "in-progress" ? B.blue : B.textMuted;
+              return (
+                <div key={m.id} style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: `1px solid ${B.borderLight}`, alignItems: "flex-start" }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: sc, marginTop: 4, flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{m.goal}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <Badge color={catColor[m.category]||B.textMuted} bg={`${catColor[m.category]||B.textMuted}14`}>{m.category}</Badge>
+                      <span style={{ fontSize: 11, color: B.textMuted }}>Target: {fmtDate(m.target)}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+                    <Badge color={sc} bg={`${sc}12`}>{m.status === "completed" ? "Done" : m.status === "in-progress" ? "In Progress" : "Pending"}</Badge>
+                    <Btn variant="ghost" size="sm" onClick={() => setMilestones(p => p.map(x => x.id === m.id ? { ...x, status: x.status === "completed" ? "pending" : "completed" } : x))}>{m.status === "completed" ? "Undo" : "Done"}</Btn>
+                    <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setMilestones(p => p.filter(x => x.id !== m.id))}>Del</Btn>
+                  </div>
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+      )}
+      <Modal open={showMModal} onClose={() => setShowMModal(false)} title="Add Development Milestone" width={440}>
+        <div style={{ display: "grid", gap: 10 }}>
+          <div><FL>Goal / Milestone</FL><input value={mForm.goal} onChange={e => setMForm(p => ({ ...p, goal: e.target.value }))} placeholder="e.g. Lead a cross-functional project" style={inp} /></div>
+          <div><FL>Target Date</FL><input type="date" value={mForm.target} onChange={e => setMForm(p => ({ ...p, target: e.target.value }))} style={inp} /></div>
+          <div><FL>Category</FL><Select value={mForm.category} onChange={v => setMForm(p => ({ ...p, category: v }))} style={{ width: "100%" }} options={["Learning","Experience","Mentorship","Networking"].map(c => ({ value: c, label: c }))} /></div>
+        </div>
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+          <Btn variant="secondary" onClick={() => setShowMModal(false)}>Cancel</Btn>
+          <Btn variant="primary" onClick={() => {
+            if (mForm.goal && mForm.target) {
+              setMilestones(p => [...p, { ...mForm, id: `cm${Date.now()}`, status: "pending" }]);
+              setMForm({ goal: "", target: "", category: "Learning" });
+              setShowMModal(false);
+            }
+          }}>Add Milestone</Btn>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+// ─── JOB EVALUATION TOOL (BIRCHES COMMUNITY) ────────────────────────────────
+const BIRCHES_CLUSTERS = [
+  { id: "General",    label: "General",    grades: ["BG-1","BG-2","BG-3"],            color: B.textMuted, desc: "Physical, mechanical, general office support",
+    kw: ["clean","drive","guard","transport","reception","filing","maintenance","security","dispatch","canteen","messenger","porter","photocopy"] },
+  { id: "Process",    label: "Process",    grades: ["BG-4","BG-5","BG-6","BG-7"],     color: B.teal,      desc: "Organized subject-specific services",
+    kw: ["coordinate","administer","process","schedule","data entry","database","monitor","track","standard procedure","organize","clerical","secretary","accountant","procurement","logistic","bookkeeper"] },
+  { id: "Design",     label: "Design",     grades: ["BG-8","BG-9","BG-10","BG-11"],   color: B.blue,      desc: "Develop unique insights, products, and services",
+    kw: ["design","develop","create","analyse","analyze","research","implement","framework","strategy","advise","recommend","proposal","technical","expertise","programme","program","specialist","officer","project management","stakeholder","capacity building","master","degree","postgraduate","7 years","10 years"] },
+  { id: "Leadership", label: "Leadership", grades: ["BG-12","BG-13","BG-14"],         color: B.accent,    desc: "Expert leadership, functional and corporate management",
+    kw: ["director","head of","vice president","chief","executive","organizational","board","enterprise","transform","global","country director","regional director","c-suite","ceo","coo","cfo","senior director","govern","vision","mandate","corporate"] },
+];
+
+const JobEvaluationTool = () => {
+  const [jdText, setJdText]         = useState("");
+  const [dragOver, setDragOver]     = useState(false);
+  const [result, setResult]         = useState(null);
+  const [analyzing, setAnalyzing]   = useState(false);
+  const [resTab, setResTab]         = useState("summary");
+  const [savedEvals, setSavedEvals] = useState([
+    { id: "JE-001", title: "Senior Program Officer — Malawi", date: "2026-04-15", grade: "BG-9",  cluster: "Design",    confidence: 84 },
+    { id: "JE-002", title: "Finance Analyst",                 date: "2026-04-20", grade: "BG-7",  cluster: "Process",   confidence: 91 },
+    { id: "JE-003", title: "Country Director — Nigeria",      date: "2026-04-22", grade: "BG-13", cluster: "Leadership",confidence: 78 },
+  ]);
+  const [evalTitle, setEvalTitle] = useState("");
+
+  const analyzeJD = () => {
+    if (!jdText.trim()) return;
+    setAnalyzing(true);
+    setTimeout(() => {
+      const t = jdText.toLowerCase();
+      const scored = BIRCHES_CLUSTERS.map(c => {
+        const matched = c.kw.filter(k => t.includes(k));
+        return { ...c, score: matched.length, matched };
+      }).sort((a, b) => b.score - a.score);
+      const primary = scored[0];
+
+      // Contextual indicators
+      const expMatch  = t.match(/(\d+)\+?\s*year/i);
+      const yrs       = expMatch ? parseInt(expMatch[1]) : 0;
+      const teamMgmt  = /manag(e|ing)\s+(a\s+)?team|supervise|direct report|line manag/i.test(t);
+      const budget    = /budget|financial oversight|fund/i.test(t);
+      const strategy  = /strateg|policy direction|vision|transform/i.test(t);
+      const research  = /research|evidence|data analysis|evaluation/i.test(t);
+      const edLvl     = t.includes("phd")||t.includes("doctorate") ? 3 : t.includes("master")||t.includes("postgraduate") ? 2 : t.includes("degree")||t.includes("bachelor") ? 1 : 0;
+      const teamSzM   = t.match(/team\s+of\s+(\d+)/i);
+      const teamSz    = teamSzM ? parseInt(teamSzM[1]) : 0;
+
+      // Grade index within cluster
+      let gi = 0;
+      if (primary.id === "General")    { gi = Math.min(2, Math.floor(primary.score / 3)); }
+      else if (primary.id === "Process") {
+        let pts = Math.floor(primary.score / 2) + (yrs > 3 ? 1 : 0) + (edLvl > 0 ? 1 : 0);
+        gi = Math.min(3, pts);
+      } else if (primary.id === "Design") {
+        let pts = Math.floor(primary.score / 2);
+        if (yrs >= 8) pts += 2; else if (yrs >= 5) pts += 1;
+        if (research) pts++; if (teamMgmt) pts++; if (budget) pts++; if (edLvl >= 2) pts++;
+        gi = Math.min(3, pts);
+      } else {
+        let pts = 0;
+        if (yrs >= 15) pts += 2; else if (yrs >= 10) pts++;
+        if (teamSz >= 20) pts += 2; else if (teamSz >= 10) pts++;
+        if (strategy) pts++; if (budget) pts++;
+        gi = Math.min(2, pts);
+      }
+
+      const grade      = primary.grades[gi];
+      const confidence = Math.min(95, 50 + primary.score * 5 + (scored[0].score - scored[1].score) * 4);
+      const purpose    = Math.min(4, 1 + (strategy ? 2 : 0) + (primary.id === "Leadership" ? 1 : 0));
+      const engagement = Math.min(4, 1 + (t.includes("external")||t.includes("donor")||t.includes("partner") ? 1 : 0) + (t.includes("government")||t.includes("board") ? 1 : 0) + (teamMgmt ? 1 : 0));
+      const delivery   = Math.min(4, 1 + (strategy ? 1 : 0) + (research ? 1 : 0) + (primary.id === "Leadership" ? 1 : 0) + (budget ? 1 : 0));
+
+      setResult({ grade, primary, scored, confidence: Math.round(confidence),
+        factors: { purpose, engagement, delivery },
+        indicators: { yrs, teamMgmt, budget, strategy, research, edLvl, teamSz },
+        topKw: primary.matched.slice(0, 8) });
+      setAnalyzing(false);
+      setResTab("summary");
+    }, 1500);
+  };
+
+  const purposeLabels     = ["Administrative support","Coordinated service delivery","Technical program delivery","Strategic organizational direction"];
+  const engagementLabels  = ["Internal contacts only","Internal + limited external","Multiple external stakeholders","Government / board / donor decision-makers"];
+  const deliveryLabels    = ["Routine execution","Structured project management","Adaptive program design","Org strategy & transformation"];
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 20, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Birches Community Job Evaluation</div>
+        <div style={{ fontSize: 12, color: B.textMuted }}>Drag & drop a job description file (.txt) or paste text below. The tool classifies roles against the Birches Community framework (BG-1 to BG-14) across three factors: Purpose, Engagement, and Delivery.</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {/* ── Input panel ── */}
+        <div>
+          <Card style={{ marginBottom: 14 }}>
+            <SectionTitle>Job Description</SectionTitle>
+            <div
+              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={e => {
+                e.preventDefault(); setDragOver(false);
+                const file = e.dataTransfer.files[0];
+                if (file) { const r = new FileReader(); r.onload = ev => setJdText(ev.target.result); r.readAsText(file); }
+              }}
+              style={{ border: `2px dashed ${dragOver ? B.blue : B.border}`, borderRadius: 8, background: dragOver ? `${B.blue}06` : B.bgHover, padding: "14px 16px", marginBottom: 10, textAlign: "center", transition: "all 0.2s" }}
+            >
+              <div style={{ fontSize: 26 }}>📄</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: B.textSecondary }}>Drop a .txt file here</div>
+              <div style={{ fontSize: 11, color: B.textMuted }}>or paste the JD below</div>
+            </div>
+            <textarea value={jdText} onChange={e => setJdText(e.target.value)}
+              placeholder={"Paste job description here...\n\nInclude: purpose of the role, reporting line, key responsibilities, qualifications, years of experience, team/budget management scope."}
+              style={{ width: "100%", height: 200, padding: 12, border: `1px solid ${B.border}`, borderRadius: 8, fontSize: 12, fontFamily: "Arial,sans-serif", resize: "vertical", color: B.textPrimary, background: B.white, boxSizing: "border-box" }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+              <span style={{ fontSize: 11, color: B.textMuted }}>{jdText.trim().split(/\s+/).filter(Boolean).length} words</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Btn variant="secondary" size="sm" onClick={() => { setJdText(""); setResult(null); }}>Clear</Btn>
+                <Btn variant="primary" onClick={analyzeJD} style={{ minWidth: 120 }}>{analyzing ? "Analyzing..." : "Evaluate JD"}</Btn>
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <SectionTitle>Birches Community Grade Scale</SectionTitle>
+            {BIRCHES_CLUSTERS.map(c => (
+              <div key={c.id} style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
+                  <Badge color={c.color} bg={`${c.color}12`}>{c.label}</Badge>
+                  <span style={{ fontSize: 11, color: B.textMuted }}>{c.grades[0]}–{c.grades[c.grades.length-1]}</span>
+                </div>
+                <div style={{ fontSize: 11, color: B.textSecondary, paddingLeft: 4 }}>{c.desc}</div>
+              </div>
+            ))}
+          </Card>
+        </div>
+
+        {/* ── Results panel ── */}
+        <div>
+          {!result && !analyzing && (
+            <Card>
+              <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>🧠</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: B.textSecondary, marginBottom: 8 }}>Ready to Evaluate</div>
+                <div style={{ fontSize: 12, color: B.textMuted, lineHeight: 1.8 }}>Paste a job description and click <strong>Evaluate JD</strong>.<br/>The tool scores it across the three Birches factors and recommends a grade.</div>
+              </div>
+            </Card>
+          )}
+          {analyzing && (
+            <Card>
+              <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                <div style={{ fontSize: 36, marginBottom: 10 }}>⏳</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: B.textSecondary, marginBottom: 10 }}>Analyzing Job Description...</div>
+                <ProgressBar value={70} max={100} color={B.blue} height={6} />
+                <div style={{ fontSize: 11, color: B.textMuted, marginTop: 8 }}>Matching against Birches Community criteria</div>
+              </div>
+            </Card>
+          )}
+          {result && !analyzing && (
+            <>
+              <Card style={{ marginBottom: 14, borderTop: `4px solid ${result.primary.color}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: B.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Recommended Grade</div>
+                    <div style={{ fontSize: 40, fontWeight: 900, color: result.primary.color, fontFamily: "Georgia,serif" }}>{result.grade}</div>
+                    <Badge color={result.primary.color} bg={`${result.primary.color}12`} style={{ marginTop: 4 }}>{result.primary.label} Cluster</Badge>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 4 }}>Confidence</div>
+                    <div style={{ fontSize: 30, fontWeight: 700, color: result.confidence >= 80 ? B.success : result.confidence >= 65 ? B.orange : B.danger }}>{result.confidence}%</div>
+                    <div style={{ fontSize: 10, color: B.textMuted }}>{result.confidence >= 80 ? "High" : result.confidence >= 65 ? "Moderate" : "Low"}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>{result.primary.desc}</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input value={evalTitle} onChange={e => setEvalTitle(e.target.value)} placeholder="Label this evaluation (optional)" style={{ ...inp, flex: 1 }} />
+                  <Btn variant="primary" size="sm" onClick={() => {
+                    setSavedEvals(p => [{ id: `JE-${Date.now()}`, title: evalTitle || "Untitled Evaluation", date: new Date().toISOString().slice(0,10), grade: result.grade, cluster: result.primary.label, confidence: result.confidence }, ...p]);
+                    setEvalTitle(""); alert("Evaluation saved!");
+                  }}>Save</Btn>
+                  <Btn variant="secondary" size="sm" onClick={() => alert("Exporting PDF report...")}>Export</Btn>
+                </div>
+              </Card>
+              <Tabs tabs={["summary","factors","indicators"]} labels={["Cluster Analysis","Factor Scores","JD Indicators"]} active={resTab} onTabChange={setResTab} />
+              {resTab === "summary" && (
+                <Card style={{ marginTop: 10 }}>
+                  {result.scored.map(c => (
+                    <div key={c.id} style={{ marginBottom: 10 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <Badge color={c.color} bg={`${c.color}12`}>{c.label}</Badge>
+                          <span style={{ fontSize: 11, color: B.textMuted }}>{c.matched.length} keyword{c.matched.length !== 1 ? "s" : ""}</span>
+                        </div>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: c.color }}>{c.score}</span>
+                      </div>
+                      <ProgressBar value={c.score} max={Math.max(...result.scored.map(x => x.score), 1)} color={c.color} height={5} />
+                    </div>
+                  ))}
+                  {result.topKw.length > 0 && (
+                    <div style={{ marginTop: 10 }}>
+                      <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 6 }}>Matched keywords:</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                        {result.topKw.map(kw => <span key={kw} style={{ padding: "3px 8px", borderRadius: 4, background: `${result.primary.color}10`, border: `1px solid ${result.primary.color}25`, fontSize: 11, color: result.primary.color }}>{kw}</span>)}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              )}
+              {resTab === "factors" && (
+                <Card style={{ marginTop: 10 }}>
+                  {[
+                    { name: "Purpose",    score: result.factors.purpose,    labels: purposeLabels,    desc: "Why this job exists — mission contribution and scope of impact" },
+                    { name: "Engagement", score: result.factors.engagement, labels: engagementLabels, desc: "Stakeholder complexity — who the role interacts with" },
+                    { name: "Delivery",   score: result.factors.delivery,   labels: deliveryLabels,   desc: "How work is done — execution through to organizational direction" },
+                  ].map(f => (
+                    <div key={f.name} style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: B.bgHover }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>{f.name}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: B.blue }}>Level {f.score} / 4</div>
+                      </div>
+                      <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 7 }}>{f.desc}</div>
+                      <ProgressBar value={f.score} max={4} color={B.blue} height={7} />
+                      <div style={{ fontSize: 11, color: B.textSecondary, marginTop: 5 }}>{f.labels[Math.min(f.score - 1, 3)]}</div>
+                    </div>
+                  ))}
+                </Card>
+              )}
+              {resTab === "indicators" && (
+                <Card style={{ marginTop: 10 }}>
+                  <SectionTitle>Detected JD Indicators</SectionTitle>
+                  {[
+                    { label: "Years of experience",   val: result.indicators.yrs > 0 ? `${result.indicators.yrs}+ years` : "Not specified",                                                       flag: result.indicators.yrs > 0       },
+                    { label: "Team management",       val: result.indicators.teamMgmt ? "Detected" : "Not detected",                                                                                flag: result.indicators.teamMgmt       },
+                    { label: "Team size",             val: result.indicators.teamSz > 0 ? `~${result.indicators.teamSz} reports` : "Not specified",                                                flag: result.indicators.teamSz > 0     },
+                    { label: "Budget responsibility", val: result.indicators.budget ? "Detected" : "Not detected",                                                                                  flag: result.indicators.budget         },
+                    { label: "Strategic/policy scope",val: result.indicators.strategy ? "Detected" : "Not detected",                                                                               flag: result.indicators.strategy       },
+                    { label: "Research/analysis",     val: result.indicators.research ? "Detected" : "Not detected",                                                                               flag: result.indicators.research       },
+                    { label: "Education level",       val: ["Not specified","Bachelor degree","Master / Postgraduate","PhD / Doctorate"][result.indicators.edLvl]||"Not specified",                flag: result.indicators.edLvl > 0      },
+                  ].map((ind, i) => (
+                    <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                      <span style={{ fontSize: 12, color: B.textSecondary }}>{ind.label}</span>
+                      <Badge color={ind.flag ? B.success : B.textMuted} bg={ind.flag ? B.successBg : B.bgHover}>{ind.val}</Badge>
+                    </div>
+                  ))}
+                </Card>
+              )}
+            </>
+          )}
+          <Card style={{ marginTop: 14 }}>
+            <SectionTitle>Saved Evaluations</SectionTitle>
+            {savedEvals.map(ev => {
+              const cl = BIRCHES_CLUSTERS.find(c => c.label === ev.cluster);
+              return (
+                <div key={ev.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700 }}>{ev.title}</div>
+                    <div style={{ fontSize: 11, color: B.textMuted }}>{fmtDate(ev.date)} &bull; {ev.cluster}</div>
+                  </div>
+                  <Badge color={cl?.color || B.textMuted} bg={`${cl?.color || B.textMuted}12`}>{ev.grade}</Badge>
+                  <span style={{ fontSize: 11, color: B.textMuted }}>{ev.confidence}%</span>
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DashboardModule = ({ setModule, role }) => {
+  if (role === "employee") return <EmployeeDashboard setModule={setModule} />;
+  if (role === "manager")  return <ManagerDashboard  setModule={setModule} />;
+  const activeCount    = EMPLOYEES.filter(e => e.status === "Active").length;
+  const onLeaveCount   = 3;
+  const turnoverRate   = 8.2;
+  const openPositions  = 5;
+  const countryCounts  = COUNTRIES.map(c => ({ ...c, count: EMPLOYEES.filter(e => e.country === c.code).length })).sort((a, b) => b.count - a.count);
+  const complianceAlerts = [
+    { type: "Certification Expiry",    detail: "3 staff certifications expire in 30 days",            urgency: "High",   icon: "⚠️"  },
+    { type: "Contract Renewal",        detail: "2 fixed-term contracts end June 30, 2026",             urgency: "High",   icon: "📋"  },
+    { type: "Overdue Performance",     detail: "7 employees have not completed Q2 self-assessment",    urgency: "Medium", icon: "📊"  },
+    { type: "Missing Documents",       detail: "4 employees missing signed policy acknowledgements",   urgency: "Medium", icon: "📄"  },
+    { type: "MFA Not Enabled",         detail: "1 user account has multi-factor auth disabled",        urgency: "Low",    icon: "🔐"  },
+  ];
+  const onboardingPipeline = [
+    { name: "Amara Diallo",     role: "Program Officer",        country: "SN", start: "2026-05-05", pct: 80 },
+    { name: "Ravi Krishnan",    role: "Finance Analyst",        country: "IN", start: "2026-05-12", pct: 40 },
+    { name: "Claire Beaumont",  role: "Senior HR Officer",      country: "CA", start: "2026-05-19", pct: 15 },
+    { name: "Samuel Oduya",     role: "M&E Specialist",         country: "KE", start: "2026-06-02", pct:  0 },
+  ];
+  const leaveHeatMap = COUNTRIES.filter(c => [c.code].every(x => ["CA","GB","KE","NG","IN","BD"].includes(x)))
+    .concat(COUNTRIES.filter(c => !["CA","GB","KE","NG","IN","BD"].includes(c.code)));
+  const urgencyColor = { High: B.danger, Medium: B.orange, Low: B.blue };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      {/* Metrics row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(170px,1fr))", gap: 12 }}>
+        <MetricCard label="Total Workforce"   value={EMPLOYEES.length}  sub={`${activeCount} active`}       color={B.accent}  trend={2.8} />
+        <MetricCard label="Turnover YTD"      value={`${turnoverRate}%`} sub="voluntary + involuntary"       color={B.orange}  trend={-1.2} />
+        <MetricCard label="Open Positions"    value={openPositions}      sub="pending recruitment"           color={B.blue}    />
+        <MetricCard label="On Leave Today"    value={onLeaveCount}       sub="approved absences"             color={B.teal}    />
+        <MetricCard label="Pending Approvals" value={PENDING_APPROVALS.length} sub="require action"         color={B.purple}  />
+        <MetricCard label="Countries"         value={COUNTRIES.length}   sub="14 legal entities"            color={B.charcoal} />
+      </div>
+
+      {/* Headcount + Compliance Alerts */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <Card>
+          <SectionTitle action={<Btn variant="ghost" size="sm" onClick={() => setModule("analytics")}>Analytics</Btn>}>Headcount by Country</SectionTitle>
+          {countryCounts.slice(0, 8).map(c => (
+            <div key={c.code} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              <span style={{ fontSize: 16, width: 24 }}>{c.flag}</span>
+              <span style={{ fontSize: 13, color: B.textPrimary, width: 90, flexShrink: 0 }}>{c.name}</span>
+              <div style={{ flex: 1 }}><ProgressBar value={c.count} max={Math.max(...countryCounts.map(x => x.count))} color={B.accent} /></div>
+              <span style={{ fontSize: 13, fontWeight: 700, width: 20, textAlign: "right" }}>{c.count}</span>
+            </div>
+          ))}
+        </Card>
+        <Card>
+          <SectionTitle>Compliance Alerts</SectionTitle>
+          {complianceAlerts.map((a, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, padding: "9px 10px", borderRadius: 7, background: B.bgHover, marginBottom: 6, borderLeft: `3px solid ${urgencyColor[a.urgency]}` }}>
+              <span style={{ fontSize: 16 }}>{a.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 700 }}>{a.type} <Badge color={urgencyColor[a.urgency]} bg={`${urgencyColor[a.urgency]}12`} style={{ marginLeft: 4 }}>{a.urgency}</Badge></div>
+                <div style={{ fontSize: 11, color: B.textMuted }}>{a.detail}</div>
+              </div>
             </div>
           ))}
         </Card>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+
+      {/* Onboarding Pipeline + Approvals */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <Card>
+          <SectionTitle action={<Btn variant="ghost" size="sm" onClick={() => setModule("onboarding")}>View All</Btn>}>Onboarding Pipeline</SectionTitle>
+          {onboardingPipeline.map((n, i) => {
+            const cty = COUNTRIES.find(c => c.code === n.country);
+            return (
+              <div key={i} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{n.name}</span>
+                    <span style={{ fontSize: 11, color: B.textMuted }}> &bull; {n.role} &bull; {cty?.flag} {n.country}</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: B.textMuted }}>Starts {fmtDate(n.start)}</span>
+                </div>
+                <ProgressBar value={n.pct} max={100} color={n.pct === 100 ? B.success : n.pct > 0 ? B.blue : B.border} height={6} />
+                <div style={{ fontSize: 10, color: B.textMuted, marginTop: 2 }}>{n.pct}% onboarding complete</div>
+              </div>
+            );
+          })}
+        </Card>
+        <Card>
+          <SectionTitle action={<Btn variant="ghost" onClick={() => setModule("approvals")} size="sm">View All</Btn>}>Pending Approvals</SectionTitle>
+          {PENDING_APPROVALS.slice(0, 4).map(a => (
+            <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 11px", borderRadius: 6, background: B.bgHover, marginBottom: 6 }}>
+              <Avatar name={a.employee} size={30} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{a.type}</div>
+                <div style={{ fontSize: 11, color: B.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.employee} &bull; {a.detail}</div>
+              </div>
+              <StatusBadge status={a.urgency} />
+            </div>
+          ))}
+        </Card>
+      </div>
+
+      {/* Leave heat map + dept distribution */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <Card>
+          <SectionTitle>Leave Utilization Heat Map</SectionTitle>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 5 }}>
+            {COUNTRIES.map(c => {
+              const pct = [72, 55, 48, 61, 35, 40, 28, 31, 45, 38, 62, 44, 29, 37][COUNTRIES.indexOf(c)] || 40;
+              const col = pct > 65 ? B.danger : pct > 50 ? B.orange : pct > 35 ? B.blue : B.teal;
+              return (
+                <div key={c.code} title={`${c.name}: ${pct}% utilization`} style={{ padding: "8px 4px", borderRadius: 6, background: `${col}22`, border: `1px solid ${col}40`, textAlign: "center", cursor: "default" }}>
+                  <div style={{ fontSize: 16 }}>{c.flag}</div>
+                  <div style={{ fontSize: 9, color: col, fontWeight: 700, marginTop: 2 }}>{pct}%</div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", gap: 12, marginTop: 10, fontSize: 10, color: B.textMuted }}>
+            {[{ label: ">65% High", col: B.danger }, { label: "50–65% Mod", col: B.orange }, { label: "35–50% Normal", col: B.blue }, { label: "<35% Low", col: B.teal }].map(l => (
+              <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 8, height: 8, borderRadius: 2, background: l.col }} />{l.label}</div>
+            ))}
+          </div>
+        </Card>
         <Card>
           <SectionTitle>Department Distribution</SectionTitle>
-          {DEPARTMENTS.slice(0,6).map(d=>{ const count=EMPLOYEES.filter(e=>e.department===d).length; return(
-            <div key={d} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
-              <span style={{ fontSize:13, color:B.textPrimary, width:140, flexShrink:0 }}>{d}</span>
-              <div style={{ flex:1 }}><ProgressBar value={count} max={6} color={B.blue}/></div>
-              <span style={{ fontSize:13, fontWeight:700, width:20, textAlign:"right" }}>{count}</span>
+          {DEPARTMENTS.slice(0, 7).map(d => { const count = EMPLOYEES.filter(e => e.department === d).length; return (
+            <div key={d} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
+              <span style={{ fontSize: 12, color: B.textPrimary, width: 140, flexShrink: 0 }}>{d}</span>
+              <div style={{ flex: 1 }}><ProgressBar value={count} max={6} color={B.blue} /></div>
+              <span style={{ fontSize: 12, fontWeight: 700, width: 20, textAlign: "right" }}>{count}</span>
             </div>
           );})}
-        </Card>
-        <Card>
-          <SectionTitle>Grant Allocation Overview</SectionTitle>
-          {[{ name:"GC - Vitamin A Supplementation", budget:2400000, spent:1680000, color:B.accent },
-            { name:"BMGF - Food Fortification", budget:1800000, spent:990000, color:B.teal },
-            { name:"USAID - Maternal Nutrition", budget:950000, spent:712000, color:B.blue },
-            { name:"DFID - Adolescent Girls", budget:620000, spent:310000, color:B.purple }
-          ].map((g,i)=>(
-            <div key={i} style={{ marginBottom:12 }}>
-              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:B.textPrimary }}>{g.name}</span>
-                <span style={{ fontSize:11, color:B.textMuted }}>{Math.round(g.spent/g.budget*100)}%</span>
-              </div>
-              <ProgressBar value={g.spent} max={g.budget} color={g.color}/>
-              <div style={{ fontSize:11, color:B.textMuted, marginTop:2 }}>{fmt(g.spent,"CAD")} / {fmt(g.budget,"CAD")}</div>
-            </div>
-          ))}
         </Card>
       </div>
     </div>
@@ -3218,9 +3840,18 @@ const SettingsSuperCenter = ({ role }) => {
   const [showGradeEdit, setShowGradeEdit] = useState(null);
   const [gradeForm, setGradeForm] = useState({ grade: "", title: "", category: "Professional", minExp: 0, maxExp: 0, benchmarks: "", factor: "", points: 0 });
 
-  // ── Feature Toggles ──────────────────────────────────────────────────────
-  const [featureToggles, setFeatureToggles] = useState({ dashboard: true, people: true, time: true, approvals: true, allowances: true, workflows: true, analytics: true, settings: true, recruiting: true, clockInOut: true, gpsTracking: true, offlineMode: true, grantTimesheets: true, laborCompliance: true, multiCurrency: true, verificationLetters: true, benefitsTab: true, reportingCenter: true, customReports: true, workableIntegration: true, leaveManagement: true, hwAllowance: true, ldAllowance: true });
-  const [showConfirm, setShowConfirm] = useState(null);
+  // ── Feature Toggles + Scoped Access ─────────────────────────────────────
+  const [featureToggles, setFeatureToggles] = useState({ dashboard: true, people: true, time: true, approvals: true, allowances: true, workflows: true, analytics: true, settings: true, recruiting: true, clockInOut: true, gpsTracking: true, offlineMode: true, grantTimesheets: true, laborCompliance: true, multiCurrency: true, verificationLetters: true, benefitsTab: true, reportingCenter: true, customReports: true, workableIntegration: true, leaveManagement: true, hwAllowance: true, ldAllowance: true, career: true, jobeval: true });
+  const [featureAccess, setFeatureAccess] = useState({
+    clockInOut:      { scope: "custom", rules: [{ id: "r1", type: "grade",    value: "P1,P2,P3",                  label: "Entry-level staff" }, { id: "r2", type: "location", value: "KE,NG,TZ,BD,IN,PK,ID,PH", label: "Field offices" }] },
+    gpsTracking:     { scope: "custom", rules: [{ id: "r3", type: "location", value: "KE,NG,TZ,MW,SN",            label: "Africa field offices" }] },
+    grantTimesheets: { scope: "custom", rules: [{ id: "r4", type: "role",     value: "employee,manager",          label: "Staff and managers" }] },
+    jobeval:         { scope: "custom", rules: [{ id: "r5", type: "role",     value: "hr,superuser",              label: "HR Admin and Superuser" }] },
+    career:          { scope: "all",    rules: [] },
+  });
+  const [showConfirm, setShowConfirm]   = useState(null);
+  const [showAccessModal, setShowAccessModal] = useState(null);
+  const [ruleForm, setRuleForm]         = useState({ type: "role", value: "", label: "" });
 
   // ── Add-On Modules ───────────────────────────────────────────────────────
   const [addOnModules, setAddOnModules] = useState([
@@ -3921,29 +4552,162 @@ const SettingsSuperCenter = ({ role }) => {
       );
 
       // ── FEATURE MANAGEMENT ─────────────────────────────────────────────
-      case "features": return (
-        <div>
-          <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Feature Management</div>
-          <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>Enable or disable modules and feature flags globally. Changes affect all users immediately.</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-            <Card>
-              <SectionTitle>Core Modules</SectionTitle>
-              {[{ key: "dashboard", label: "Dashboard", desc: "Main overview, metrics, and announcements" }, { key: "people", label: "People Directory", desc: "Employee directory, profiles, and search" }, { key: "time", label: "Time & Attendance", desc: "Clock in/out, timesheets, leave management" }, { key: "approvals", label: "Approvals Inbox", desc: "Leave, compensation, and allowance approvals" }, { key: "allowances", label: "Allowances (H&W / L&D)", desc: "Receipt upload and reimbursement claims" }, { key: "workflows", label: "Workflow Engine", desc: "Configurable approval chains and routing" }, { key: "analytics", label: "Analytics & Reporting", desc: "Workforce analytics and visual dashboards" }, { key: "recruiting", label: "Recruiting (Workable)", desc: "ATS integration and candidate pipeline" }].map(f => <ToggleSw key={f.key} on={featureToggles[f.key]} onToggle={() => setShowConfirm(f.key)} label={f.label} desc={f.desc} />)}
-            </Card>
-            <Card>
-              <SectionTitle>Feature Flags</SectionTitle>
-              {[{ key: "clockInOut", label: "Mobile Clock In/Out", desc: "GPS-enabled remote time tracking" }, { key: "gpsTracking", label: "GPS Location Tracking", desc: "Field staff location verification" }, { key: "offlineMode", label: "Offline Mode", desc: "Queue events when no connectivity" }, { key: "grantTimesheets", label: "Grant / Project Timesheets", desc: "Donor allocation tracking" }, { key: "laborCompliance", label: "Labor Compliance Engine", desc: "14-country overtime and rest rules" }, { key: "multiCurrency", label: "Multi-Currency Payroll", desc: "Cross-border payroll consolidation" }, { key: "verificationLetters", label: "Verification Letters", desc: "Auto-generated employment letters" }, { key: "benefitsTab", label: "Benefits Package View", desc: "Country-specific benefits display" }, { key: "hwAllowance", label: "Health & Wellness Claims", desc: "Receipt-based wellness reimbursement" }, { key: "ldAllowance", label: "L&D Claims", desc: "Learning and development reimbursement" }].map(f => <ToggleSw key={f.key} on={featureToggles[f.key]} onToggle={() => setShowConfirm(f.key)} label={f.label} desc={f.desc} />)}
-            </Card>
-          </div>
-          <Modal open={!!showConfirm} onClose={() => setShowConfirm(null)} title="Confirm Feature Change" width={440}>
-            <div style={{ fontSize: 13, color: B.textSecondary, marginBottom: 16, lineHeight: 1.6 }}>Are you sure you want to <strong>{featureToggles[showConfirm] ? "DISABLE" : "ENABLE"}</strong> <strong>{showConfirm}</strong>? This takes effect immediately for all users.</div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <Btn variant="secondary" onClick={() => setShowConfirm(null)}>Cancel</Btn>
-              <Btn variant={featureToggles[showConfirm] ? "danger" : "success"} onClick={() => { setFeatureToggles(p => ({ ...p, [showConfirm]: !p[showConfirm] })); setShowConfirm(null); }}>{featureToggles[showConfirm] ? "Disable" : "Enable"}</Btn>
+      case "features": return (() => {
+        const CORE_FEATURES = [
+          { key: "dashboard",       label: "Dashboard",              desc: "Main overview, metrics, and announcements" },
+          { key: "people",          label: "People Directory",        desc: "Employee directory, profiles, and search" },
+          { key: "time",            label: "Time & Attendance",       desc: "Clock in/out, timesheets, leave management" },
+          { key: "approvals",       label: "Approvals Inbox",         desc: "Leave, compensation, and allowance approvals" },
+          { key: "allowances",      label: "Allowances (H&W / L&D)", desc: "Receipt upload and reimbursement claims" },
+          { key: "workflows",       label: "Workflow Engine",         desc: "Configurable approval chains and routing" },
+          { key: "analytics",       label: "Analytics & Reporting",   desc: "Workforce analytics and visual dashboards" },
+          { key: "recruiting",      label: "Recruiting (Workable)",   desc: "ATS integration and candidate pipeline" },
+          { key: "career",          label: "Career Path Planning",    desc: "Grade pathway, competency map, development plan" },
+        ];
+        const FLAG_FEATURES = [
+          { key: "clockInOut",        label: "Mobile Clock In/Out",       desc: "GPS-enabled remote time tracking" },
+          { key: "gpsTracking",       label: "GPS Location Tracking",     desc: "Field staff location verification" },
+          { key: "offlineMode",       label: "Offline Mode",              desc: "Queue events when no connectivity" },
+          { key: "grantTimesheets",   label: "Grant / Project Timesheets",desc: "Donor allocation tracking" },
+          { key: "laborCompliance",   label: "Labor Compliance Engine",   desc: "14-country overtime and rest rules" },
+          { key: "multiCurrency",     label: "Multi-Currency Payroll",    desc: "Cross-border payroll consolidation" },
+          { key: "verificationLetters",label:"Verification Letters",      desc: "Auto-generated employment letters" },
+          { key: "benefitsTab",       label: "Benefits Package View",     desc: "Country-specific benefits display" },
+          { key: "hwAllowance",       label: "Health & Wellness Claims",  desc: "Receipt-based wellness reimbursement" },
+          { key: "ldAllowance",       label: "L&D Claims",                desc: "Learning and development reimbursement" },
+          { key: "jobeval",           label: "Job Evaluation Tool",       desc: "Birches Community JD evaluation (HR only)" },
+        ];
+        const ruleTypeLabel = { role: "Role", location: "Country", grade: "Grade", title: "Job Title", manager: "Manager's Team", individual: "Individual" };
+        const ruleTypeColor = { role: B.purple, location: B.teal, grade: B.blue, title: B.orange, manager: B.accent, individual: B.dkBlue };
+        const allFeatures = [...CORE_FEATURES, ...FLAG_FEATURES];
+        const FeatureRow = ({ fkey, label, desc }) => {
+          const acc = featureAccess[fkey] || { scope: "all", rules: [] };
+          const on  = featureToggles[fkey];
+          return (
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "11px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+              <div style={{ paddingTop: 2 }}>
+                <button onClick={() => setShowConfirm(fkey)} style={{ width: 38, height: 22, borderRadius: 11, border: "none", background: on ? B.success : B.border, cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                  <span style={{ position: "absolute", top: 3, left: on ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
+                </button>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: on ? B.textPrimary : B.textMuted }}>{label}</span>
+                  {!on && <Badge color={B.textMuted} bg={B.bgHover}>Disabled</Badge>}
+                  {on && acc.scope === "custom" && <Badge color={B.blue} bg={`${B.blue}12`}>Custom access</Badge>}
+                  {on && acc.scope === "all"    && <Badge color={B.success} bg={B.successBg}>All users</Badge>}
+                </div>
+                <div style={{ fontSize: 11, color: B.textMuted, marginTop: 2 }}>{desc}</div>
+                {on && acc.scope === "custom" && acc.rules.length > 0 && (
+                  <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 5 }}>
+                    {acc.rules.map(r => (
+                      <span key={r.id} style={{ padding: "2px 7px", borderRadius: 4, background: `${ruleTypeColor[r.type]||B.textMuted}12`, border: `1px solid ${ruleTypeColor[r.type]||B.textMuted}30`, fontSize: 10, color: ruleTypeColor[r.type]||B.textMuted }}>
+                        {ruleTypeLabel[r.type]}: {r.label || r.value}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {on && (
+                <Btn variant="ghost" size="sm" onClick={() => setShowAccessModal(fkey)}>Access Rules</Btn>
+              )}
             </div>
-          </Modal>
-        </div>
-      );
+          );
+        };
+        return (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: B.textPrimary }}>Feature Management</div>
+              <div style={{ fontSize: 12, color: B.textMuted }}>Control which features are available and to whom</div>
+            </div>
+            <div style={{ padding: "10px 14px", borderRadius: 8, background: `${B.blue}08`, border: `1px solid ${B.blue}20`, fontSize: 12, color: B.textMuted, marginBottom: 16 }}>
+              <strong style={{ color: B.blue }}>Access Rules</strong> allow you to restrict any enabled feature to specific roles, countries, job grades, titles, a manager's team, or named individuals. Features without custom rules are visible to all users.
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <Card>
+                <SectionTitle>Core Modules</SectionTitle>
+                {CORE_FEATURES.map(f => <FeatureRow key={f.key} fkey={f.key} label={f.label} desc={f.desc} />)}
+              </Card>
+              <Card>
+                <SectionTitle>Feature Flags</SectionTitle>
+                {FLAG_FEATURES.map(f => <FeatureRow key={f.key} fkey={f.key} label={f.label} desc={f.desc} />)}
+              </Card>
+            </div>
+
+            {/* Enable/Disable confirm */}
+            <Modal open={!!showConfirm} onClose={() => setShowConfirm(null)} title="Confirm Feature Change" width={440}>
+              <div style={{ fontSize: 13, color: B.textSecondary, marginBottom: 16, lineHeight: 1.6 }}>
+                Are you sure you want to <strong>{featureToggles[showConfirm] ? "DISABLE" : "ENABLE"}</strong> <strong>{allFeatures.find(f => f.key === showConfirm)?.label}</strong>? This takes effect immediately.
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <Btn variant="secondary" onClick={() => setShowConfirm(null)}>Cancel</Btn>
+                <Btn variant={featureToggles[showConfirm] ? "danger" : "success"} onClick={() => { setFeatureToggles(p => ({ ...p, [showConfirm]: !p[showConfirm] })); setShowConfirm(null); }}>{featureToggles[showConfirm] ? "Disable" : "Enable"}</Btn>
+              </div>
+            </Modal>
+
+            {/* Access Rules modal */}
+            <Modal open={!!showAccessModal} onClose={() => setShowAccessModal(null)} title={`Access Rules — ${allFeatures.find(f => f.key === showAccessModal)?.label}`} width={560}>
+              {showAccessModal && (() => {
+                const acc = featureAccess[showAccessModal] || { scope: "all", rules: [] };
+                return (
+                  <div>
+                    <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+                      {[{ v: "all", l: "All Users" }, { v: "custom", l: "Custom Rules" }].map(opt => (
+                        <button key={opt.v} onClick={() => setFeatureAccess(p => ({ ...p, [showAccessModal]: { ...acc, scope: opt.v } }))}
+                          style={{ flex: 1, padding: "9px 0", borderRadius: 8, border: `2px solid ${acc.scope === opt.v ? B.blue : B.border}`, background: acc.scope === opt.v ? `${B.blue}10` : B.white, cursor: "pointer", fontSize: 13, fontWeight: acc.scope === opt.v ? 700 : 400, color: acc.scope === opt.v ? B.blue : B.textSecondary }}>
+                          {opt.l}
+                        </button>
+                      ))}
+                    </div>
+                    {acc.scope === "all" && <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 16 }}>This feature is visible to all users when enabled. Switch to Custom Rules to restrict access.</div>}
+                    {acc.scope === "custom" && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: B.textSecondary, marginBottom: 8 }}>Current Rules ({acc.rules.length})</div>
+                        {acc.rules.length === 0 && <div style={{ fontSize: 12, color: B.textMuted, marginBottom: 12 }}>No rules yet — feature is hidden from all users. Add at least one rule.</div>}
+                        {acc.rules.map(r => (
+                          <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 7, background: B.bgHover, marginBottom: 6 }}>
+                            <Badge color={ruleTypeColor[r.type]||B.textMuted} bg={`${ruleTypeColor[r.type]||B.textMuted}12`}>{ruleTypeLabel[r.type]}</Badge>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700 }}>{r.label || r.value}</div>
+                              <div style={{ fontSize: 11, color: B.textMuted }}>{r.value}</div>
+                            </div>
+                            <Btn variant="ghost" size="sm" style={{ color: B.danger }} onClick={() => setFeatureAccess(p => ({ ...p, [showAccessModal]: { ...acc, rules: acc.rules.filter(x => x.id !== r.id) } }))}>Remove</Btn>
+                          </div>
+                        ))}
+                        <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${B.border}` }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: B.textSecondary, marginBottom: 8 }}>Add Rule</div>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+                            <div><FL>Rule Type</FL>
+                              <Select value={ruleForm.type} onChange={v => setRuleForm(p => ({ ...p, type: v }))} style={{ width: "100%" }}
+                                options={Object.entries(ruleTypeLabel).map(([v, l]) => ({ value: v, label: l }))} />
+                            </div>
+                            <div><FL>Value</FL>
+                              {ruleForm.type === "role"     && <Select value={ruleForm.value} onChange={v => setRuleForm(p => ({ ...p, value: v }))} style={{ width: "100%" }} options={["employee","manager","hr","superuser"].map(r => ({ value: r, label: r }))} />}
+                              {ruleForm.type === "location" && <Select value={ruleForm.value} onChange={v => setRuleForm(p => ({ ...p, value: v }))} style={{ width: "100%" }} options={COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.code}` }))} />}
+                              {ruleForm.type === "grade"    && <Select value={ruleForm.value} onChange={v => setRuleForm(p => ({ ...p, value: v }))} style={{ width: "100%" }} options={JOB_LEVELS.map(l => ({ value: l, label: l }))} />}
+                              {!["role","location","grade"].includes(ruleForm.type) && <input value={ruleForm.value} onChange={e => setRuleForm(p => ({ ...p, value: e.target.value }))} placeholder={ruleForm.type === "manager" ? "Manager ID" : ruleForm.type === "individual" ? "Employee ID" : "Job title keyword"} style={inp} />}
+                            </div>
+                            <div><FL>Label</FL><input value={ruleForm.label} onChange={e => setRuleForm(p => ({ ...p, label: e.target.value }))} placeholder="e.g. Field staff" style={inp} /></div>
+                          </div>
+                          <Btn variant="primary" size="sm" onClick={() => {
+                            if (!ruleForm.value) return;
+                            const newRule = { id: `r${Date.now()}`, ...ruleForm };
+                            setFeatureAccess(p => ({ ...p, [showAccessModal]: { ...acc, rules: [...acc.rules, newRule] } }));
+                            setRuleForm({ type: "role", value: "", label: "" });
+                          }}>+ Add Rule</Btn>
+                        </div>
+                      </div>
+                    )}
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                      <Btn variant="primary" onClick={() => setShowAccessModal(null)}>Done</Btn>
+                    </div>
+                  </div>
+                );
+              })()}
+            </Modal>
+          </div>
+        );
+      })();
 
       // ── ADD-ONS ────────────────────────────────────────────────────────
       case "addons": return (
@@ -8150,6 +8914,7 @@ const NAV = [
   { key: "lms",        label: "Learning",       icon: "learning",    roles: ["employee", "manager", "hr", "superuser"] },
   { key: "performance",label: "Performance",    icon: "performance", roles: ["employee", "manager", "hr", "superuser"] },
   { key: "surveys",    label: "Surveys",        icon: "surveys",     roles: ["employee", "manager", "hr", "superuser"] },
+  { key: "career",     label: "Career Path",    icon: "analytics",   roles: ["employee", "manager", "hr", "superuser"] },
   { key: "directory",  label: "Directory",      icon: "people",      roles: ["employee"] },                              // ESS: read-only colleague lookup
   { key: "orgchart",   label: "Org Chart",      icon: "orgchart",    roles: ["employee", "manager", "hr", "superuser"] }, // ESS: read-only org chart
   // ── Manager-level ────────────────────────────────────────────────────────
@@ -8160,6 +8925,7 @@ const NAV = [
   { key: "onboarding", label: "Onboarding",     icon: "onboarding",  roles: ["hr", "superuser"] },
   { key: "compplan",   label: "Comp Planning",  icon: "comp",        roles: ["hr", "superuser"] },
   { key: "analytics",  label: "Analytics",      icon: "analytics",   roles: ["hr", "superuser"] },
+  { key: "jobeval",    label: "Job Evaluation", icon: "comp",        roles: ["hr", "superuser"] },
   { key: "settings",   label: "Settings",       icon: "admin",       roles: ["hr", "superuser"] },
 ];
 
@@ -8216,6 +8982,8 @@ export default function App() {
       case "lms":         return <LMSModule role={role} />;
       case "performance": return <PerformanceModule role={role} />;
       case "surveys":     return <SurveyModule />;
+      case "career":      return <CareerPathModule role={role} />;
+      case "jobeval":     return <JobEvaluationTool />;
       case "workflows":   return <WorkflowModule />;
       case "analytics":   return <AnalyticsModule />;
       case "settings":    return <SettingsSuperCenter role={role} />;
