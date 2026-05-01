@@ -3140,9 +3140,10 @@ const GRANTS_PROJECTS = [
 ];
 
 // ─── ENHANCED TIME & ATTENDANCE MODULE ──────────────────────────────────────
-const TimeModule = ({ employee: empProp } = {}) => {
+const TimeModule = ({ employee: empProp, role } = {}) => {
+  const isEmp = role === "employee";
   const emp = empProp || ME;
-  const [tab, setTab] = useState("clock");
+  const [tab, setTab] = useState(role === "employee" ? "requests" : "clock");
   const [countryFilter, setCountryFilter] = useState("ALL");
   const [requests, setRequests] = useState(LEAVE_REQUESTS);
   const [showNewRequest, setShowNewRequest] = useState(false);
@@ -3204,7 +3205,10 @@ const TimeModule = ({ employee: empProp } = {}) => {
 
   const handleApprove = (id) => setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "Approved", approvedBy: "Admin", approvedDate: new Date().toISOString().split("T")[0] } : r));
   const handleReject = (id) => setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "Rejected", rejectedReason: "Manager discretion" } : r));
-  const filteredRequests = countryFilter === "ALL" ? requests : requests.filter(r => r.country === countryFilter);
+  const allFiltered = countryFilter === "ALL" ? requests : requests.filter(r => r.country === countryFilter);
+  const filteredRequests = isEmp ? requests.filter(r => r.employeeId === emp.id || r.employeeName === `${emp.first} ${emp.last}`) : allFiltered;
+  const myLeaveBalance = { annual: emp.leaveBalance?.annual ?? 15, sick: emp.leaveBalance?.sick ?? 10, personal: emp.leaveBalance?.personal ?? 3 };
+  const [leaveForm, setLeaveForm] = useState({ type: "", from: "", to: "", reason: "" });
   const law = LABOR_LAWS[complianceCountry];
   const compCountry = COUNTRIES.find(c => c.code === complianceCountry);
 
@@ -3230,14 +3234,19 @@ const TimeModule = ({ employee: empProp } = {}) => {
   return (
     <div>
       <EmpModuleHeader emp={emp} label="Time &amp; Leave" sub={`${emp.leaveBalance.annual} vacation days · ${emp.leaveBalance.sick} sick days remaining`} color={B.teal} />
-      <Tabs tabs={[
-        { key: "clock", label: "Clock In/Out" },
-        { key: "attendance", label: "Weekly Timesheet" },
-        { key: "grants", label: "Grant / Project Tracking" },
-        { key: "compliance", label: "Labor Compliance" },
-        { key: "requests", label: "Leave Requests", count: requests.filter(r => r.status === "Pending").length },
-        { key: "calendars", label: "Holiday Calendars" },
-        { key: "multicurrency", label: "Multi-Currency" },
+      <Tabs tabs={isEmp ? [
+        { key: "requests",   label: "My Leave" },
+        { key: "attendance", label: "My Timesheet" },
+        { key: "clock",      label: "Clock In/Out" },
+        { key: "calendars",  label: "Holidays" },
+      ] : [
+        { key: "clock",        label: "Clock In/Out" },
+        { key: "attendance",   label: "Weekly Timesheet" },
+        { key: "grants",       label: "Grant / Project Tracking" },
+        { key: "compliance",   label: "Labor Compliance" },
+        { key: "requests",     label: "Leave Requests", count: requests.filter(r => r.status === "Pending").length },
+        { key: "calendars",    label: "Holiday Calendars" },
+        { key: "multicurrency",label: "Multi-Currency" },
       ]} active={tab} onChange={setTab} />
 
       {/* ════════════════════ CLOCK IN/OUT (Mobile-First, GPS, Offline) ═══════ */}
@@ -3348,8 +3357,8 @@ const TimeModule = ({ employee: empProp } = {}) => {
               )}
             </Card>
 
-            {/* GPS Field Map */}
-            <Card>
+            {/* GPS Field Map — HR/Manager only */}
+            {!isEmp && <Card>
               <SectionTitle>Field Staff Locations (Live)</SectionTitle>
               <div style={{ height: 140, borderRadius: 8, background: `linear-gradient(135deg, ${B.ltTeal}40, ${B.ltBlue}40)`, border: `1px solid ${B.border}`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", width: "100%", height: "100%", opacity: 0.15, backgroundImage: "radial-gradient(circle at 30% 40%, #253746 1px, transparent 1px), radial-gradient(circle at 70% 60%, #253746 1px, transparent 1px), radial-gradient(circle at 50% 80%, #253746 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
@@ -3361,13 +3370,75 @@ const TimeModule = ({ employee: empProp } = {}) => {
                 ))}
               </div>
               <div style={{ fontSize: 11, color: B.textMuted, marginTop: 6 }}>4 field staff clocked in across 3 sites  · Last updated 2 min ago</div>
-            </Card>
+            </Card>}
           </div>
         </div>
       )}
 
       {/* ════════════════════ WEEKLY TIMESHEET ════════════════════════════════ */}
-      {tab === "attendance" && (
+      {tab === "attendance" && isEmp && (() => {
+        const myRow = generateTimesheetRow(emp, 1);
+        const [myHours, setMyHours] = useState(myRow.days.map(d => String(d)));
+        const myTotal = myHours.reduce((s, h) => s + (parseFloat(h) || 0), 0);
+        const submitted = useState(false);
+        const setSubmitted = submitted[1];
+        const wasSubmitted = submitted[0];
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+        return (
+          <div>
+            <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
+              <FieldLabel>Week of</FieldLabel>
+              <input type="week" value={timesheetWeek} onChange={e => setTimesheetWeek(e.target.value)} style={{ padding: "6px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontSize: 13, fontFamily: "Arial, sans-serif" }} />
+              <span style={{ fontSize: 12, color: B.textMuted, marginLeft: "auto" }}>Logged: <strong>{myTotal}h</strong> / 37.5h standard week</span>
+            </div>
+            <Card style={{ marginBottom: 14 }}>
+              <SectionTitle>My Hours — {emp.first} {emp.last}</SectionTitle>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 10, marginBottom: 14 }}>
+                {days.map((day, i) => (
+                  <div key={day} style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", marginBottom: 6 }}>{day.slice(0,3)}</div>
+                    <input
+                      type="number" min="0" max="16" step="0.5"
+                      value={myHours[i]}
+                      onChange={e => setMyHours(h => h.map((v, j) => j === i ? e.target.value : v))}
+                      style={{ width: "100%", textAlign: "center", padding: "10px 4px", border: `1px solid ${parseFloat(myHours[i]) > 9 ? B.warning : B.border}`, borderRadius: 8, fontSize: 18, fontWeight: 700, fontFamily: "Georgia,serif", color: parseFloat(myHours[i]) > 9 ? B.orange : B.textPrimary, boxSizing: "border-box" }}
+                    />
+                    <div style={{ fontSize: 10, color: B.textMuted, marginTop: 4 }}>hours</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", padding: "10px 14px", borderRadius: 8, background: B.bgHover, marginBottom: 14 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, color: B.textMuted, marginBottom: 2 }}>Charge to project</div>
+                  <Select value={selectedGrant} onChange={setSelectedGrant} style={{ width: "100%" }} options={emp.grants?.map(g => ({ value: g.name, label: g.name })) || GRANTS_PROJECTS.slice(0,3).map(g => ({ value: g.id, label: g.name }))} />
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 11, color: B.textMuted }}>Total hours</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: myTotal > 40 ? B.orange : B.success, fontFamily: "Georgia,serif" }}>{myTotal}h</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <Btn variant="secondary" size="sm" onClick={() => setMyHours(["","","","",""])}>Clear</Btn>
+                <Btn variant="primary" onClick={() => { setSubmitted(true); setTimeout(() => setSubmitted(false), 3000); }}>{wasSubmitted ? "✓ Submitted!" : "Submit Timesheet"}</Btn>
+              </div>
+              {wasSubmitted && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 6, background: B.successBg, color: B.success, fontWeight: 700, fontSize: 13 }}>Timesheet submitted — routed to your manager for approval.</div>}
+            </Card>
+            <Card>
+              <SectionTitle>Previous Submissions</SectionTitle>
+              {[{ week: "Apr 14–18, 2026", total: "37.5h", status: "Approved", grant: emp.grants?.[0]?.name || "GC – Vitamin A" }, { week: "Apr 7–11, 2026", total: "40h", status: "Approved", grant: emp.grants?.[0]?.name || "GC – Vitamin A" }, { week: "Mar 31–Apr 4, 2026", total: "35h", status: "Approved", grant: emp.grants?.[0]?.name || "GC – Vitamin A" }].map((row, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${B.borderLight}` }}>
+                  <div><div style={{ fontSize: 13, fontWeight: 600 }}>{row.week}</div><div style={{ fontSize: 11, color: B.textMuted }}>{row.grant}</div></div>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{row.total}</span>
+                    <Badge color={B.success} bg={B.successBg}>{row.status}</Badge>
+                  </div>
+                </div>
+              ))}
+            </Card>
+          </div>
+        );
+      })()}
+      {tab === "attendance" && !isEmp && (
         <div>
           <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center", flexWrap: "wrap" }}>
             <FieldLabel>Pay Period</FieldLabel>
@@ -3604,14 +3675,38 @@ const TimeModule = ({ employee: empProp } = {}) => {
       {/* ════════════════════ LEAVE REQUESTS (Enhanced) ═══════════════════════ */}
       {tab === "requests" && (
         <div>
-          <div style={{ display: "flex", gap: 10, marginBottom: 14, justifyContent: "space-between", flexWrap: "wrap" }}>
-            <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
-            <div style={{ display: "flex", gap: 6 }}>
-              <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Leave Type, Start Date, End Date, Days columns")}> Batch Upload</Btn>
-              <Btn variant="primary" onClick={() => setShowNewRequest(true)}>+ New Leave Request</Btn>
+          {/* Employee view — personal leave balance + simple request form */}
+          {isEmp && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
+              {[{ label: "Vacation Days", value: myLeaveBalance.annual, color: B.teal, icon: "🌴" }, { label: "Sick Days", value: myLeaveBalance.sick, color: B.blue, icon: "🏥" }, { label: "Personal Days", value: myLeaveBalance.personal, color: B.purple, icon: "⭐" }].map((b, i) => (
+                <div key={i} style={{ padding: "14px 16px", borderRadius: 10, background: B.bgHover, border: `1px solid ${B.border}`, textAlign: "center" }}>
+                  <div style={{ fontSize: 22, marginBottom: 4 }}>{b.icon}</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: b.color, fontFamily: "Georgia,serif" }}>{b.value}</div>
+                  <div style={{ fontSize: 11, color: B.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{b.label} Remaining</div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+          {/* HR / Manager toolbar */}
+          {!isEmp && (
+            <div style={{ display: "flex", gap: 10, marginBottom: 14, justifyContent: "space-between", flexWrap: "wrap" }}>
+              <Select value={countryFilter} onChange={setCountryFilter} options={[{ value: "ALL", label: "All Countries" }, ...COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))]} />
+              <div style={{ display: "flex", gap: 6 }}>
+                <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Leave Type, Start Date, End Date, Days columns")}> Batch Upload</Btn>
+                <Btn variant="primary" onClick={() => setShowNewRequest(true)}>+ New Leave Request</Btn>
+              </div>
+            </div>
+          )}
+          {/* Employee — simple New Request button */}
+          {isEmp && (
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
+              <Btn variant="primary" onClick={() => setShowNewRequest(true)}>+ Request Leave</Btn>
+            </div>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {filteredRequests.length === 0 && (
+              <div style={{ textAlign: "center", padding: 32, color: B.textMuted, fontSize: 13 }}>No leave requests found.</div>
+            )}
             {filteredRequests.map(r => (
               <Card key={r.id} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <Avatar name={r.employeeName} size={40} />
@@ -3625,39 +3720,118 @@ const TimeModule = ({ employee: empProp } = {}) => {
                   {r.approvedBy && <div style={{ fontSize: 11, color: B.success, marginTop: 2 }}>Approved by {r.approvedBy} on {fmtDate(r.approvedDate)}</div>}
                   {r.rejectedReason && <div style={{ fontSize: 11, color: B.danger, marginTop: 2 }}>Rejected: {r.rejectedReason}</div>}
                 </div>
-                {r.status === "Pending" && (
+                {!isEmp && r.status === "Pending" && (
                   <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                     <Btn variant="success" size="sm" onClick={() => handleApprove(r.id)}>✓ Approve</Btn>
                     <Btn variant="danger" size="sm" onClick={() => handleReject(r.id)}>✕ Reject</Btn>
                   </div>
                 )}
+                {isEmp && r.status === "Pending" && (
+                  <Badge color={B.orange} bg={B.warningBg}>Pending approval</Badge>
+                )}
               </Card>
             ))}
           </div>
-          <Modal open={showNewRequest} onClose={() => setShowNewRequest(false)} title="New Leave Request" width={550}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[{ label: "Employee", type: "text", placeholder: "Search employee..." }, { label: "Country", type: "select-country" }, { label: "Leave Type", type: "select-leave" }, { label: "Start Date", type: "date" }, { label: "End Date", type: "date" }, { label: "Charge to Grant (optional)", type: "select-grant" }, { label: "Reason", type: "textarea" }].map((field, i) => (
-                <div key={i}>
-                  <FieldLabel>{field.label}</FieldLabel>
-                  {field.type === "textarea" ? <textarea rows={3} style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, resize: "vertical", boxSizing: "border-box" }} /> :
-                    field.type === "select-country" ? <Select value="CA" onChange={() => {}} options={COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))} style={{ width: "100%" }} /> :
-                    field.type === "select-leave" ? <Select value="" onChange={() => {}} options={[{ value: "", label: "Select type..." }, ...["Vacation", "Sick Leave", "Personal Day", "Parental Leave", "Bereavement", "Compassionate"].map(t => ({ value: t, label: t }))]} style={{ width: "100%" }} /> :
-                    field.type === "select-grant" ? <Select value="" onChange={() => {}} options={[{ value: "", label: "No grant (overhead)" }, ...GRANTS_PROJECTS.map(g => ({ value: g.id, label: g.name }))]} style={{ width: "100%" }} /> :
-                    <input type={field.type} placeholder={field.placeholder || ""} style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, boxSizing: "border-box" }} />}
+
+          {/* Employee — simplified leave request modal */}
+          {isEmp && (
+            <Modal open={showNewRequest} onClose={() => { setShowNewRequest(false); setLeaveForm({ type: "", from: "", to: "", reason: "" }); }} title="Request Leave" width={460}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: B.accentBg, border: `1px solid ${B.accent}20`, fontSize: 13, color: B.textSecondary }}>
+                  Requesting as: <strong>{emp.first} {emp.last}</strong> · {COUNTRIES.find(c => c.code === emp.country)?.flag} {COUNTRIES.find(c => c.code === emp.country)?.name}
                 </div>
-              ))}
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
-                <Btn variant="secondary" onClick={() => setShowNewRequest(false)}>Cancel</Btn>
-                <Btn variant="primary" onClick={() => setShowNewRequest(false)}>Submit Request</Btn>
+                <div>
+                  <FieldLabel>Leave Type</FieldLabel>
+                  <Select value={leaveForm.type} onChange={v => setLeaveForm(p => ({ ...p, type: v }))} style={{ width: "100%" }} options={[{ value: "", label: "Select type..." }, ...["Vacation", "Sick Leave", "Personal Day", "Parental Leave", "Bereavement", "Compassionate"].map(t => ({ value: t, label: t }))]} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <FieldLabel>From Date</FieldLabel>
+                    <input type="date" value={leaveForm.from} onChange={e => setLeaveForm(p => ({ ...p, from: e.target.value }))} style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <FieldLabel>To Date</FieldLabel>
+                    <input type="date" value={leaveForm.to} onChange={e => setLeaveForm(p => ({ ...p, to: e.target.value }))} style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, boxSizing: "border-box" }} />
+                  </div>
+                </div>
+                <div>
+                  <FieldLabel>Reason (optional)</FieldLabel>
+                  <textarea rows={3} value={leaveForm.reason} onChange={e => setLeaveForm(p => ({ ...p, reason: e.target.value }))} placeholder="Brief description..." style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, resize: "vertical", boxSizing: "border-box" }} />
+                </div>
+                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
+                  <Btn variant="secondary" onClick={() => { setShowNewRequest(false); setLeaveForm({ type: "", from: "", to: "", reason: "" }); }}>Cancel</Btn>
+                  <Btn variant="primary" onClick={() => {
+                    if (!leaveForm.type || !leaveForm.from || !leaveForm.to) { alert("Please select leave type and dates."); return; }
+                    const from = new Date(leaveForm.from); const to = new Date(leaveForm.to);
+                    const days = Math.max(1, Math.round((to - from) / 86400000) + 1);
+                    setRequests(p => [{ id: `LR-${Date.now()}`, employeeId: emp.id, employeeName: `${emp.first} ${emp.last}`, country: emp.country, type: leaveForm.type, from: leaveForm.from, to: leaveForm.to, days, reason: leaveForm.reason || "Personal", status: "Pending", submitted: new Date().toISOString().slice(0,10) }, ...p]);
+                    setShowNewRequest(false); setLeaveForm({ type: "", from: "", to: "", reason: "" });
+                    alert("Leave request submitted — your manager has been notified.");
+                  }}>Submit Request</Btn>
+                </div>
               </div>
-            </div>
-          </Modal>
+            </Modal>
+          )}
+
+          {/* HR / Manager — full leave request modal */}
+          {!isEmp && (
+            <Modal open={showNewRequest} onClose={() => setShowNewRequest(false)} title="New Leave Request" width={550}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {[{ label: "Employee", type: "text", placeholder: "Search employee..." }, { label: "Country", type: "select-country" }, { label: "Leave Type", type: "select-leave" }, { label: "Start Date", type: "date" }, { label: "End Date", type: "date" }, { label: "Charge to Grant (optional)", type: "select-grant" }, { label: "Reason", type: "textarea" }].map((field, i) => (
+                  <div key={i}>
+                    <FieldLabel>{field.label}</FieldLabel>
+                    {field.type === "textarea" ? <textarea rows={3} style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, resize: "vertical", boxSizing: "border-box" }} /> :
+                      field.type === "select-country" ? <Select value="CA" onChange={() => {}} options={COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` }))} style={{ width: "100%" }} /> :
+                      field.type === "select-leave" ? <Select value="" onChange={() => {}} options={[{ value: "", label: "Select type..." }, ...["Vacation", "Sick Leave", "Personal Day", "Parental Leave", "Bereavement", "Compassionate"].map(t => ({ value: t, label: t }))]} style={{ width: "100%" }} /> :
+                      field.type === "select-grant" ? <Select value="" onChange={() => {}} options={[{ value: "", label: "No grant (overhead)" }, ...GRANTS_PROJECTS.map(g => ({ value: g.id, label: g.name }))]} style={{ width: "100%" }} /> :
+                      <input type={field.type} placeholder={field.placeholder || ""} style={{ width: "100%", padding: 10, borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial, sans-serif", fontSize: 13, boxSizing: "border-box" }} />}
+                  </div>
+                ))}
+                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6 }}>
+                  <Btn variant="secondary" onClick={() => setShowNewRequest(false)}>Cancel</Btn>
+                  <Btn variant="primary" onClick={() => setShowNewRequest(false)}>Submit Request</Btn>
+                </div>
+              </div>
+            </Modal>
+          )}
         </div>
       )}
 
       {/* ════════════════════ HOLIDAY CALENDARS (Editable) ═════════════════════ */}
       {tab === "calendars" && (
         <div>
+          {/* Employee read-only view — own country only */}
+          {isEmp && (() => {
+            const myCountry = COUNTRIES.find(c => c.code === emp.country);
+            const myHolidays = (holidays[emp.country] || []).sort((a, b) => a.date.localeCompare(b.date));
+            return (
+              <div>
+                <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 8, background: B.accentBg, border: `1px solid ${B.accent}20`, fontSize: 13, color: B.textSecondary }}>
+                  Public holidays for <strong>{myCountry?.flag} {myCountry?.name}</strong> — {calendarYear}
+                </div>
+                <Card>
+                  <SectionTitle>{myCountry?.flag} {myCountry?.name} — {calendarYear} Holidays ({myHolidays.length})</SectionTitle>
+                  {myHolidays.map((h, i) => {
+                    const isPast = new Date(h.date) < new Date();
+                    const isUpcoming = !isPast && new Date(h.date) < new Date(Date.now() + 30 * 86400000);
+                    return (
+                      <div key={h.id || i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: isUpcoming ? B.warningBg : B.bgHover, marginBottom: 4, opacity: isPast ? 0.55 : 1, border: `1px solid ${isUpcoming ? `${B.warning}20` : "transparent"}` }}>
+                        <div style={{ width: 6, height: 6, borderRadius: 3, background: isPast ? B.textMuted : isUpcoming ? B.warning : [B.accent, B.teal, B.blue, B.purple, B.orange, B.yellow][i % 6], flexShrink: 0 }} />
+                        <span style={{ fontSize: 13, fontWeight: 600, flex: 1, color: isPast ? B.textMuted : B.textPrimary }}>{h.name}</span>
+                        <span style={{ fontSize: 12, color: B.textMuted, width: 110, textAlign: "right" }}>{fmtDate(h.date)}</span>
+                        {isUpcoming && <Badge color={B.warning} bg={B.warningBg}>UPCOMING</Badge>}
+                        {isPast && <Badge color={B.textMuted} bg={B.bgHover}>PAST</Badge>}
+                      </div>
+                    );
+                  })}
+                  {myHolidays.length === 0 && <div style={{ textAlign: "center", padding: 20, fontSize: 12, color: B.textMuted }}>No holidays on record for {calendarYear}.</div>}
+                </Card>
+              </div>
+            );
+          })()}
+
+          {/* HR / Manager — full editable view */}
+          {!isEmp && (<div>
           {/* Dec 1 Alert Banner */}
           {showDecAlert && (
             <div style={{ padding: "12px 16px", borderRadius: 8, background: B.dangerBg, border: `1px solid ${B.danger}25`, marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
@@ -3710,6 +3884,7 @@ const TimeModule = ({ employee: empProp } = {}) => {
               );
             })}
           </div>
+          </div>)}
 
           {/* Holiday Add/Edit Modal */}
           <Modal open={!!showHolidayEdit} onClose={() => setShowHolidayEdit(null)} title={showHolidayEdit?.idx === "new" ? `Add Holiday — ${COUNTRIES.find(c => c.code === showHolidayEdit?.country)?.name || ""}` : `Edit Holiday — ${COUNTRIES.find(c => c.code === showHolidayEdit?.country)?.name || ""}`} width={450}>
@@ -4011,12 +4186,35 @@ const WorkflowModule = () => {
 };
 
 // ─── H&W / L&D ALLOWANCE MODULE ─────────────────────────────────────────────
-const AllowanceModule = ({ employee: empProp } = {}) => {
+const AllowanceModule = ({ employee: empProp, role } = {}) => {
+  const isEmp = role === "employee";
   const emp = empProp || ME;
   const [tab, setTab] = useState("hw");
   const [dragOver, setDragOver] = useState(false);
   const [uploads, setUploads] = useState([]);
   const [showSubmit, setShowSubmit] = useState(false);
+  const [claimForm, setClaimForm] = useState({ description: "", amount: "", date: "", category: "" });
+  const [myClaims, setMyClaims] = useState([
+    { id: "HW-001", employee: `${emp.first} ${emp.last}`, type: "Gym Membership", claimType: "hw", amount: "CA$45.00", date: "2026-04-15", status: "Approved" },
+    { id: "LD-001", employee: `${emp.first} ${emp.last}`, type: "Data Science Course", claimType: "ld", amount: "CA$890.00", date: "2026-03-20", status: "Approved" },
+    { id: "HW-002", employee: `${emp.first} ${emp.last}`, type: "Running Shoes", claimType: "hw", amount: "CA$160.00", date: "2026-02-28", status: "Pending" },
+  ]);
+
+  const allOrgClaims = [
+    { id: "HW-001", employee: "Priya Patel", type: tab === "hw" ? "Gym Membership" : "Data Science Course", amount: tab === "hw" ? "CA$45.00" : "CA$890.00", date: "2026-04-15", status: "Approved" },
+    { id: "HW-002", employee: "Oliver Wright", type: tab === "hw" ? "Yoga Classes" : "PMP Certification", amount: tab === "hw" ? "CA$120.00" : "CA$450.00", date: "2026-04-10", status: "Pending" },
+    { id: "HW-003", employee: "Mei Wong", type: tab === "hw" ? "Running Shoes" : "French Language", amount: tab === "hw" ? "CA$160.00" : "CA$320.00", date: "2026-04-05", status: "Approved" },
+    { id: "HW-004", employee: "Carlos Reyes", type: tab === "hw" ? "Meditation App" : "Leadership Certificate", amount: tab === "hw" ? "CA$80.00" : "CA$1,200.00", date: "2026-04-03", status: "Approved" },
+  ];
+  const displayedClaims = isEmp ? myClaims.filter(c => c.claimType === tab) : allOrgClaims;
+
+  const hwBudget = emp.hwAllowance?.total ?? 500;
+  const hwUsed = emp.hwAllowance?.used ?? 205;
+  const ldBudget = emp.ldAllowance?.total ?? 2000;
+  const ldUsed = emp.ldAllowance?.used ?? 890;
+  const budget = tab === "hw" ? hwBudget : ldBudget;
+  const used = tab === "hw" ? hwUsed : ldUsed;
+  const remaining = budget - used;
 
   const handleDrop = (e) => {
     e.preventDefault(); setDragOver(false);
@@ -4026,56 +4224,122 @@ const AllowanceModule = ({ employee: empProp } = {}) => {
     }
   };
 
-  const existingClaims = [
-    { id: "HW-001", employee: "Priya Patel", type: tab === "hw" ? "Gym Membership" : "Data Science Course", amount: tab === "hw" ? "$45.00" : "$890.00", date: "2026-04-15", status: "Approved" },
-    { id: "HW-002", employee: "Oliver Wright", type: tab === "hw" ? "Yoga Classes" : "PMP Certification", amount: tab === "hw" ? "$120.00" : "$450.00", date: "2026-04-10", status: "Pending" },
-    { id: "HW-003", employee: "Mei Wong", type: tab === "hw" ? "Running Shoes" : "French Language", amount: tab === "hw" ? "$160.00" : "$320.00", date: "2026-04-05", status: "Approved" },
-  ];
+  const hwCategories = ["Gym / Fitness", "Sports Equipment", "Mental Health / Therapy", "Nutrition / Wellness", "Ergonomic Equipment", "Other"];
+  const ldCategories = ["Online Course", "Certification / Exam", "Conference / Workshop", "Books / Materials", "Coaching / Mentoring", "Other"];
 
   return (
     <div>
-      <EmpModuleHeader emp={emp} label="My Allowances" sub={`H&W CA$${emp.hwAllowance.total - emp.hwAllowance.used} remaining · L&D CA$${emp.ldAllowance.total - emp.ldAllowance.used} remaining`} color={B.blue} />
-      <Tabs tabs={[{ key: "hw", label: "Health &amp; Wellness" }, { key: "ld", label: "Learning &amp; Development" }]} active={tab} onChange={setTab} />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
-        <MetricCard label={`${tab === "hw" ? "H&W" : "L&D"} Budget (Org-wide)`} value={tab === "hw" ? "$14,000" : "$42,000"} sub="Annual allocation" color={tab === "hw" ? B.teal : B.blue} />
-        <MetricCard label="Claims This Quarter" value={existingClaims.length} sub={`${existingClaims.filter(c => c.status === "Pending").length} pending approval`} color={B.orange} />
-      </div>
+      <EmpModuleHeader emp={emp} label="My Allowances" sub={`H&W ${emp.hwAllowance?.total - emp.hwAllowance?.used ?? 295} remaining · L&D ${emp.ldAllowance?.total - emp.ldAllowance?.used ?? 1110} remaining`} color={B.blue} />
+      <Tabs tabs={[{ key: "hw", label: "Health & Wellness" }, { key: "ld", label: "Learning & Development" }]} active={tab} onChange={setTab} />
+
+      {/* Employee personal balance view */}
+      {isEmp && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ padding: "16px", borderRadius: 10, background: B.bgHover, border: `1px solid ${B.border}`, textAlign: "center" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Annual Budget</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: tab === "hw" ? B.teal : B.blue, fontFamily: "Georgia,serif" }}>CA${budget.toLocaleString()}</div>
+          </div>
+          <div style={{ padding: "16px", borderRadius: 10, background: B.bgHover, border: `1px solid ${B.border}`, textAlign: "center" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Used</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: B.orange, fontFamily: "Georgia,serif" }}>CA${used.toLocaleString()}</div>
+          </div>
+          <div style={{ padding: "16px", borderRadius: 10, background: remaining > 0 ? B.successBg : B.dangerBg, border: `1px solid ${remaining > 0 ? B.success : B.danger}20`, textAlign: "center" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Remaining</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: remaining > 0 ? B.success : B.danger, fontFamily: "Georgia,serif" }}>CA${remaining.toLocaleString()}</div>
+          </div>
+        </div>
+      )}
+
+      {/* HR org-wide view */}
+      {!isEmp && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
+          <MetricCard label={`${tab === "hw" ? "H&W" : "L&D"} Budget (Org-wide)`} value={tab === "hw" ? "CA$14,000" : "CA$42,000"} sub="Annual allocation" color={tab === "hw" ? B.teal : B.blue} />
+          <MetricCard label="Claims This Quarter" value={allOrgClaims.length} sub={`${allOrgClaims.filter(c => c.status === "Pending").length} pending approval`} color={B.orange} />
+        </div>
+      )}
+
+      {/* Claim submission */}
       <Card style={{ marginBottom: 16 }}>
         <SectionTitle>Submit New {tab === "hw" ? "Health & Wellness" : "Learning & Development"} Claim</SectionTitle>
+
+        {/* Employee — manual entry form */}
+        {isEmp && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4 }}>Category</label>
+                <Select value={claimForm.category} onChange={v => setClaimForm(p => ({ ...p, category: v }))} style={{ width: "100%" }}
+                  options={[{ value: "", label: "Select category..." }, ...(tab === "hw" ? hwCategories : ldCategories).map(c => ({ value: c, label: c }))]} />
+              </div>
+              <div>
+                <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4 }}>Amount (CA$)</label>
+                <input type="number" min="0" step="0.01" value={claimForm.amount} onChange={e => setClaimForm(p => ({ ...p, amount: e.target.value }))} placeholder="0.00"
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial,sans-serif", fontSize: 13, boxSizing: "border-box" }} />
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4 }}>Description</label>
+                <input value={claimForm.description} onChange={e => setClaimForm(p => ({ ...p, description: e.target.value }))} placeholder={tab === "hw" ? "e.g. Monthly gym membership at GoodLife Fitness" : "e.g. Coursera Data Analysis Specialization"}
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial,sans-serif", fontSize: 13, boxSizing: "border-box" }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 10, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 4 }}>Date of Purchase</label>
+                <input type="date" value={claimForm.date} onChange={e => setClaimForm(p => ({ ...p, date: e.target.value }))}
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: `1px solid ${B.border}`, fontFamily: "Arial,sans-serif", fontSize: 13, boxSizing: "border-box" }} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Receipt upload (all roles) */}
         <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleDrop}
-          style={{ border: `2px dashed ${dragOver ? B.accent : B.border}`, borderRadius: 8, padding: 30, textAlign: "center", background: dragOver ? B.accentBg : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}></div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: B.textPrimary, marginBottom: 4 }}>Drag & drop receipts here</div>
-          <div style={{ fontSize: 12, color: B.textMuted }}>PDF, JPG, PNG — receipts will be automatically parsed via OCR</div>
+          style={{ border: `2px dashed ${dragOver ? B.accent : B.border}`, borderRadius: 8, padding: isEmp ? 18 : 30, textAlign: "center", background: dragOver ? B.accentBg : B.bgHover, transition: "all 0.2s", cursor: "pointer" }}>
+          <div style={{ fontSize: 28, marginBottom: 6 }}></div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary, marginBottom: 2 }}>{isEmp ? "Attach receipt (optional)" : "Drag & drop receipts here"}</div>
+          <div style={{ fontSize: 11, color: B.textMuted }}>PDF, JPG, PNG{isEmp ? "" : " — receipts will be automatically parsed via OCR"}</div>
         </div>
         {uploads.length > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: B.textMuted, textTransform: "uppercase", marginBottom: 8 }}>Parsed Receipts</div>
+          <div style={{ marginTop: 12 }}>
             {uploads.map((u, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 6, background: B.successBg, border: `1px solid ${B.success}20`, marginBottom: 6 }}>
                 <span style={{ fontSize: 18 }}>✓</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: B.textPrimary }}>{u.name}</div>
-                  <div style={{ fontSize: 12, color: B.textMuted }}>Vendor: {u.parsed.vendor}  · Amount: {u.parsed.amount}  · Date: {u.parsed.date}  · Category: {u.parsed.category}</div>
+                  {!isEmp && <div style={{ fontSize: 12, color: B.textMuted }}>Vendor: {u.parsed.vendor}  · Amount: {u.parsed.amount}  · Date: {u.parsed.date}  · Category: {u.parsed.category}</div>}
                 </div>
-                <Badge color={B.success} bg={B.successBg}>Parsed</Badge>
+                <Badge color={B.success} bg={B.successBg}>Attached</Badge>
               </div>
             ))}
-            <Btn variant="primary" style={{ marginTop: 8 }} onClick={() => { setShowSubmit(true); setTimeout(() => setShowSubmit(false), 2000); setUploads([]); }}>Submit for Approval</Btn>
-            {showSubmit && <div style={{ marginTop: 8, padding: 10, borderRadius: 6, background: B.successBg, color: B.success, fontWeight: 700, fontSize: 13 }}>✓ Claim submitted successfully — routed to manager for approval</div>}
           </div>
         )}
+        <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+          <Btn variant="primary" onClick={() => {
+            if (isEmp && (!claimForm.category || !claimForm.amount || !claimForm.date)) { alert("Please fill in category, amount and date."); return; }
+            const newClaim = { id: `${tab.toUpperCase()}-${Date.now()}`, employee: `${emp.first} ${emp.last}`, type: claimForm.category || uploads[0]?.parsed?.category || "Claim", claimType: tab, amount: `CA$${parseFloat(claimForm.amount || 0).toFixed(2)}`, date: claimForm.date || new Date().toISOString().slice(0,10), status: "Pending" };
+            if (isEmp) setMyClaims(p => [newClaim, ...p]);
+            setShowSubmit(true); setTimeout(() => setShowSubmit(false), 3000); setUploads([]); setClaimForm({ description: "", amount: "", date: "", category: "" });
+          }}>Submit Claim for Approval</Btn>
+        </div>
+        {showSubmit && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 6, background: B.successBg, color: B.success, fontWeight: 700, fontSize: 13 }}>✓ Claim submitted — your manager has been notified and will review within 5 business days.</div>}
       </Card>
+
       <Card>
-        <SectionTitle action={<Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Type (H&W/L&D), Description, Amount, Currency, Date columns")}> Batch Import Claims</Btn>}>Recent Claims</SectionTitle>
-        <Table columns={[
-          { label: "ID", render: r => <span style={{ fontWeight: 600, color: B.accent }}>{r.id}</span> },
-          { label: "Employee", key: "employee" },
-          { label: "Type", key: "type" },
-          { label: "Amount", key: "amount" },
-          { label: "Date", key: "date" },
-          { label: "Status", render: r => <StatusBadge status={r.status} /> },
-        ]} data={existingClaims} />
+        <SectionTitle action={!isEmp && <Btn variant="secondary" size="sm" onClick={() => alert("Batch upload: drag Excel with Employee ID, Type (H&W/L&D), Description, Amount, Currency, Date columns")}> Batch Import Claims</Btn>}>
+          {isEmp ? "My Claims" : "Recent Claims"}
+        </SectionTitle>
+        {displayedClaims.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 24, color: B.textMuted, fontSize: 13 }}>No {tab === "hw" ? "Health & Wellness" : "Learning & Development"} claims yet.</div>
+        ) : (
+          <Table columns={[
+            { label: "ID", render: r => <span style={{ fontWeight: 600, color: B.accent }}>{r.id}</span> },
+            ...(!isEmp ? [{ label: "Employee", key: "employee" }] : []),
+            { label: "Type", key: "type" },
+            { label: "Amount", key: "amount" },
+            { label: "Date", key: "date" },
+            { label: "Status", render: r => <StatusBadge status={r.status} /> },
+          ]} data={displayedClaims} />
+        )}
       </Card>
     </div>
   );
